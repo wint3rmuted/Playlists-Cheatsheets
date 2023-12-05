@@ -1,7 +1,7 @@
 Docker
 Docker privesc
 Basic privesc example: https://flast101.github.io/docker-privesc/ More on Docker breakout & privesc: https://book.hacktricks.xyz/linux-unix/privilege-escalation/docker-breakout
-Writable Docker Socket /var/run/docker.sock: see here
+Writable Docket Socket /var/run/docker.sock
 
     Detected Linpeas.sh or manually.
     Requires image -> if none, run docker pull to download an image to machine.
@@ -20,13 +20,14 @@ Launch a container and be root over it in mnt.
 Mounted root on the host to this machine docker container, in the container we have privs. 
 docker run -v /:/mnt -it alpine 
 
-The command id shows we are a member of the docker group. GTFObins again shows a method for spawning a root shell when we are a member of the docker group.
+The command id shows we are a member of the docker group. GTFObins shows a method for spawning a root shell when we are a member of the docker group.
 
 First check what images we have available to us:
 docker run -v /:/mnt --rm -it redmine chroot /mnt sh
 
 We can use the GTFObins command replacing the value <alpine> with one of the images listed above.
 docker run -v /:/mnt --rm -it redmine chroot /mnt sh
+docker run -v /:/mnt -it <nameofcontainer> chroot /mnt  sh
 
 .dockerenv
 Listing everything inside the '/' directory shows a .dockerenv file. This combined with the hostname of 0873e8062560 means we are likely running inside a docker container.
