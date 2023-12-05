@@ -7,7 +7,7 @@ Import-Module .\SharpHound.ps1
 Now you can execute Invoke-BloodHound by providing All to -CollectionMethod to invoke all available collection methods.
 PS C:\Users\wint3rmute> Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\Windows\Temp
 
-Exiltrate the generated .zip file archive to your Kali machine then start neo4j and BloodHound. 
+Exfiltrate the generated .zip file archive to your Kali machine then start neo4j and BloodHound. 
 Once BloodHound is started, we'll upload the zip archive with the Upload Data function.
 Once the upload is finished, we can start the enumeration of the AD environment with BloodHound.
 
