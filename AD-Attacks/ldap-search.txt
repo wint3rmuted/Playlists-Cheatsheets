@@ -1,3 +1,39 @@
+LDAP Enumeration
+ldapsearch -x -h 10.10.10.x -p 389 -s base namingcontexts
+ldapsearch -h 10.10.10.x -p 389 -x -b "dc=boxname,dc=local"
+
+find service accounts
+ldapsearch -h 10.10.10.x -p 389 -x -b "dc=box,dc=local" | grep "service"
+
+Enumeration with ldapsearch as authenticated user
+ldapsearch -x -h ldap.megacorp.corp -w '$pass'
+ldapsearch -x -h 10.10.131.x -p 389 -b "dc=megacorp,dc=corp" -D 'rio@megacorp.corp' -w 'vs2k6!'
+ldapsearch -D "cn=binduser,ou=users,dc=megacorp,dc=corp" -w 'J~42%W?]g' -s base namingcontexts
+ldapsearch -D "cn=binduser,ou=users,dc=megacorp,dc=corp" -w 'J~42%W?]g' -b 'dc=megacorp'
+
+Enumeration with ldapdomaindump (authenticated) with nice output
+ldapdomaindump 10.10.197.x -u 'megacorp.corp\john' -p '$pass' --no-json --no-grep
+
+Nmap
+Enumeration with nmap scripts
+nmap -p 389 --script ldap-search 10.10.10.x
+nmap -n -sV --script "ldap*" -p 389 10.10.10.x
+nmap -p 88 --script=krb5-enum-users --script-args krb5-enum-users.realm='MEGACORP.CORP',userdb=/usr/share/wordlists/seclists/Usernames/Names/names.txt 10.10.13.x
+
+LDAP
+Tools:
+ldapsearch
+
+ldapsearch -h <ip> -p 389 -x -s base
+
+Anonymous Bind:
+ldapsearch -h ldaphostname -p 389 -x -b "dc=domain,dc=com"
+
+Authenticated:
+ldapsearch -h 192.168.0.60 -p 389 -x -D "CN=Administrator, CN=User, DC=<domain>, DC=com" -b "DC=<domain>, DC=com" -W
+
+
+
 ldapsearch
 ldapsearch -x -h 10.10.10.x -s base namingcontexts
 
