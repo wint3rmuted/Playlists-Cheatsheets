@@ -1,3 +1,9 @@
+WPS
+wpscan --url https://<RHOST> --disable-tls-checks
+wpscan --url https://<RHOST> --disable-tls-checks --enumerate u
+target=<RHOST>; wpscan --url http://$target:80 --enumerate u,t,p | tee $target-wpscan-enum
+wpscan --url http://<RHOST> -U <USERNAME> -P passwords.txt -t 50
+
 Basic Scanning
 Utilize WPScan’s scanning capabilities to gather valuable information about your WordPress site:
     Scan a WordPress website:
