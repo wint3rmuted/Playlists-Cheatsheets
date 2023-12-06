@@ -1,1 +1,41 @@
+droopescan
+I’m going to run droopescan to enumerate the Drupal site. Warning: This scan takes a long time to run:
+root@kali# /opt/droopescan/droopescan scan drupal -u http://10.10.10.9
+droopescan scan drupal -u http://192.168.x.x:80/
 
+[+] Themes found:
+    seven http://10.10.10.x/themes/seven/
+    garland http://10.10.10.x/themes/garland/
+
+[+] Possible interesting urls found:
+    Default changelog file - http://10.10.10.x/CHANGELOG.txt
+    Default admin - http://10.10.10.x/user/login
+
+[+] Possible version(s):
+    7.54
+
+[+] Plugins found:
+    ctools http://10.10.10.x/sites/all/modules/ctools/
+        http://10.10.10.x/sites/all/modules/ctools/CHANGELOG.txt
+        http://10.10.10.x/sites/all/modules/ctools/changelog.txt
+        http://10.10.10.x/sites/all/modules/ctools/CHANGELOG.TXT
+        http://10.10.10.x/sites/all/modules/ctools/LICENSE.txt
+        http://10.10.10.x/sites/all/modules/ctools/API.txt
+    libraries http://10.10.10.x/sites/all/modules/libraries/
+        http://10.10.10.x/sites/all/modules/libraries/CHANGELOG.txt
+        http://10.10.10.x/sites/all/modules/libraries/changelog.txt
+        http://10.10.10.x/sites/all/modules/libraries/CHANGELOG.TXT
+        http://10.10.10.x/sites/all/modules/libraries/README.txt
+        http://10.10.10.x/sites/all/modules/libraries/readme.txt
+        http://10.10.10.x/sites/all/modules/libraries/README.TXT
+        http://10.10.10.x/sites/all/modules/libraries/LICENSE.txt
+    services http://10.10.10.x/sites/all/modules/services/
+        http://10.10.10.x/sites/all/modules/services/README.txt
+        http://10.10.10.x/sites/all/modules/services/readme.txt
+        http://10.10.10.9.x/sites/all/modules/services/README.TXT
+        http://10.10.10.x/sites/all/modules/services/LICENSE.txt
+    image http://10.10.10.x/modules/image/
+    profile http://10.10.10.x/modules/profile/
+    php http://10.10.10.x/modules/php/
+
+[+] Scan finished (0:40:53.627982 elapsed)
