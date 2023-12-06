@@ -1,1 +1,68 @@
+rustscan -a www.site.org
+rustscan -a www.site.org -p 443
+rustscan -a www.site.org -p 443,80,121,65535
+rustscan -a www.site.org --range 1-1000
+rustscan ip-address --ulimit 5000 -- -sC -sV -oN nmap/initial | tee r./nmap/rust_initial.txt
+rustscan ip-address --ulimit 5000 -- -A nmap/initial | tee ./nmap/rust_-A.txt
 
+
+Here is an example of how to use RustScan to scan for open UDP ports on a specific IP address:
+rustscan - ip <target_ip> - ports <port_range> - udp
+
+No Nmap 
+rustscan -a 192.168.45.220 --ulimit 10000  --no-nmap <-- I like to find which ports are open then manually format them for an nmap scan. 
+
+Format
+Basic format for RustScan is rustscan -r ports -a <Target-ip> — <nmap cmds>
+
+Multiple IP Scanning
+You can scan multiple IPs using a comma-separated list like so:
+rustscan -a 127.0.0.1,0.0.0.0
+
+Host Scanning
+RustScan can also scan hosts, like so:
+rustscan -a www.google.com, 127.0.0.1
+
+CIDR support
+RustScan supports CIDR:
+rustscan -a 192.168.0.0/30
+
+Host Files
+Hosts file as input
+hosts.txt
+
+192.168.0.1
+192.168.0.2
+google.com
+
+The argument is:
+rustscan -a 'hosts.txt'
+
+Multiple selected port scanning
+You can input a comma-separated list of ports to scan:
+rustscan -a 127.0.0.1 -p 53,80,121,65535
+
+Ranges of ports
+To scan a range of ports:
+rustscan -a 127.0.0.1 --range 1-1000    
+
+NMAP Arguments
+Adjusting the Nmap arguments
+RustScan, at the moment, runs Nmap by default.
+You can adjust the arguments like so:
+
+ rustscan -a 192.168.45.220 -p 22 -- -sV  ← Service Version scan. 
+ rustscan -a 192.168.45.220 -p 21,22,80 -- -sC ← More aggresive script scan.  
+
+rustscan -r ports -a <Target-ip> — <nmap cmds>
+rustscan -a 127.0.0.1 -- -A -sC
+To run:
+nmap -Pn -vvv -p $PORTS -A -sC 127.0.0.1
+
+Random Port Ordering
+Firewall Evasion
+If you want to scan ports in a random order (which will help with not setting off firewalls) run RustScan like this:
+➜ rustscan -a 127.0.0.1 --range 1-1000 --scan-order "Random"
+
+rustscan ip-address --ulimit 5000 -- -sC -sV -oN nmap/initial | tee r./nmap/rust_initial.txt
+rustscan ip-address --ulimit 5000 -- -A nmap/initial | tee ./nmap/rust_-A.txt
