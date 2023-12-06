@@ -1,1 +1,201 @@
+Go-to Full-port scan:
+nmap -v -Pn -sV -sC -p- 192.168.237.120 -T4 -oN nmapfullscripts.txt 
 
+mute@muted$ nmap -sCV -p 53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389 10.10.11.181
+
+Http-Headers
+Using nmap's scripting engine (NSE) for OS fingerprinting
+nmap --script http-headers 192.168.50.6
+
+Service Version Script Scan 
+nmap -sV -sC -p 21,80 -oN nmap-scripts.txt 10.10.10.5
+
+Full TCP  SCAN
+nmap -p- --min-rate 10000 -oN nmap-alltcp.txt 10.10.10.192
+
+Ful UDP Scan
+sudo nmap -sU {RHOST}
+
+Script / Version Scan 
+nmap -p- -sC -sV $IP --open -oN nmapscriptsfull.txt
+
+Usage
+nmap -p- --min-rate 5000 -Pn -sC -sV {RHOST} -oN scan.txt -vv -T4 
+
+Firewall Evasion
+Fragment Packets: nmap -f [target]
+Specify a Specific MTU: nmap --mtu [MTU] [target]
+Use a Decoy: nmap -D RND:[number] [target]
+Idle Zombie Scan: nmap -sI [zombie] [target]
+Manually Specify a Source Port: nmap --source-port [port] [target]
+Append Random Data: nmap --data-length [size] [target]
+Randomize Target Scan Order: nmap --randomize-hosts [target]
+Spoof MAC Address: nmap --spoof-mac [MAC|0|vendor] [target]
+Send Bad Checksums: nmap --badsum [target]
+
+Advacned Scanning
+TCP SYN Scan: nmap -sS [target]
+TCP Connect Scan: nmap -sT [target] 
+UDP Scan: nmap -sU [target]
+TCP NULL Scan: nmap -sN [target]
+TCP FIN Scan: nmap -sF [target]
+Xmas Scan: nmap -sA [target]
+TCP ACK Scan: nmap -sA [target]
+Custom TCP Scan: nmap --scanflags [flags] [target]
+IP Protocol Scan: nmap -sO [target]
+Send Raw Ethernet Packets: nmap --send-eth [target]
+Send IP Packets: nmap --send-ip [target]
+
+Target Selection
+Scan a single IP: nmap 192.168.0.1
+Scan a host: nmap www.testhostname.com
+Scan a range of IPs: nmap 192.168.0.1-20
+Scan a subnet: nmap 192.168.0.0/24
+Scan targets from a text file: nmap -iL list-of-ips.txt
+
+Port Selection
+Scan a single port: nmap -p 22 192.168.0.1
+Scan a range of ports: nmap -p 1-100 192.168.0.1
+Scan 100 common ports: nmap -F 192.168.0.1
+Scan all ports(65535): nmap -p- 192.168.0.1
+Specify UDP or TCP scan: nmap -p U:137,T:139 192.168.0.1
+
+Port Status
+After scanning, you may see some results with a port status like filtered, open, closed, etc. 
+• Open: This indicates that an application is listening for connections on this port.
+• Closed: This indicates that the probes were received but there is no application listening on this port.
+• Filtered: This indicates that the probes were not received and the state could not be established. It also indicates that the probes are being dropped by some kind of filtering.
+• Unfiltered: This indicates that the probes were received but a state could not be established.
+• Open/Filtered: This indicates that the port was filtered or open but Nmap couldn’t establish the state.
+• Closed/Filtered: This indicates that the port was filtered or closed but Nmap couldn’t establish the state.
+
+Scans
+Scan using TCP connect:  nmap -sT 192.168.0.1
+Scan using TCP SYN scan: nmap -sS 192.168.0.1   ← Privileged access is required to perform the default SYN scans
+Scan UDP ports : nmap -sU -p 123,161,162 192.168.0.1
+Scan selected ports (ignore discovery): nmap -Pn -F 192.168.0.1 ← Ignoring discovery is often required as many firewalls or hosts will not respond to PING, so could be missed unless you select the -Pn  parameter.
+
+OS
+Detect OS and Services: nmap -A 192.168.0.1
+Standard service detection: nmap -sV 192.168.0.1
+
+Aggresive Service Detection
+Aggressive Service Detection: nmap -sV --version-intensity 5 192.168.0.1← The aggressive service detection is helpful when there are services running on unusual ports.
+
+Light Service banner Detections
+Light banner detection: nmap -sV --version-intensity 0 192.168.0.1
+
+Default Safe Scripts
+Scan using default safe scripts: nmap -sV -sC 192.168.0.1
+
+Script
+Get help for a script: nmap --script-help=ssl-heartbleed
+Scan using a specific script: nmap -sV -p 443 –script=ssl-heartbleed.nse 192.168.0.1
+Scan with a set of scripts: nmap -sV --script=smb* 192.168.0.1
+Update script database:  nmap --script-updatedb
+
+Some useful NSE scripts
+HTTP
+Gather page titles from HTTP servers: nmap --script=http-title 192.168.0.0/24
+Get HTTP headers of web services: nmap --script=http-headers 192.168.0.0/24
+nmap -n -Pn -p 80 –open -sV -vvv –script banner,http-title -iR 1000
+
+Find Web Apps
+Find web apps from known paths: nmap --script=http-enum 192.168.0.0/24
+
+IP Info
+Find Information about IP address: nmap --script=asn-query,whois,ip-geolocation-maxmind 192.168.0.0/24
+DNS
+Attempts to pull a zone file (AXFR) from a DNS server: nmap --script dns-zonetransfer.nse --script-args dns-zonetransfer.domain=<domain> -p53 192.168.0.1
+Retrieve robots.txt files from discovered web servers: nmap --script http-robots.txt 192.168.0.0/24
+
+SMB
+Try to guess valid samba's username and password combinations using brute force: nmap --script smb-brute.nse -p445 192.168.0.0/24
+nmap -sV --script=smb* 192.168.0.1
+
+
+Discovery is a delicate dance
+Discovery with Nmap is very interesting and very helpful for penetration testers. During discovery one can learn about services, port numbers, firewall presence, protocol, operating system, etc. 
+
+Don’t ping
+The -PN option instructs Nmap to skip the default discovery check and perform a complete port scan on the target. This is useful when scanning hosts that are protected by a firewall that blocks  ping probes.
+By specifying these options, Nmap will discover the open ports without ping, which is the unpingable system.
+Syntax: nmap –PN Target
+
+Ping only scan
+The -Sp option is responsible for a ping only scan. It will be more useful when you have a group of IP addresses and you don’t know which one is reachable. By specifying a particular target, you can get even  more information, like MAC address.
+Syntax: nmap –Sp target
+
+TCP syn scan
+Before we start, we must know the syn packet. Basically a syn packet is used to initiate the connection between the two hosts. The TCP SYN ping sends a SYN packet to the target system and listens for a response. This alternative discovery method is useful for systems that are configured to block standard ICMP pings.
+The default port is port80. You can also specify other ports like –PS22, 23, 25, 443.
+The -PS option performs a TCP SYN ping.
+Syntax: nmap –PS targets
+
+TCP ack ping scan
+This type of scan will only scan of Acknowledgement(ACK) packet.
+This method attempts to discover hosts by responding to TCP connections that are nonexistent in an attempt to solicit a response from the target. Like other ping options, it is useful in situations where standard ICMP pings are blocked.
+The -PA performs a TCP ACK ping on the specified target.
+The -PA option causes Nmap to send TCP ACK packets to the specified hosts.
+Syntax: nmap –PA target
+
+UDP ping scan
+The –PU scan only on udp ping scans on the target. This type of scan sends udp packets to get a response.
+You can also specify the port number for scanning, like –PU 22, 80, 25, etc. 
+Syntax: nmap –PU target
+
+Sctp init ping
+The -PY parameter instructs Nmap to perform an SCTP  INIT ping. This option sends an SCTP packet containing a minimal INIT chunk. This discovery method attempts to locate hosts using the Stream 
+ Control Transmission Protocol (SCTP). SCTP is typically used on systems  for IP based telephony.
+though there is no sctp services on the machine, we have to use the –pn option for discovery.
+Syntax: nmap –PY target
+
+ICMP echo ping
+The -PE option performs an ICMP (Internet Control Message Protocol) echo ping on the specified system.
+This type of discovery works best on local networks where ICMP packets can be transmitted with few restrictions.
+Syntax: nmap –PE target
+
+ICMP timestamp ping
+The -PP option performs an ICMP timestamp ping.
+
+ICMP address mask ping
+This unconventional ICMP query (similar to the -PP option) attempts to ping the specified host using alternative ICMP registers. This type of ping can occasionally sneak past a firewall that is configured to block standard echo requests.
+The -PM option performs an ICMP address mask ping.
+Syntax: nmap –PM target
+
+IP protocol ping
+The -PO option performs an IP protocol ping. An IP protocol ping sends packets with the specified protocol to the target. If no protocols are specified, the default protocols 1 (ICMP), 2 (IGMP), and 4 (IP-in-IP) are used.
+Syntax: nmap –PO protocol target
+
+ARP ping
+The –PR option is used to perform an arp ping scan. The -PR option instructs Nmap to perform an ARP (Address Resolution Protocol) ping on the specified target.
+The -PR option is automatically implied when scanning the local network. This type of discovery is much faster than the other ping methods.
+SYTAX: nmap –PR target
+
+Traceroute
+The -traceroute parameter can be use to trace the network path to the specified host.
+Syntax: nmap -traceroute target
+
+Force reverse DNS resolution
+The -R parameter instructs Nmap to always perform a reverse DNS resolution on the target IP address.
+The -R option is useful when performing reconnaissance on a block of IP addresses, as Nmap will try to resolve the reverse DNS information of every IP address.
+Syntax: nmap –R target
+
+Disable reverse DNS resolution
+The -n parameter is used to disable reverse DNS lookups.
+Reverse DNS can significantly slow an Nmap scan. Using the -n option greatly reduces scanning times – especially when scanning a large number of hosts. This option is useful if you don’t care about the DNS 
+information for the target system and prefer to perform a scan which produces faster results.
+Syntax: nmap –n target
+
+Alternative DNS lookup method
+The –system-dns option instructs Nmap to use the host system’s DNS resolver instead of its own internal method.
+Syntax:nmap –system-dns target
+
+Manually specify DNS server
+The –dns-servers option is used to manually specify DNS servers to be queried when scanning.
+The –dns-servers option allows you to specify one or more alternative servers for Nmap to query. This can be useful for systems that do not have DNS configured or if you want to prevent your scan lookups from appearing in your locally configured DNS server’s log file.
+Syntax: nmap –dns-servers server1 server2 target
+
+List scan
+The -sL option will display a list and performs a reverse DNS lookup of the specified IP addresses.
+Syntax:nmap –sL target
