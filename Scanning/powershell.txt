@@ -5,21 +5,21 @@ There are a few built-in PowerShell functions we can use.
 The Test-NetConnection function checks if an IP responds to ICMP and whether a specified TCP port on the target host is open.
 From the Windows 11 client, we can verify if the SMB port 445 is open on a domain controller as follows.
 
-PS C:\Users\mute> Test-NetConnection -Port 445 192.168.50.x
+Port scanning SMB via PowerShell
+PS C:\Users\mute> Test-NetConnection -Port 445 192.168.x.x
 
-ComputerName     : 192.168.50.x
-RemoteAddress    : 192.168.50.x
+ComputerName     : 192.168.x.x
+RemoteAddress    : 192.168.x.x
 RemotePort       : 445
 InterfaceAlias   : Ethernet0
-SourceAddress    : 192.168.50.x
+SourceAddress    : 192.168.x.x
 TcpTestSucceeded : True
-    Listing 38 - Port scanning SMB via PowerShell
 
 Port scanning SMB via PowerShell
-Test-NetConnection -Port 445 192.168.50.x
+Test-NetConnection -Port 445 192.168.x.x
 
-The returned value in the TcpTestSucceeded parameter indicates that port 445 is open.
-Script the whole process in order to scan the first 1024 ports on the DC with the PowerShell one-liner. 
+The value returned in the TcpTestSucceeded parameter indicates that port 445 is open.
+Script in order to scan the first 1024 ports on the DC with the PowerShell one-liner. 
 To do so we need to instantiate a TcpClient Socket object as Test-NetConnection send additional traffic that is non needed for our purposes.
 
 Automating the PowerShell portscanning
