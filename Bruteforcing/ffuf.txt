@@ -1,8 +1,8 @@
 Recursion
-ffuf -u https://codingo.io/FUZZ -w ./wordlist -recursion <--Does not work, I like to use dirsearch for recursion
+ffuf -u https://site.io/FUZZ -w ./wordlist -recursion <--Does not work, I like to use dirsearch for recursion
 
 Extensions
-ffuf -u https://codingo.io/FUZZ -w ./wordlist -recursion -e .bak
+ffuf -u https://site.io/FUZZ -w ./wordlist -recursion -e .bak
 
 Typical commands & Usage 
 
@@ -31,7 +31,6 @@ ffuf -w /path/to/paramnames.txt -u https://target/script.php?FUZZ=test_value -fs
 
 # GET parameter fuzzing if the param is known (fuzzing values) and filtering 401
 ffuf -w /path/to/values.txt -u https://target/script.php?valid_name=FUZZ -fc 401
-
 
 
 # POST parameter fuzzing
