@@ -4,7 +4,7 @@ cewl --lowercase http://192.168.233.x:8081/ | grep -v CeWL  >> custom-wordlist.t
 root@kali# cewl -w cewl-forum.txt -e -a http://forum.site.internal
 
 HTTP
-cewl www.megacorpone.com -m 6 -w mega-cewl.txt
+cewl www.megacorp.com -m 6 -w mega-cewl.txt
 
 Mangle:
 john --wordlist=mega-cewl.txt --rules --stdout > mega-mangled
