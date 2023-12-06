@@ -1,1 +1,28 @@
+If we are conducting initial network enumeration from a Windows laptop with no internet access, we are prevented from installing any extra tools that might help us, like the Windows Nmap version. 
+In such a limited scenario, we are forced to pursue the 'living off the land' strategy. 
+There are a few built-in PowerShell functions we can use.
+
+The Test-NetConnection function checks if an IP responds to ICMP and whether a specified TCP port on the target host is open.
+From the Windows 11 client, we can verify if the SMB port 445 is open on a domain controller as follows.
+
+PS C:\Users\mute> Test-NetConnection -Port 445 192.168.50.x
+
+ComputerName     : 192.168.50.x
+RemoteAddress    : 192.168.50.x
+RemotePort       : 445
+InterfaceAlias   : Ethernet0
+SourceAddress    : 192.168.50.x
+TcpTestSucceeded : True
+    Listing 38 - Port scanning SMB via PowerShell
+
+Port scanning SMB via PowerShell
+Test-NetConnection -Port 445 192.168.50.x
+
+The returned value in the TcpTestSucceeded parameter indicates that port 445 is open.
+Script the whole process in order to scan the first 1024 ports on the DC with the PowerShell one-liner. 
+To do so we need to instantiate a TcpClient Socket object as Test-NetConnection send additional traffic that is non needed for our purposes.
+
+Automating the PowerShell portscanning
+PS C:\Users\mute> 1..1024 | % {echo ((New-Object Net.Sockets.TcpClient).Connect("192.168.50.x", $_)) "TCP port $_ is open"} 2>$null
+TCP port 88 is open
 
