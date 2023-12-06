@@ -1,1 +1,158 @@
+Creating a dictionary file using cewl
+The following command scrapes the www.site.com web site, locates words with a minimum of six characters (-m 6), and writes (-w) the wordlist to a custom file (megacorp-cewl.txt):
+kali@kali:~$ cewl www.site.com -m 6 -w site-cewl.txt
+
+kali@kali:~$ wc -l site-cewl.txt
+312
+
+kali@kali:~$ grep Nano site-cewl.txt
+Nanotechnology
+
+Creating mutation rule in John the Ripper configuration file
+We will add a rule to the JTR configuration file (/etc/john/john.conf) that will mutate our wordlist, appending two digits to each password
+
+We will begin this rule with the $ character, which tells John to append a character to the original word in our wordlist. 
+Next, we specify the type of character we want to append, in our case we want any number between zero and nine ([0-9]). 
+Finally, to append double-digits, we will simply repeat the $[0-9] sequence. 
+
+kali@kali:~$ sudo nano /etc/john/john.conf
+...
+# Wordlist mode rules
+[List.Rules:Wordlist]
+# Try words as they are
+:
+# Lowercase every pure alphanumeric word
+-c >3 !?X l Q
+# Capitalize every pure alphanumeric word
+-c (?a >2 !?X c Q
+# Lowercase and pluralize pure alphabetic words
+...
+# Try the second half of split passwords
+-s x_
+-s-c x_ M l Q
+# Add two numbers to the end of each password
+$[0-9]$[0-9]
+...
+    
+Mutating passwords using John the Ripper
+Now that the rule has been added to the configuration file, we can mutate our wordlist, which currently contains 312 entries.
+To do this, we will invoke john and specify the dictionary file (--wordlist=site-cewl.txt), activate the rules in the configuration file (--rules), output the results to standard output (--stdout), and redirect that output to a file called mutated.txt:
+
+kali@kali:~$ john --wordlist=site-cewl.txt --rules --stdout > mutated.txt
+Press 'q' or Ctrl-C to abort, almost any other key for status
+46446p  0:00:00:00 100.00% (2018-03-01 15:41) 663514p/s chocolate99
+
+kali@kali:~$ grep Nanobot mutated.txt
+...
+Nanobot90
+Nanobot96
+...
+    
+Crunch  - Generates a ton of data.     
+Character translation format
+First, we must describe the pattern we need crunch to replicate, and for this we will use placeholders that represent specific types of characters:
+Placeholder 	Character Translation
+@ Lower case alpha characters
+, 	Upper case alpha characters
+% 	Numeric characters
+^ 	Special characters including space
+
+To generate a wordlist that matches our requirements, we will specify a minimum and maximum word length of eight characters (8 8) and describe our rule pattern with -t ,@@^^%%%:
+
+Generating password lists with crunch
+kali@kali:~$ crunch 8 8 -t ,@@^^%%%
+Crunch will now generate the following amount of data: 172262376000 bytes
+164282 MB
+160 GB
+0 TB
+0 PB
+Crunch will now generate the following number of lines: 19140264000
+Aaa!!000
+Aaa!!001
+Aaa!!002
+Aaa!!003
+Aaa!!004
+...
+
+The output would consume a massive 160 GB of disk space 
+Remember that brute force techniques prioritize password coverage at the expense of speed, and in this case, disk space.
+
+Generating passwords with a specific character set with crunch
+We can also define a character set with crunch. For example, we can create a brute force wordlist accounting for passwords between four and six characters in length (4 6), containing only the characters 0-9 and A-F (0123456789ABCDEF), and we will write the output to a file (-o crunch.txt):
+
+kali@kali:~$ crunch 4 6 0123456789ABCDEF -o crunch.txt
+Crunch will now generate the following amount of data: 124059648 bytes
+118 MB
+0 GB
+0 TB
+0 PB
+Crunch will now generate the following number of lines: 17891328 
+crunch: 100% completed generating output
+
+kali@kali:~$ head crunch.txt 
+0000
+0001
+0002
+0003
+0004
+0005
+0006
+0007
+0008
+    
+
+Notice the file output size is significantly smaller than the previous example, primarily due to the shorter password length as well as the limited character set. 
+However, the wordlist file is impressive, containing over 17 million passwords:
+
+Counting the number of generated passwords:
+kali@kali:~$ wc -l crunch.txt 
+17891328 crunch.txt
+
+In addition, we can generate passwords based on pre-defined character-sets like those defined in /usr/share/crunch/charset.lst. 
+For example, we can specify the path to the character set file (-f /usr/share/crunch/charset.lst) and choose the mixed alpha set mixalpha, which includes all lower and upper case letters:
+
+Generating password list of lower and upper case letters:
+kali@kali:~$ crunch 4 6 -f /usr/share/crunch/charset.lst mixalpha -o crunch.txt
+Crunch will now generate the following amount of data: 140712049920 bytes
+134193 MB
+131 GB
+0 TB
+0 PB
+Crunch will now generate the following number of lines: 20158125312 
+Although this command generates an enormous 131 GB wordlist file, it offers impressive password coverage.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
