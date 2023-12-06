@@ -1,1 +1,2 @@
-
+Scan Joomla
+joomscan -u http://192.168.230.x:8081
