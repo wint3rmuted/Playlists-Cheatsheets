@@ -1,1 +1,12 @@
+$ psql -h 192.168.174.56 -p 5432 -U postgres
 
+Look for local listening active ports, if you see postgress you can chisel it
+$ psql -h 127.0.0.1 -U postgres -W
+
+Port 5437 is running postgresql version between 11.3 - 11.7. I was able to login with the default credentials of 
+postgres:postgres using psql.
+
+ psql -h 192.168.51.47 -U postgres -p 5437
+ 
+ As we are running on a version of postgresql higher than 9.3 we should be able to use the following exploit to gain command execution on the target machine.
+ https://www.exploit-db.com/exploits/46813
