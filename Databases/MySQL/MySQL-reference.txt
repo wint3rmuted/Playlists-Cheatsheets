@@ -5,7 +5,7 @@ nmap -sV -Pn -vv --script=mysql-audit,mysql-databases,mysql-dump-hashes,mysql-em
 nmap -sV -Pn -vv -script=mysql* $ip -p 3306
 
 Local Access
-if you gain access to target box and see mysql running , you can try to connect with it from target locally
+If you gain access to target box and see mysql running , you can try to connect with it from target locally
 mysql -u root 
 # Connect to root without password
 
