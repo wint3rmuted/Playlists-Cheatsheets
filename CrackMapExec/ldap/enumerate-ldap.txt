@@ -1,1 +1,4 @@
+Enumerating LDAP
+To enumerate the AD environment, we can utilize CrackMapExec much like we use PowerView. CrackMapExec has several modules that enable us to enumerate LDAP information for authenticated users. By running LDAP with the -L option, we can see the list of all the available modules.
 
+crackmapexec ldap -L
