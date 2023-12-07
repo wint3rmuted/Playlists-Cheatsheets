@@ -1,1 +1,4 @@
+Bloodhound Ingestor
+To ingest the data of the Active Directory
 
+crackmapexec ldap <ip> -u user -p pass --bloodhound --ns ip --collection All
