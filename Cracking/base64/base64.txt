@@ -1,1 +1,17 @@
+The password looks Base64 encoded. So let’s decode in Kali.
+echo -n Tm93aXNlU2xvb3BUaGVvcnkxMzkK | base64 –decode 
 
+# Decode Base64 Encoded Values
+echo -n "QWxhZGRpbjpvcGVuIHNlc2FtZQ==" | base64 --decode
+
+
+This password is secure, it's encoded at least 13 times. 
+It’s base64 encoded, so let’s decode it:
+
+root@kali# data=$(cat pwd.b64); for i in $(seq 1 13); do data=$(echo $data | tr -d ' ' | base64 -d); done; echo $data
+Charix!2#4%6&8(0
+
+/file/U0VBU09OLTIvMDEuYXZp. That base64 on the end of the path is just the file name:
+
+root@kali# echo U0VBU09OLTIvMDEuYXZp | base64 -d
+SEASON-2/01.avi
