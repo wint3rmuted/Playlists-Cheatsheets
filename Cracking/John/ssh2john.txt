@@ -1,1 +1,18 @@
+kali@kali:~/passwordattacks$ ssh -i id_rsa -p 2222 dave@192.168.50.201
+Enter passphrase for key 'id_rsa':
 
+kali@kali:~/passwordattacks$ ssh2john id_rsa > ssh.hash
+
+Determine the correct mode for Hashcat
+ hashcat -h | grep -i "ssh" 
+
+  10300 | SAP CODVN H (PWDSALTEDHASH) iSSHA-1                 | Enterprise Application Software (EAS)
+  22911 | RSA/DSA/EC/OpenSSH Private Keys ($0$)               | Private Key
+  22921 | RSA/DSA/EC/OpenSSH Private Keys ($6$)               | Private Key
+  22931 | RSA/DSA/EC/OpenSSH Private Keys ($1, $3$)           | Private Key
+  22941 | RSA/DSA/EC/OpenSSH Private Keys ($4$)               | Private Key
+  22951 | RSA/DSA/EC/OpenSSH Private Keys ($5$)               | Private Key
+
+The output indicates that "$6$" is mode 22921.
+
+john --wordlist=ssh.passwords --rules=sshRules ssh.hash
