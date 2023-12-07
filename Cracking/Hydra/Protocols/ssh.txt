@@ -1,1 +1,12 @@
+SSH:
+$ hydra -L users -P pass ssh://192.168.x.x -t 4 -s 43022
 
+SSH
+Bruteforce SSH credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP -t 4 ssh
+
+-f: Exit as soon as at least one a login and a password combination is found
+-t: Tasks, run tasks number of connects in parallel per target, default is 16 Tasks. 
+
+For ssh attack:
+Hydra -l userlogin -P password-list-adress ssh:// — — IP — Address -V
