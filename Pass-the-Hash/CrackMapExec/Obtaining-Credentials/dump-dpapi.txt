@@ -1,1 +1,6 @@
+Dump DPAPI
+Dump DPAPI credentials using CrackMapExec
+You can dump DPAPI credentials using CrackMapExec using the following option --dpapi
+You need at least local admin privilege on the remote target, use option --local-auth if your user is a local account
 
+$ crackmapexec smb <ip> -u user -p password --dpapi
