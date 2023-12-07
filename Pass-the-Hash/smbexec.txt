@@ -1,1 +1,5 @@
+smbexec.py does not have built-in commands like wmiexec.py does, making this shell a bit more limited. Again, most basic commands will work but when it comes to piggy-backing off this shell to obtain a full shell, it may require some additional creativity.
 
+smbexec.py administrator@172.16.x.x -hashes aad3b435b51404eeaad3b435b51404ee:3542d79d5d17bc9d3014d4d56b5e3060
+
+Now that we have moved laterally from one host to another with our pass-the-hash attack, we can proceed to dump the LSASS process to see if there are any hashes leftover from users logging in to the machine. If we get lucky, we may find a domain admin hash in the LSASS process on either host.
