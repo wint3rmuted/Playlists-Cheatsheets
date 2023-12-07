@@ -1,1 +1,7 @@
+wmiexec.py uses WmiPrvSE.exe to spawn an instance of cmd.exe, which is a lot more stealthy as this might be a legitimate use case in some environments.
+
+wmiexec.py administrator@172.16.x.x -hashes aad3b435b51404eeaad3b435b51404ee:3542d79d5d17bc9d3014d4d56b5e3060
+
+Most of the basic commands will still work but you might find yourself limited when trying to piggy-back off this shell to get a full shell. That is where the built-in commands may come in handy, say for example to upload a file onto the victim. If you find you’re unable to execute the files from this shell, you could focus on placing them in a directory that you have access to from another port to execute and get a full shell.
+
 
