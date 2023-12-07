@@ -122,3 +122,21 @@ CREATE TABLE Users (
 
 # To disable general logging 
 set global general_log=0;
+
+MySQL
+mysql -u root -p
+mysql -u <USERNAME> -h <RHOST> -p
+
+mysql> show databases;
+mysql> use <DATABASE>;
+mysql> show tables;
+mysql> describe <TABLE>;
+mysql> SELECT * FROM Users;
+mysql> SELECT * FROM users \G;
+mysql> SELECT Username,Password FROM Users;
+
+Update User Password
+mysql> update user set password = '37b08599d3f323491a66feabbb5b26af' where user_id = 1;
+
+Drop a Shell
+mysql> \! /bin/sh
