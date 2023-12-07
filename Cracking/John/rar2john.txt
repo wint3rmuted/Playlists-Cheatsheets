@@ -1,1 +1,18 @@
+# Usage - Crack a rar file {FILE.rar} and output hash into text file {FILE.txt} 
+sudo rar2john {FILE.rar} > {FILE.txt}
+
+hashcat -h | grep -i "rar" 
+  12500 | RAR3-hp                                                    | Archive
+  23800 | RAR3-p (Compressed)                                        | Archive
+  23700 | RAR3-p (Uncompressed)                                      | Archive
+  13000 | RAR5                                                       | Archive
+
+Create Hash
+To get this into a format that can be brute forces, I’ll need to run rar2john:
+
+mute@hack$ rar2john keys.rar | tee keys.rar.hash
+! file name: rootauthorizedsshkey.pub
+keys.rar:$RAR3$*1*723eaa0f90898667*eeb44b5b*384*451*1*a4ef3a3b7fab5f8ea48bd08c77bfaa082d3da7dc432f9805f1683073b9992bdc24893a6f5cee2f9a6339d1b6ab155262e798c3de5f49f2f6abe623026fcf8bae99f67bbf6b5c52b392d049d9edff7122d46514afdf7710164dbef5be373c30e3503e8843a1556e373bdaccbaffc6ccbbb93c318b49585447b0b4f02178b464caddfefc9d545abbbd08943d86edec7d12b1c5d8e1cac47fd6a79fd890ca5e95d37e2d96e319f5543a0e6917939dde9126dbdff0a4e7fd616fdaa3d91a414143535bbd1f4086c35e370ea7ea8a7ab97c71fa43768ec90d165b98906e61de7380510048a1eb7b0deca6a43f819acd3ba9bf56f23f6546ba0d39aa860b8760a0bcdfc73d273cc3996e7675a7ae3cc66d753cf6074127cf9781755d972dba1fc7a640de7218728e8324cbd4f4dc4e7da2e09d38ff256455020523a0481051d732583116a03621f8045b01f1beab2a91845f2e8e052a61635b5d8f05c4cb2b4cf75c586cfcdf8f0e66c3161fd352e52f3f29e2281995356217e93ffeaca388a15829d6*33:1::rootauthorizedsshkey.pub 
+
+tee will save it to a file, and let me look at the output.
 
