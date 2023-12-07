@@ -3,7 +3,7 @@ Master filetype list: php,html,htm,asp,aspx,js,xml,git,txt,pdf,zip,tar,gz,md,sh,
 
 -x php,html,txt 
 
-FEROXBUSTER:
+Feroxbuster:
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --filter-status 403,404
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-extensions.txt
@@ -52,7 +52,7 @@ My Common Wordlists:
 /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 
 /usr/share/dirb/wordlists/common.txt 
-
+/usr/share/seclists/Passwords/Default-Credentials <-- Decent default credentials list, try pass-station too. 
 
 IIS 
 /usr/share/wordlists/seclists/Discovery/Web-Content/IIS.fuzz.txt
