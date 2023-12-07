@@ -1,1 +1,4 @@
+The .pdf file is password-protected, and although we can use John to crack the file, I like a tool called PDFCrack. 
+PDFCrack needs the -f and -w switches for the file and the word-list location.
 
+pdfcrack -f Infrastructure.pdf -w /usr/share/wordlists/rockyou.txt
