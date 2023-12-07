@@ -1,1 +1,22 @@
+Oracle
+Install oscanner:
+apt-get install oscanner  
 
+Run oscanner:
+oscanner -s 192.168.1.200 -P 1521 
+
+Fingerprint Oracle TNS Version:
+Install tnscmd10g:
+apt-get install tnscmd10g
+
+Fingerprint oracle tns:
+tnscmd10g version -h TARGET
+nmap --script=oracle-tns-version 
+
+Brute force oracle user accounts:
+Identify default Oracle accounts:
+ nmap --script=oracle-sid-brute 
+ nmap --script=oracle-brute 
+
+Run nmap scripts against Oracle TNS:
+nmap -p 1521 -A TARGET
