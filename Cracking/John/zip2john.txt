@@ -1,1 +1,11 @@
+Cracking a Zip File Password with John The Ripper
+To crack a zip file, we first need to extract the password hash then crack it with John the Ripper. 
+To extract zip file password hashes, we will use a tool called zip2john. 
+Execute the command below to extract the hashes on your zipped file and store them in a file named zip.hashes.
+
+$ zip2john protected.zip > zip.hashes
+
+After successfully extracting the password hash, we will crack it with John the Ripper using a wordlist. Execute the command below:
+
+$ john --wordlist=/usr/share/wordlists/crypton.txt zip.hashes
 
