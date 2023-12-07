@@ -1,1 +1,15 @@
+$ ls
+backup.7z  
+
+Crack Password
+I’ll grab a copy and take a look on my local machine. It asks for a password:
+
+root@kali# 7z x backup.7z 
+Extracting archive: backup.7z
+   Enter password (will not be echoed):
+
+I can crack that password using 7z2john.pl and hashcat:
+root@kali# /opt/john/run/7z2john.pl backup.7z > backup.hash
+
+$ hashcat -m 11600 -a 0 -o backup.cracked backup.hash /usr/share/wordlists/rockyou.txt --force
 
