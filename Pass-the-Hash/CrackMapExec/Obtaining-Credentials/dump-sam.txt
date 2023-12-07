@@ -1,1 +1,5 @@
+Dump SAM
+You need at least local admin privilege on the remote target, use option --local-auth if your user is a local account
+cme smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --sam
+
 
