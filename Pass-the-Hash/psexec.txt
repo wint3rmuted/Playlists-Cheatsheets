@@ -1,1 +1,6 @@
+psexec.py administrator@172.16.1.200 -hashes aad3b435b51404eeaad3b435b51404ee:3542d79d5d17bc9d3014d4d56b5e3060
+
+We can pass either the full LM:NT hash like we did above… or since the LM is blank, we can replace the LM hash with thirty-two 0’s or we can just leave the leading semi-colon. Either way this will indicate that a blank LM is being used. This is useful when you dump the hashes with other tools and they only provide the NT hash value, like mimikatz for example.
+
+Since psexec creates an exe and executes it to setup the reverse shell, it results in us obtaining a full shell. This is not how wmiexec.py and smbexec.py work. For example, wmiexec.py uses WmiPrvSE.exe to spawn an instance of cmd.exe, which is a lot more stealthy as this might be a legitimate use case in some environments.
 
