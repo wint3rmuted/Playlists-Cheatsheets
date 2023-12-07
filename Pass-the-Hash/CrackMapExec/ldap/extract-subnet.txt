@@ -1,1 +1,5 @@
-
+Extract subnet
+Extract subnet over an active directory environment
+$ crackmapexec ldap <ip> -u <user> -p <pass> -M get-network
+$ crackmapexec ldap <ip> -u <user> -p <pass> -M get-network -o ONLY_HOSTS=true
+$ crackmapexec ldap <ip> -u <user> -p <pass> -M get-network -o ALL=true
