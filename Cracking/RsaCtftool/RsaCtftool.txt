@@ -1,1 +1,27 @@
+Crack Public Key
+RsaCtfTool will try a bunch of different well known cryptography attacks against a public key. I’ll clone it on to my machine, and run it, giving it the public key and --private so that it will show the private key if it cracks it. After a few minutes, it does:
 
+mute@hacks$ /opt/RsaCtfTool/RsaCtfTool.py --publickey rootauthorizedsshkey.pub --private 
+
+[*] Testing key rootauthorizedsshkey.pub.
+[*] Performing factordb attack on rootauthorizedsshkey.pub.
+[*] Performing fibonacci_gcd attack on rootauthorizedsshkey.pub.
+100%| 9999/9999 [00:00<00:00, 157548.15it/s]
+[*] Performing system_primes_gcd attack on rootauthorizedsshkey.pub.
+100 7007/7007 [00:00<00:00, 1363275.26it/s]
+[*] Performing pastctfprimes attack on rootauthorizedsshkey.pub.
+100 113/113 [00:00<00:00, 1419030.99it/s]
+[*] Performing nonRSA attack on rootauthorizedsshkey.pub.
+...[snip]...
+[*] Attack success with wiener method !
+
+Results for rootauthorizedsshkey.pub:
+
+Private key :
+-----BEGIN RSA PRIVATE KEY-----
+MIICOgIBAAKBgQYHLL65S3kVbhZ6kJnpf072YPH4Clvxj/41tzMVp/O3PCRVkDK/
+...[snip]...
+hxnHNiRzKhXgV4umYdzDsQ6dPPBnzzMWkB7SOE5rxabZzkAinHK3eZ3HsMsC8Q==
+-----END RSA PRIVATE KEY-----
+
+I’ll save that to a file and chmod it to 600 so SSH will use it.
