@@ -1,1 +1,51 @@
+New password policy passwords need 3 numbers, a capital letter and a special character
+We can begin to create our rule file. We must include three numbers, at least one capital letter, and at least one special character.
+
+For our first attempt, we'll just use the most common special characters "!", "@", and "#", since they are the first three special characters when typing them from the left side of many keyboard layouts.
+
+Based on the analysis, we'll create our rules. We'll use c for the capitalization of the first letter and $1 $3 $7 for the numerical values. 
+To address the special characters, we'll create rules to append the different special characters $!, $@, and $#.
+
+$ cat ssh.rule
+c $1 $3 $7 $!
+c $1 $3 $7 $@
+c $1 $3 $7 $#
+
+Next, we'll create a wordlist file containing the passwords from note.txt and save the output to ssh.passwords.
+
+kali@kali:~/passwordattacks$ cat ssh.passwords
+Window
+mute
+supermute
+megamute
+umbrellas
+
+Now we can use Hashcat to perform the cracking by specifying the rules file, the wordlist, and the mode.
+
+kali@kali:~/passwordattacks$ hashcat -m 22921 ssh.hash ssh.passwords -r ssh.rule --force
+hashcat (v6.2.5) starting
+
+Hashfile 'ssh.hash' on line 1 ($sshng...cfeadfb412288b183df308632$16$486): Token length exception
+No hashes loaded.
+
+Unfortunately, we receive an error indicating that our hash caused a "Token length exception". Several posts suggest that modern private keys and their corresponding passphrases are created with the aes-256-ctr cipher, which Hashcat's mode 22921 does not support.
+
+This reinforces the benefit of using multiple tools since John the Ripper (JtR) can handle this cipher.
+
+john.conf
+To be able to use the previously created rules in JtR, we need to add a name for the rules and append them to the /etc/john/john.conf configuration file. For this demonstration, we'll name the rule sshRules with a "List.Rules" rule naming syntax (as shown in Listing 34). We'll use sudo and sh -c to append the contents of our rule file into /etc/john/john.conf.
+
+kali@kali:~/passwordattacks$ cat ssh.rule
+[List.Rules:sshRules]
+c $1 $3 $7 $!
+c $1 $3 $7 $@
+c $1 $3 $7 $#
+
+kali@kali:~/passwordattacks$ sudo sh -c 'cat /home/kali/passwordattacks/ssh.rule >> /etc/john/john.conf'
+ Adding the named rules to the JtR configuration file
+
+Now that we've successfully added our sshRules to the JtR configuration file, we can use john to crack the passphrase in the final step 
+We'll define our wordlist with --wordlist=ssh.passwords, select the previously created rule with --rules=sshRules, and provide the hash of the private key as the final argument, ssh.hash.
+
+kali@kali:~/passwordattacks$ john --wordlist=ssh.passwords --rules=sshRules ssh.hash
 
