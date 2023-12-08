@@ -1,1 +1,6 @@
+# HTTP - Apache2
+# cp file /var/www/html/file_name
+sudo service apache2 start
 
+# Apache2 Server: var/www/html
+sudo systemctl start apache2
