@@ -1,1 +1,9 @@
+Ruby HTTP Server   
+Using Ruby to run an HTTP server 
+We can also launch an HTTP server with a Ruby "one liner". The command requires several flags including -run to load un.rb, which contains replacements for common Unix commands, -e httpd to run the HTTP server, . to serve content from the current directory, and -p 9000 to set the TCP port:
 
+kali@kali:~$ ruby -run -e httpd . -p 9000
+[2019-08-28 12:44:14] INFO  WEBrick 1.4.2
+[2019-08-28 12:44:14] INFO  ruby 2.5.5 (2019-03-15) [x86_64-linux-gnu]
+[2019-08-28 12:44:14] INFO  WEBrick::HTTPServer#start: pid=1367 port=9000
+     
