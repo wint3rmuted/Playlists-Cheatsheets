@@ -1,1 +1,8 @@
+so example:
+xfreerdp /dynamic-resolution +clipboard /cert:ignore /v:192.168.215.x /u:USER /p:PASS /drive:home,/home/kali
+
+network attached drive
+ xfreerdp /v:ip_address /u:username /p:password /drive:path/to/directory,share_name
+ 
+xfreerdp /dynamic-resolution +clipboard /cert-ignore /u:backup_service /v:10.10.87.x /p:muted /drive:home,/home/kali/scripts/windows
 
