@@ -44,3 +44,7 @@ kali@kali:~$ sudo ./setup-ftp.sh
 Password:
 Enter it again:
 Restarting ftp server
+
+TFTP (UDP)
+tftp -i <ip> get file_name
+
