@@ -1,1 +1,5 @@
-
+BusyBox HTTP Server
+Using BusyBox to run an HTTP server on port 10000
+We can also use busybox, "the Swiss Army Knife of Embedded Linux", to run an HTTP server with httpd as the function, -f to run interactively, and -p 10000 to run on TCP port 10000:
+kali@kali:~$ busybox httpd -f -p 10000
+      
