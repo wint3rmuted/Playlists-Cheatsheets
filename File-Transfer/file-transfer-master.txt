@@ -1,1 +1,26 @@
+Windows File Transfer
 
+    IWR (Invoke-Web Request)
+    Certutil
+    Bitsadmin
+    Curl
+    Wget
+    Powershell
+    SMB
+    TFTP
+    FTP
+
+Linux File Transfer
+
+    HTTP
+        PHP Web-Server
+        Apache
+        Simple HTTP server
+        Ruby HTTP server
+    Curl
+    Wget
+    Netcat
+    SCP
+    SMB-Client
+    Meterpreter
+    FTP
