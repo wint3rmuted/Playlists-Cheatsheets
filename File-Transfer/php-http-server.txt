@@ -1,1 +1,9 @@
+PHP HTTP Server
+Using PHP to run an HTTP server on port 8000
+PHP includes a built-in web server that can be launched with the -S flag followed by the address and port to use:
 
+kali@kali:~$ php -S 0.0.0.0:8000
+PHP 7.3.8-1 Development Server started at Wed Aug 28 12:59:52 2019
+Listening on http://0.0.0.0:8000
+Document root is /home/kali
+Press Ctrl-C to quit.
