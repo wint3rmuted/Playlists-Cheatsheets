@@ -1,1 +1,5 @@
+Collect passwd.txt and shadow.txt:
+unshadow passwd.txt shadow.txt > unshadowed.txt
 
+Then crack with John:
+john --wordlist=rockyou.txt unshadowed.txt
