@@ -1,1 +1,60 @@
+Firewall
+Firewall Rules
+List all profile's firewall rules! Is the firewall turned on? If so what’s configured?
+netsh advfirewall firewall show rule name=all 
+netsh advfirewall firewall show rule name=all
+netsh firewall show state
+netsh firewall show config
+netsh advfirewall export "firewall.txt"
+
+Whitelist an IP address in Windows firewall
+Here’s a useful command to whitelist an IP address in the Windows firewall:
+Now we should be able to connect to this host from our IP address (10.10.15.x) on every port.
+
+New-NetFirewallRule -Action Allow -DisplayName "pentest" -RemoteAddress 10.10.15.x
+
+After we are done with our business, remove the rule:
+Remove-NetFirewallRule -DisplayName "pentest"
+
+List installed antivirus (AV) products
+Here’s a simple PowerShell command to query Security Center and identify all installed Antivirus products on this computer:
+
+Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct
+
+Identify currently installed antivirus product. By decoding the productState value, we can identify which AV is currently enabled (in case there is more than one installed), whether the signatures are up-to-date and even which AV features and scanning engines are enabled (e.g. real-time protection, anti-spyware, auto-update etc.).
+
+Allow RDP
+netsh advfirewall firewall add rule name="Remote Desktop (TCP-In)" dir=in action=allow protocol=TCP localport=3389
+
+Allow https in and out
+netsh advfirewall firewall add rule name="https" dir=in action=allow protocol=TCP localport=443
+netsh advfirewall firewall add rule name="https" dir=out action=allow protocol=TCP localport=443
+
+Allow https in and out for different firewall profiles
+netsh advfirewall firewall add rule name="https" dir=in action=allow protocol=TCP localport=443 profile=private,public,domain
+netsh advfirewall firewall add rule name="https" dir=out action=allow protocol=TCP localport=443 profile=private,public,domain
+
+Disable Windows Firewall
+netsh advfirewall set allprofiles state off
+service_exec(conn, r'cmd /c netsh advfirewall set allprofiles state off') 
+
+Disable firewall
+netsh firewall set opmode disable 
+netsh advfirewall set allprofiles state off
+
+Firewall Disabling
+Bypassing Linux firewalls.
+
+# flush Iptables - delete all rules temporarily.
+# add this command before executing reverse shell connection/command.
+$ iptables --flush
+
+Bypassing Windows firewalls.
+
+# Win Vista, 7, 8, Server 2008, 10
+cmd> netsh advfirewall set allprofiles state off
+cmd> netsh advfirewall set currentprofile state off
+
+# Older Win, XP, Server 2003
+cmd> netsh firewall set opmode mode=DISABLE
 
