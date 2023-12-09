@@ -5,3 +5,7 @@ PS C:\Users\Administrator> Get-Content (Get-PSReadlineOption).HistorySavePath | 
 
 Read Powershell History
 type C:\Users\<USERNAME>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+
+
+Reading PowerShell history file
+gc (Get-PSReadLineOption).HistorySavePath
