@@ -2,3 +2,6 @@ Powershell History
 Check Powershell history files:
 PS C:\Users\Administrator> Get-History
 PS C:\Users\Administrator> Get-Content (Get-PSReadlineOption).HistorySavePath | more
+
+Read Powershell History
+type C:\Users\<USERNAME>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
