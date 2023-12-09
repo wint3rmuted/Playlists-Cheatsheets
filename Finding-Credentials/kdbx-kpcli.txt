@@ -1,1 +1,44 @@
+kdbx powershell search
+Searching for password manager databases on the C:\ drive
+PS C:\Users\mute> Get-ChildItem -Path C:\ -Include *.kdbx -File -Recurse -ErrorAction SilentlyContinue
 
+Searching for sensitive information in XAMPP directory
+PS C:\Users\dave> Get-ChildItem -Path C:\xampp -Include *.txt,*.ini -File -Recurse -ErrorAction SilentlyContinue
+
+Search for documents and text files in the home directory of the user mute. We enter *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx as file extensions to search for and set -Path to the home directory.
+PS C:\Users\mute> Get-ChildItem -Path C:\Users\mute\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue
+
+
+
+Found kdbx?
+Now access database.kdbx with `kpcli --kdb=Database.kdbx` and you may find further credentials inside.
+
+kpcli --kdb=Database.kdbx
+
+#then to check each  entry you use:
+show  -f 0
+show  -f 1
+
+
+
+└─$ kpcli --kdb=Database.kdbx
+Provide the master password: *************************
+Couldn't load the file Database.kdbx
+
+Error(s) from File::KeePass:
+Missing pass
+
+
+Crack .kdbx password with John:
+John
+keepass2john database.kdbx > keypass.hash
+Format keepass hashes and remove the Database: at the beginning
+
+kali@kali:~/passwordattacks$ hashcat --help | grep -i "KeePass"
+13400 | KeePass 1 (AES/Twofish) and KeePass 2 (AES)         | Password Manager
+
+Hashcat
+└─$ hashcat -m 13400 keepass.hash /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/rockyou-30000.rule --force  
+
+Quick Summary:
+You can format the .kdbx file with keepass2john database.kdbx > keepass.hash, then crack with hashcat -m 13400 keepass.hash /usr/share/wordlists/rockyou.txt, once cracked you can open it with kpcli --kdb=Database.kdbx 
