@@ -1,1 +1,21 @@
-
+$ rpcclient -U "" <RHOST>
+srvinfo
+netshareenum
+netshareenumall
+netsharegetinfo
+netfileenum
+netsessenum
+netdiskenum
+netconnenum
+getanydcname
+getdcname
+dsr_getdcname
+dsr_getdcnameex
+dsr_getdcnameex2
+dsr_getsitename
+enumdomusers
+enumdata
+enumjobs
+enumports
+enumprivs
+queryuser <USERNAME>
