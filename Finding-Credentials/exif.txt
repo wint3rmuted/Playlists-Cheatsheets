@@ -1,1 +1,8 @@
+exiftool -a -u brochure.pdf 
+exiftool somephoto.png
 
+== STENOGRAPHICS / EXIF ==
+exiftool somephoto.png
+steghide extract -sf ./file.wav
+steghide extract -sf ./image.jpg
+steghide info ./image.jpg
