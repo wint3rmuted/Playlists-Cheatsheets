@@ -1,1 +1,17 @@
-
+chmod +x pspy64
+./pspy64 -f
+...[snip]...
+2019/07/26 05:26:01 FS:                 OPEN | /etc/supervisord.conf                                                      
+2019/07/26 05:26:01 FS:               ACCESS | /etc/supervisord.conf                                                         
+2019/07/26 05:26:01 FS:             OPEN DIR | /home/professor                                                                
+2019/07/26 05:26:01 FS:             OPEN DIR | /home/professor/                                                               
+2019/07/26 05:26:01 FS:           ACCESS DIR | /home/professor                                                                
+2019/07/26 05:26:01 FS:           ACCESS DIR | /home/professor/                                                              
+2019/07/26 05:26:01 FS:           ACCESS DIR | /home/professor                                                                
+2019/07/26 05:26:01 FS:           ACCESS DIR | /home/professor/
+2019/07/26 05:26:01 FS:    CLOSE_NOWRITE DIR | /home/professor
+2019/07/26 05:26:01 FS:    CLOSE_NOWRITE DIR | /home/professor/
+2019/07/26 05:26:01 FS:                 OPEN | /home/professor/memcached.ini
+2019/07/26 05:26:01 FS:               ACCESS | /home/professor/memcached.ini
+2019/07/26 05:26:01 FS:        CLOSE_NOWRITE | /home/professor/memcached.ini 
+...[snip]...
