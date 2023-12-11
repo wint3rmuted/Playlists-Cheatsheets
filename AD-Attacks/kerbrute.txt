@@ -1,3 +1,14 @@
+Enumerating AD users for kerberos attack (requires dc ip and wordlist)
+using tool called kerbrute
+
+To enumerate avalible users for kerberos authentication use command
+here dc is for domain controller and d is for domain. d is necessary to specify
+    ./kerbrute userenum --dc IPdomaincontroller -d CONTROLLER.local WordLists/ADusers.txt
+
+If we have credentials of the machine then we can enumerate users more accurately with impacket
+    GetADUSers.py -all domain.name/USER:PASS@computername -dc-ip IPADDRESS
+
+
 User Enumeration
 ./kerbrute userenum -d <DOMAIN> --dc <DOMAIN> /PATH/TO/FILE/<USERNAMES>
 
