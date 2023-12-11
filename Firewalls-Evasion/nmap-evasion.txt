@@ -1,1 +1,12 @@
+Nmap
+Firewall Evasion:
+Fragment Packets: nmap -f [target]
+Specify a Specific MTU: nmap --mtu [MTU] [target]
+Use a Decoy: nmap -D RND:[number] [target]
+Idle Zombie Scan: nmap -sI [zombie] [target]
+Manually Specify a Source Port: nmap --source-port [port] [target]
+Append Random Data: nmap --data-length [size] [target]
+Randomize Target Scan Order: nmap --randomize-hosts [target]
+Spoof MAC Address: nmap --spoof-mac [MAC|0|vendor] [target]
+Send Bad Checksums: nmap --badsum [target]
 
