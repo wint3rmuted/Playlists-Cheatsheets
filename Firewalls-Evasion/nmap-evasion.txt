@@ -10,3 +10,53 @@ Randomize Target Scan Order: nmap --randomize-hosts [target]
 Spoof MAC Address: nmap --spoof-mac [MAC|0|vendor] [target]
 Send Bad Checksums: nmap --badsum [target]
 
+Firewall Evasion
+Decoy Scan
+Fake packets from other hosts. It's more difficult to tell which machine launched the scan because firewall logs will include not just our IP address but also the IP addresses of the decoys. It's important to remember that the hosts you'll be using as decoys must be online for this method to work. Using a large number of decoys might also generate network congestion.
+
+When performing this type of scan, you have two options.
+nmap -D decoy1, decoy2, decoy3 etc. 
+
+This option allows you to manually specify the IP addresses of the decoys
+nmap -D RND:3 [Target IP] This option generates a random number of decoys. In this example we use 3 decoys.
+
+Nmap Firewall Evasion
+Fragment packets
+IP packet fragments cause problems for some packet filters. Firewalls could reassemble the packets on their own, but it would necessitate additional resources. It's also possible that fragments will take separate paths, making reassembly impossible. Because of this complication, some filters discard all pieces, while others pass all but the first. If the first fragment isn't long enough to carry the entire TCP header, or if the second packet partially overwrites it, unexpected events can occur. This technique was very effective a long time ago but is now obsolete against today’s firewalls. However, you can still use it against a firewall that is improperly configured.
+
+For this example we will target port 22:
+nmap -f -p22 [Target IP]
+
+Nmap Firewall Evasion8
+Specifying MTU
+Nmap allows the user to specify a specified MTU (Maximum Transmission Unit) for a packet. This is comparable to the packet fragmentation process. During the scan, Nmap will create packets with a size based on the number that we give. The number must be a multiple of 8. In this example we use 16:
+nmap --mtu 16 [Target IP]
+
+Nmap Firewall Evasion
+MAC Address Spoofing
+Spoofing your host's MAC address is another way to get around firewall restrictions when running a port scan. This can be highly effective, especially if a MAC filtering rule is in place to allow only communication from specific MAC addresses, so you will need to find out which MAC address you need for this to work. Your scan will be more stealthy because your actual MAC address will not be visible in the firewall log files. The –spoof-mac option allows you to select a MAC address from a specified vendor, a random MAC address, or a specific MAC address of your own.
+
+Nmap -sT -Pn –spoof-mac [Vendor or Specified MAC] [Target IP]
+
+Nmap Firewall Evasion
+Source Port Manipulation
+A common error system admins make is trusting traffic only based on the source port number. DNS may be damaged in particular because UDP DNS responses from external servers can no longer reach the network. Another common example is FTP. The remote server tries to establish a connection with the client to send the requested file during active FTP transfers. Secure solutions are available to address these issues, however, administrators continue to make the mistake of allowing incoming traffic from DNS and FTP ports, without securing them. 
+
+To exploit these flaws, Nmap provides the -g and —source-port options. Provide a port number, and Nmap will send packets from that port if it is available. For specific OS detection tests to operate effectively, Nmap must use distinct port numbers. Most TCP scans, including SYN scan, and UDP scans, fully support the option.
+
+nmap -g [Target IP]
+
+Nmap Firewall Evasion
+Conclusion
+Because firewalls are the first line of protection against outside incursions, firewall testing is one of the most critical types of network tests that can be performed. 
+Many of these techniques may not work on a network with properly configured IDS and firewalls. 
+Because each scenario is unique, you must determine which option will work best for you.
+
+After testing, you should go through the policies and rules ensuring that they are properly configured. 
+This can greatly limit the success of attacks and prevent the majority of unauthorized connection attempts. 
+More tests should be done after this to confirm the expected configurations.
+
+Once policies have been properly configured, you should make a report. 
+It's just as crucial to document everything as it is to perform the test. 
+Instead of waiting until the end of the test, add all important facts and tools as you go through the procedure. 
+This will save time and confusion when it is time to make a report.
