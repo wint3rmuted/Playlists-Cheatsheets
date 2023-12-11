@@ -1,1 +1,2 @@
-
+Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
+    crackmapexec smb $ip -u anonymous -p '' -d domain.name --rid-brute (anonymous login)
