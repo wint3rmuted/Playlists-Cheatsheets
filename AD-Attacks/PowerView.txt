@@ -1,3 +1,75 @@
+Post Compromise Enumeration
+Once we have gained access in a machine from the network
+
+    Gather info using powerview
+    Map the AD environment by using bloodhound
+
+PowerView.ps1
+First bypass powershell execution policy and then import powerview
+    powershell -ep bypass
+    . .\Powerview.ps1
+
+Get-DomainUser is used for whole domain and Get-NetUser for current Computer on which we have foothold
+domain info:
+    Get-NetDomain
+
+Displays Domain controllers info:
+    Get-NetDomainController
+
+Get list of Network info:
+    Get-NetIPAddress
+
+Domain policy:
+    Get-DomainPolicy
+
+We will get few objects and we can view detailed info by following command.for eg if we get some info about system access object ,we will insert the object name in below command
+    (Get-DomainPolicy."above command output")
+
+See open ports
+    Get-NetTCPConnection | where-Object -Property State -match listen
+
+Get Computer information in domain
+    Get-NetComputer -fulldata
+
+to get only OS on computers
+    Get-NetComputer -fulldata | select operatingsystem
+
+Get list of users on local machine
+    Get-LocalUser
+
+Get list of Users on domain
+    Get-NetUser
+
+To view only usernames
+    Get-NetUser | select cn
+
+Detecting Honeypots in the networks
+    Get-UserProperty -Properties logoncount
+
+Seeing which account has multiple retries in authetntication
+    Get-UserProperty -Properties badpwdcount
+
+Get all groupsname on domain
+    Get-NetGroup -GroupName *
+
+Get local groups of current machine
+    Get-NetLocalGroup SERVER.domain.local
+
+Get Service accounts passwords and info
+    Get-NetUser -SPN
+
+Or to get info about service account of specific group
+    Get-NetUser -SPN | ?{$_.memberof -match 'GroupName'}
+    Get-NetUser | Where-Object {$_.servicePrincipalName} | fl
+    get-adobject | Where-Object {$.serviceprincipalname -ne $null -and $.distinguishedname -like "CN=Users" -and $_.cn -ne "krbtgt"}
+
+See recently applied patches
+    Get-HOtfix
+
+Find available shares
+    Invoke-ShareFinder
+
+
 PowerView.ps1
 PS C:\Tools> Import-Module .\PowerView.ps1 or . .\PowerView.ps1 
 
