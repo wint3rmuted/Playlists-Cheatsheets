@@ -1,1 +1,5 @@
-
+Broken Authentication
+    Try default credentials and common credentials like admin/admin etc.
+    Try to find valid usernames by the server response. For eg (Invalid password error indicates username is correct but password is invalid)
+    If Forgot password functionality provides knowledge based question reset ,the question only appears if we provide a valid username hence leading to usernames exposure. Also these questions are easily guessable
+    After login as a user ,take note of their session token/id/cookie etc and logout and login again to see this session key is reused or rotated.
