@@ -1,1 +1,8 @@
+Squid Proxy
+squid proxy or any other proxy
 
+    If we see any proxy running on any port then we have to access that proxy using proxychains
+    Go to /etc/proxychains4.conf and below there add http ipaddress port
+    now we can use any commands with proxychains and will bypass the proxy running on target server
+    We can do port scan with proxychains to see any open ports which were being blocked before
+    Now we will tunnel all the further exploitation or enumuration with via proxychains
