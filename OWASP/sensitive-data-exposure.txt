@@ -1,1 +1,7 @@
+Sensitive Data exposure
+    Bust directories and file to find files containing sensitive data like ,keys,password,bacckup or source code
+
+    test response headers to see what kind of security controls are implemented on webserver. For e.g if server uses hsts for encyrption we can perform ssl stripping to make it unencrypted.This is why data should be encrypted with cryptographic algorithms and keys should be utilized so even if data gets compromised,it couldnt be leaked . We can use securityheaders.com to check for headers security of any website
+
+    When submitting something in a form alwasy inspect element and wherever hidden attribute is used like in passwords we see ****** as a placeholder,we can actually remove the hidden="" or set hidden to false from there and the value will reflect in page if vulnerable.THis way we can get sensitive information like passwords,userid etc
 
