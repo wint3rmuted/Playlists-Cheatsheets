@@ -1,1 +1,8 @@
+Security Misconfiguration
+https://www.owasp.org/index.php/Top_10-2017_A6-Security_Misconfiguration
+
+    default creds
+    verbose errors
+    outdated softwares
+    file upload bypass
 
