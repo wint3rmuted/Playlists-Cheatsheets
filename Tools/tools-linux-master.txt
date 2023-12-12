@@ -1,0 +1,51 @@
+Tools - Linux
+    pspy (hidden cronjobs and services)
+    steghide (extract files from an image)
+        steghide extract -sf
+    stegcracker (cracking images passphrase when extracting data)
+        stegcracker
+    johntheripper (cracking passwords)
+        john --wordlists=wordlist
+    ssh2john (converting ssh keys into hash for cracking in john)
+        python3 ssh2john <ssh_keys> >
+        john ---wordlist=wordlist
+    zip2john (cracking zip passwords)
+        zip2john >
+        john --wordlist=wordlist
+    rar2john (cracking rar passwords)
+        rar2john >
+        john --wordlist=wordlist
+    gpg2john and gpg (cracking pgp files passwords and accessing pgp files)
+        gpg2john key.asc > hash
+        john hash --wordlist=wordlist
+        gpg --import key.asc
+        gpg --decrypt file.pgp
+
+    Password Variation maker
+    hashcat --stdout wordlist.txt -r /usr/share/hashcat/rules/best64.rule
+
+    Hydra (bruteforcing credentials from different services)
+    Basic Usage
+    hydra -l -P service://IP -S portnumber
+
+Automatic Tools / Sripts
+linpeas.sh 
+LinEnum.sh
+pspy64
+lse.sh
+chisel_1.8.1_linux_amd64
+ligolo_proxy_linux
+suid3num.py 
+SUDO_KILLERv2.4.2.sh
+wmiexec.py
+psexec.py
+linuxprivchecker.py
+credHarvest.sh
+GetADUsers.py
+GetNPUsers.py
+GetUserSPNs.py
+kerbrute.py
+secretsdump.py
+smbserver.py
+upc.sh  ← ./unix-privesc-check standard > output.txt
+responder
