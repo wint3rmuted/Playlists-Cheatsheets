@@ -1,1 +1,6 @@
+Insecure Deserialization
+https://www.owasp.org/index.php/Top_10-2017_A8-Insecure_Deserialization
+
+When a data from a website is needed to be converted in some universal form like binary,xml etc for compatibility across internet and data communication its called data serialization. The server upon receiving the serialized data , deserialize it according to its requirement and technology being used. In this attack we can serialize our malicious data and get the server to deserialize it and execute
+
 
