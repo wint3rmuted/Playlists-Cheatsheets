@@ -265,24 +265,18 @@ NOw we will add the cmd paramter in url and execute commands as follows
 
 http://example.com/product?view=../../../../../var/log/apache2/access.log&cmd=id
 
+
+
 Self environ LFI TO RCE
-
 we can navigate to /proc/self/environ and pass php shell in user agent header just like log poisoning
-
 if we can access apache logs then we can get a rce via user agent header.
-
     get the lfi apache logs and use burp to intercept
-
     Now add a php parameter shell to user agent header and forward it
-
     NOw access that parameter and execute commands as www-data
 
 PHPSESSID cookie RCE FROM LFI
-
     If our web app has phpsessid cookie and we have found a lfi point ,we can try cookie poisoining
-
 when we include our malicius file or payload in lfi point ,the cookie stores in the below mentioned path. WE can verify by typing any random string in lfi parameter and then view the contents of session cookie by including /var/lib/php/sessions/sess_COOKIEVALUE in lfi if our random string is there then we can pollute the cookie. We can pollute the lfi parameter with Now simply include the cookie file path /var/lib/php/sessions/sess_COOKIEID&cmd=ourcommands. we can execute commands at system level now. The php get shell must always be included whenever executing a command becuase cookie value keeps getting changed
-
 we have to pollute the cookie evrytime after executing a ingle command becuse it overwrites it
 
 The payload will be
@@ -290,7 +284,6 @@ The payload will be
     ?param=
 
 Now execute the command
-
     ?param=../../../../../var/lib/php/sessions/sess_COOKIEID&cmd=id
 
 Similar to server log files, PHP saves user sessions on disk. This path is dictated by the session.save_path configuration variable, which is empty by default.
@@ -298,6 +291,8 @@ Similar to server log files, PHP saves user sessions on disk. This path is dicta
 in linux php sessions are stored in /var/lib/php/sessions/ and in windows c:\windows\temp
 
 The name of the session file can be identified from the PHPSESSID cookie. For example, if the PHPSESSID cookie is set to el4ukv0kqbvoirg7nkp4dncpk3 then it's location on disk would be /var/lib/php/sessions/sess_el4ukv0kqbvoirg7nkp4dncpk3.
+
+
 RFI
 http rfi
 
