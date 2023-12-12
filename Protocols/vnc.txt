@@ -1,1 +1,4 @@
-
+VNC (Similiar to RDP)
+if we have a encrypted password we can decrypt it online by searching vnc password decrypt
+or if we have a password file we can use it directly to authenticate
+    vncviewer $IPADDRESS:$PORT -passwd passwdfile
