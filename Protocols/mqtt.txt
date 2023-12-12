@@ -1,1 +1,8 @@
+Mqtt
+Mqtt is a iot communication service . If this is running we can enumarate this for any information gathering
+    First insatll mqqt python client shell from github (https://github.com/bapowell/python-mqtt-client-shell)
+    Then run it and select the protocol version of mqtt(WE can try different ones if one dont work)
+    Now type connection in shell and in next prompt type host IPaddress. Do same for PORT in next prompt
+    NOw type connect and we are in
 
+    https://book.hacktricks.xyz/pentesting/1883-pentesting-mqtt-mosquitto
