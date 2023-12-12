@@ -1,1 +1,10 @@
+tcpdump
+tcpdump -D (available interfaces)
+### filter by port
+tcpdump --interface interfacename -nn port portno -v
 
+ ### filter by destination
+ tcpdump --interface interfacename -nn des ip -v
+
+ ### filter by source
+ tcpdump --interface interfacename -nn src ip -v
