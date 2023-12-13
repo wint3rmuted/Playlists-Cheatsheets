@@ -1,1 +1,237 @@
+SSH (22) 
+id_rsa.pub: Public key that can be used in authorized_keys for login. 
+id_rsa: Private key that is used for login. Might ask for password, can be crackied with ssh2john and john
+
+- id_rsa
+- ssh -i id_rsa user@10.10.10.x 
+- For passwordless login, add id_rsa.pub to targets authorized_keys.
+- ssh2john
+
+== SSH user enumeration ==
+1) Python:
+python ./40136.py 192.168.31.149 -U /usr/share/wordlists/metasploit/unix_users.txt -e --trials 5 --bytes 10
+
+2) Via Metasploit:
+msf > use auxiliary/scanner/ssh/ssh_enumusers
+msf auxiliary(scanner/ssh/ssh_enumusers) > set RHOSTS 192.168.31.149
+RHOSTS => 192.168.31.149
+msf auxiliary(scanner/ssh/ssh_enumusers) > set USER_FILE /usr/share/wordlists/metasploit/unix_users.txt
+USER_FILE => /usr/share/wordlists/metasploit/unix_users.txt
+msf auxiliary(scanner/ssh/ssh_enumusers) > run
+
+[*] 192.168.31.149:22 - SSH - Checking for false positives
+[*] 192.168.31.149:22 - SSH - Starting scan
+[-] 192.168.31.149:22 - SSH - User '4Dgifts' not found
+[-] 192.168.31.149:22 - SSH - User 'EZsetup' not found
+[-] 192.168.31.149:22 - SSH - User 'OutOfBox' not found
+
+
+SSH Cheatsheet 
+Generate a new key pair. This will prompt for an optional passphrase and file name.
+$ ssh-keygen -t ed25519 -c "comment"
+
+Add the public key to the server’s authorized_keys file.
+$ ssh-copy-id -i ~/.ssh/key.pub user@ip
+
+To eliminate the need to type the passphrase for every use of the key, we can cache the private key with ssh-agent and ssh-add
+$ eval "$(ssh-agent)"
+$ ssh-add ~/.ssh/private-key-file
+$ ssh-add -l	# check current cached keys
+
+The key pair should be fully configured for use
+$ ssh user@ip
+
+See Caching SSH keys for persistent methods.
+
+##
+Permissions
+For SSH to work properly, all files must have the correct permissions:
+file	mode
+~/.ssh/	   0700
+.authorized_keys	0600
+public key	0644
+private key	0600
+
+
+
+SSH
+SSH (Secure Shell) is a network protocol that enables secure remote connections between two systems.
+Connect remote machine using IP address or machine name: The remote server can be connected with local user name using either host name or IP address
+ssh <host-name> or <ip-address>
+
+Example:
+ssh 192.111.66.100
+ssh test.remoteserver.com
+
+Connect remote machine using username: It is also possible specify a user for an SSH connection.
+ssh username@hostname_or_ip-address
+
+Example:
+ssh john@192.0.0.22
+ssh john@test.remoteserver.com
+
+Connect remote machine using custom port By default, the SSH server listens for a connection on port 22. But you can also specify the custom port.
+ssh <host-name> or <ip-address> -p port_number
+
+Example:
+ssh test.remoteserver.com -p 3322
+
+Generate SSH keys using keygen: SSH Keygen is used to generate a key pair which consists of public and private keys to improve the security of SSH connections.
+ssh-keygen -t rsa
+
+Copying SSH keys to servers: For SSH authentication, ssh-copy-id command will be used to copy public key(id_rsa.pub) to server.
+ssh-copy-id hostname_or_IP
+
+Copy a File Remotely over SSH: SCP tool is used to securely copy files over the SSH protocol.
+scp fileName user@remotehost:destinationPath
+
+Example:
+scp test.txt test@10.0.0.64:/home/john/Desktop
+
+Edit SSH Config File SSH server options customized by editing the settings in sshd_config file.
+sudo vim /etc/ssh/sshd_config
+
+Run commands on a remote server SSH commands can be executed on remote machine using the local machine.
+ssh test.remoteserver.com mkdir NewDirectoryName // Creating directory on remote machine
+
+Restart SSH service: You need to restart the service in Linux after making changes to SSH configuration.
+sudo ssh service restart
+(or)
+sudo sshd service restart
+Configuration is done in /etc/ssh/sshd_config.
+Reload SSH service with systemctl reload sshd to apply changes!
+DenyUsers, AllowUsers, DenyGroups, AllowGroups override each other and are applied in the order listed above.
+
+PermitRootLogin no , Deny root to login via SSH
+PermitRootLogin yes , Allow root to login via SSH
+PermitRootLogin without-password , Allow only with private/public key authentication
+AllowUsers user1 user2 , Allow only user1 and user2 
+DenyUsers user1 user2 , Allow all users but user1 and user2
+AllowGroups group1 group2 , Allow only user from specified groups
+DenyGroups group1 group2 , Allow all users but those in specified groups
+
+$ssh -t reachable_host ssh unreachable_host
+Directly ssh to host B that is only accessible through host A
+ssh -t hostA ssh hostB 
+
+Displays the attempted user name, ip address, and time of ssh failed logins on debian machines
+awk '/sshd/ && /Failed/ {gsub(/invalid user/,""); printf "%-12s %-16s %s-%s-%s , 
+
+RDP through SSH tunnel
+ssh -f -L3389:<RDP_HOST>:3389 <SSH_PROXY> "sleep 10" && rdesktop -T'<WINDOW_TITLE>' -uAdministrator -g800x600 -a8 -rsound:off -rclipboard:PRIMARYCLIPBOARD -5 localhost  
+
+Remote Screenshot
+ssh user@remote-host "DISPLAY=:0.0 import -window root -format png -"|display -format png - 
+
+Analyze traffic remotely over ssh with wireshark
+ssh root@server.com 'tshark -f "port !22" -w -' | wireshark -k -i - 
+
+keys information
+ssh-keygen -l -f ~/.ssh/known_hosts , View ~./ssh/known_hosts 
+
+Harder , Faster, Stronger SSH Clients
+ssh -4 -C -c blowfish-cbc 
+
+SSH Service
+The Secure SHell (SSH)1 service is most commonly used to remotely access a computer, using a secure, encrypted protocol. 
+The SSH service is TCP-based and listens by default on port 22. 
+To start the SSH service in Kali, we run systemctl with the start option followed by the service name (ssh in this example):
+
+kali@kali:~$ sudo systemctl start ssh
+kalli@kali:~$
+iUsing systemctl to start the ssh service in Kali
+
+When the command completes successfully, it does not return any output but we can verify that the SSH service is running and listening on TCP port 22 by using the ss command and piping the output into grep to search the output for "sshd":
+
+kali@kali:~$ sudo ss -antlp | grep sshd
+LISTEN     0      128      *:22        *:*     users:(("sshd",pid=1343,fd=3))
+LISTEN     0      128     :::22       :::*     users:(("sshd",pid=1343,fd=4))
+Using ss and grep to confirm that ssh has been started and is running
+
+If we want to have the SSH service start automatically at boot time (as many users prefer), we simply enable it using the systemctl command. 
+However, be sure to change the default password first!
+
+kali@kali:~$ sudo systemctl enable ssh
+Synchronizing state of ssh.service with SysV service script with /lib/systemd/systemd-
+Executing: /lib/systemd/systemd-sysv-install enable ssh
+Created symlink /etc/systemd/system/sshd.service → /lib/systemd/system/ssh.service.
+
+Using systemctl to configure ssh to start at boot time
+We can use systemctl to enable and disable most services within Kali Linux.
+
+HTTP Service
+The Apache HTTP service is often used during a penetration test, either for hosting a site, or providing a platform for downloading files to a victim machine. 
+The HTTP service is TCP-based and listens by default on port 80. 
+To start the HTTP service in Kali, we can use systemctl as we did when starting the SSH service, replacing the service name with "apache2":
+
+kali@kali:~$ sudo systemctl start apache2
+kali@kali:~$
+Using systemctl to start the apache service in Kali
+
+As with the SSH service, we can verify that the HTTP service is running and listening on TCP port 80 with the ss and grep commands.
+
+kali@kali:~$ sudo ss -antlp | grep apache
+LISTEN     0      128     :::80     :::*      users:(("apache2",pid=1481,fd=4),("apache2",pid=1480,fd=4),("apache2",pid=1479,fd=4),("apache2",pid=1478,fd=4),("apache2",pid=1477,fd=4),("apache2",pid=1476,fd=4),("apache2",pid=1475,fd=4))
+Using ss and grep to confirm that apache has been started and is running
+
+To have the HTTP service start at boot time, much like with the SSH service, we need to explicitly enable it with systemctl and its enable option:
+
+kali@kali:~$ sudo systemctl enable apache2
+Synchronizing state of apache2.service with SysV service script with /lib/systemd/syst
+Executing: /lib/systemd/systemd-sysv-install enable apache2
+Using systemctl to enable apache to start at boot time
+
+Most services in Kali Linux are operated in much the same way as SSH and HTTP, through their service or init scripts. 
+To see a table of all available services, run systemctl with the list-unit-files option:
+
+kali@kali:~$ systemctl list-unit-files
+...
+UNIT FILE                                                        STATE          
+proc-sys-fs-binfmt_misc.automount                                static         
+-.mount                                                          generated      
+dev-hugepages.mount                                              static         
+dev-mqueue.mount                                                 static         
+media-cdrom0.mount                                               generated      
+proc-sys-fs-binfmt_misc.mount                                    static         
+run-vmblock\x2dfuse.mount                                        disabled       
+sys-fs-fuse-connections.mount                                    static         
+sys-kernel-config.mount                                          static         
+sys-kernel-debug.mount                                           static
+...
+
+Displaying all available services
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
