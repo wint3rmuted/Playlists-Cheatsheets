@@ -1,1 +1,19 @@
+nslookup
+Query the DNS server
+$ nslookup - brings the intera­ctive mode
+$ > [domain] - query dns server for domain
+$ > [ip_ad­dress] - reverse dns lookup
+$ > server [ip_ad­dress or domain] - change the default (current) DNS server to ip_address or domain
+$ > set root=d­nss­erver - makes the root DNS server the default DNS server for the query session
+$ > domain dnssever - show the IP address of the host domain, but query dnsserver for the inform­ation
+$ > set type=x - determines the type of DNS record that the DNS server will use to answer the query (x = DNS record type)
+$ > set recursive - query other DNS servers if the default server does not have the inform­ation
+$ > ls -a domain - list all canonical (true) names and aliases in domain
+$ > ls -h domain - list HINFO (CPU type and operating system) for domain
+$ > ls -s domain - list the well-known services available on domain
+$ > ls -d domain - list all available records for domain. Includes all DNS record types
+$ > ls -t [type] domain - list all DNS TYPE records for domain
+$ > exit - quit the intera­ctive mode
 
+Example
+$ nslookup
