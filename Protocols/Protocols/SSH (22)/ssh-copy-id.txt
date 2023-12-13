@@ -1,1 +1,16 @@
+generate an SSH key-pair, how to configure an SSH server to use a key-pair for authentication, and finally how to log in to a remote server by supplying a public key as input to the server.
+We can generate an SSH key-pair on Kali with ssh-keygen. We'll need to specify the name of the desired output file, as well as an optional passphrase.
+ssh-keygen
 
+Now that we have generated a key-pair, we need to put the public key on a remote server. 
+Remember, we never want to share the private key. 
+We will be using the web-based Kali VM as both the local and remote server.
+
+To send our public key to the remote SSH server, we can use the ssh-copy-id utility. 
+We'll be prompted to enter the password for the kali user.
+
+ssh-copy-id -i /home/kali/.ssh/id_rsa.pub kali@localhost
+kali@kali:~$ ssh-copy-id -i /home/kali/.ssh/id_rsa.pub kali@localhost
+
+Finally, we can logon to the remote server by invoking the -i flag.
+kali@kali:~$ ssh -i .ssh/id_rsa kali@localhost
