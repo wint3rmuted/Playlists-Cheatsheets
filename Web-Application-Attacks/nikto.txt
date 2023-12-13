@@ -1,1 +1,85 @@
+[ + NIKTO ]
+    nikto -h <target_host> -p <port> -ssl: Enables SSL/TLS scanning -o <file> -Format <format>
 
+
+Nikto
+Scan a web appliction with nikto
+nikto -C all -h http://IP
+
+nikto -host x.x.x.x -port 8089 -nossl
+
+Nikto -update    Update scan engine plugins
+
+Here are some examples of how to use Nikto:
+	Scan a web server and save the report to a file:
+    nikto -h <target_host> -o <output_file>
+
+	Scan a web server on a specific port:
+    nikto -h <target_host> -p <port>
+
+	Scan a web server with SSL/TLS enabled:
+    nikto -h <target_host> -ssl
+
+	Scan a web server with custom HTTP headers:
+    nikto -h <target_host> -id "Header1: Value1" -id "Header2: Value2"
+
+	Scan a web server with a specific scan profile:
+    nikto -h <target_host> -Tuning <profile>
+
+	Scan a web server with a specific plugin:
+    nikto -h <target_host> -Plugins <plugin>
+
+	Scan a web server with mutation options:
+    nikto -h <target_host> -mutate <option>
+
+	Scan a web server and specify the CGI directories to scan:
+    nikto -h <target_host> -Cgidirs <directories>
+
+	Scan a web server with HTTP authentication:
+    nikto -h <target_host> -user <username> -pass <password> -Auth <type>
+
+
+
+
+
+nikto -host x.x.x.x -port 8089 -nossl
+
+Nikto -update    Update scan engine plugins
+
+	Here are some examples of how to use Nikto:
+
+	Scan a web server and save the report to a file:
+
+    nikto -h <target_host> -o <output_file>
+
+	Scan a web server on a specific port:
+
+    nikto -h <target_host> -p <port>
+
+	Scan a web server with SSL/TLS enabled:
+
+    nikto -h <target_host> -ssl
+
+	Scan a web server with custom HTTP headers:
+
+    nikto -h <target_host> -id "Header1: Value1" -id "Header2: Value2"
+
+	Scan a web server with a specific scan profile:
+
+    nikto -h <target_host> -Tuning <profile>
+
+	Scan a web server with a specific plugin:
+
+    nikto -h <target_host> -Plugins <plugin>
+
+	Scan a web server with mutation options:
+
+    nikto -h <target_host> -mutate <option>
+
+	Scan a web server and specify the CGI directories to scan:
+
+    nikto -h <target_host> -Cgidirs <directories>
+
+	Scan a web server with HTTP authentication:
+
+    nikto -h <target_host> -user <username> -pass <password> -Auth <type>
