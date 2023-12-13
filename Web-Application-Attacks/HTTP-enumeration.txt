@@ -1,1 +1,103 @@
+Information Gathering
+DNS Brute Force
+Find sub-domains with this script. Detecting sub-domains associated with an organization's domain can reveal new targets when performing a security assessment. The discovered hosts may be virtual web hosts on a single web server or distinct hosts on IP addresses spread across the world in different data centres.
+The dns-brute.nse script will find valid DNS A records by trying a list of common sub-domains and finding those that successfully resolve.
 
+nmap -p 80 --script dns-brute.nse vulnweb.com
+
+Host script results:
+| dns-brute: 
+|   DNS Brute-force hostnames: 
+|     admin.vulnweb.com - 176.28.50.x
+|     firewall.vulnweb.com - 176.28.50.x
+|_    dev.vulnweb.com - 176.28.50.x
+
+HTTP Recon
+Nmap comes with a wide range of NSE scripts for testing web servers and web applications. An advantage of using the NSE scripts for your HTTP reconnaissance is that you are able to test aspects of a web server against large subnets. This can quickly provide a picture of the types of servers and applications in use within the subnet.
+
+http-enum.nse
+One of the more aggressive tests, this script effectively brute forces a web server path in order to discover web applications in use. Attempts will be made to find valid paths on the web server that match a list of known paths for common web applications. The standard test includes testing of over 2000 paths, meaning that the web server log will have over 2000 entries that are HTTP 404 not found, not a stealthy testing option! This is very similar to the famous Nikto web server testing tool (that performs 6000+ tests).
+
+nmap --script http-enum 192.168.10.55
+
+Additional options:
+Specify base path, for example you could specify a base path of /pub/.
+
+nmap --script -http-enum --script-args http-enum.basepath='pub/' 192.168.10.55
+
+Nmap scan report for xbmc (192.168.1.5)
+Host is up (0.0012s latency).
+PORT   STATE SERVICE
+80/tcp open  http
+| http-enum: 
+|   /pub/: Root directory w/ listing on 'apache/2.2.22 (ubuntu)'
+|   /pub/images/: Potentially interesting directory w/ listing on 'apache/2.2.22 (ubuntu)'
+|_  /pub/js/: Potentially interesting directory w/ listing on 'apache/2.2.22 (ubuntu)'
+
+HTTP Title
+It is not a difficult thing to find the Title of the web page from a web server, this script just makes it easier to get those title's in one set of results from a range of IP addresses.
+Having the title of the page included in the Nmap scan results can provide context to a host, that may identify the primary purpose of the web server and whether that server is a potential attack target.
+
+nmap --script http-title -sV -p 80 192.168.1.0/24
+
+80/tcp open  http    Linksys wireless-G WAP http config (Name RT-N16)
+|_http-title: 401 Unauthorized
+Service Info: Device: WAP
+
+80/tcp open  http    Apache httpd 2.2.22 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+
+80/tcp open  upnp    Epson WorkForce 630 printer UPnP (UPnP 1.0; Epson UPnP SDK 1.0)
+|_http-title: WorkForce 630
+Service Info: Device: printer; CPE: cpe:/h:epson:workforce_630
+
+
+smb-os-discovery.nse
+Determine operating system, computer name, netbios name and domain with the smb-os-discovery.nse script. An example use case could be to use this script to find all the Windows XP hosts on a large network, so they can be unplugged and thrown out (Windows XP is no longer supported by Microsoft). The key advantage to using Nmap for something like this rather than a Microsoft native tool is that it will find all systems connected to the network not just those attached to a domain.
+
+nmap -p 445 --script smb-os-discovery 192.168.1.0/24
+
+Starting Nmap 7.93 ( https://nmap.org ) at 2023-02-24 23:32 EST
+Host script results:
+| smb-os-discovery: 
+|   OS: Unix (Samba 3.6.3)
+|   Computer name: ubuntu003
+|   NetBIOS computer name: 
+|   Domain name: 
+|   FQDN: ubuntu003
+|_  System time: 2023-02-24T23:34:41+10:00
+
+
+
+smb-brute.nse
+Another example of the smb series of NSE scripts is the smb-brute.nse that will attempt to brute force local accounts against the SMB service.
+While I would not classify brute forcing accounts as a recon function of the assessment process this script can lead to large amount of recon if we do get valid credentials as there are other smb-* scripts that can be leveraged to retrieve all local user accounts smb-enum-users.nse, groups smb-enum-groups.nse, processes smb-enum-processes.nse and even execute processes remotely with the smb-psexec.nse script.
+
+nmap -sV -p 445 --script smb-brute 192.168.1.101
+
+Starting Nmap 7.93 ( https://nmap.org ) at 2023-02-24 23:47 EST
+Nmap scan report for 192.168.1.101
+Host is up (0.060s latency).
+PORT    STATE SERVICE      VERSION
+445/tcp open  microsoft-ds Microsoft Windows XP microsoft-ds
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb-brute: 
+|_  No accounts found
+
+Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 115.04 seconds
+
+As can be seen in the example above we have not found any accounts. So lets take a look at the activity on the wire while the smb-brute.nse script was running.
+
+Locating NSE Scripts
+To find the complete list of NSE scripts location on an Nmap installation use;
+
+ $ locate *.nse 
+
+or filter with area of interest such as below;
+
+ $ locate nse | grep scripts | grep dns 
+
+Take a look through the included scripts. There are many surprising finds, not only for recon, but also scripts for discovery of exploitable services.
