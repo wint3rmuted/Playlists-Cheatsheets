@@ -1,0 +1,26 @@
+host
+Query the DNS server
+$ host [domain] - query dns server for domain
+$ host [ip_ad­dress] - reverse dns lookup
+$ host -t [DNS_r­ecord] [domain] - query dns for given DNS record
+$ host -l [domain] - zone transfer using AXFR
+
+Example
+$ host hack.com
+hack.com has address 23.21.2­24.150
+hack.com mail is handled by 1000 0.0.0.0.h­ack.com.
+======­===­===­===­===­===­======
+$ host -t A hack.com
+hack.com has address 23.21.2­24.150
+======­===­===­===­===­===­======
+$ host -t AAAA hack.com
+hack.com has no AAAA record
+======­===­===­===­===­===­======
+$ host -t MX hack.com
+hack.com mail is handled by 1000 0.0.0.0.h­ack.com.
+======­===­===­===­===­===­======
+$ host -t SOA hack.com
+hack.com has SOA record ns1.di­gim­edi­a.com. dns.di­gim­edi­a.com. 2014090503 10800 3600 604800 3600
+======­===­===­===­===­===­======
+$ host -t PTR 23.21.2­24.150
+150.22­4.2­1.2­3.i­n-a­ddr.arpa domain name pointer ec2-23­-21­-22­4-1­50.c­om­put­e-1.am­azo­naw­s.com.
