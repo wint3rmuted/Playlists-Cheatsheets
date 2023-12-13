@@ -1,1 +1,9 @@
+3. MITRE ATT&CK
 
+The MITRE ATT&CK framework has become a cornerstone in understanding modern security threats, allowing security professionals to replicate attacker techniques. This framework assists organizations in identifying vulnerabilities and developing tailored counter-measures:
+
+    ATT&CK for Enterprise: covers adversarial behavior in Windows, Mac, Linux, and cloud environments.
+    ATT&CK for Mobile: focuses on Android and iOS systems.
+    ATT&CK for ICS: targets industrial control systems (ICS), detailing potential adversarial actions.
+
+The MITRE ATT&CK framework has become a cornerstone in understanding modern security threats, allowing security professionals to replicate attacker techniques. This framework assists organizations in identifying vulnerabilities and developing tailored counter-measures
