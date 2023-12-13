@@ -1,1 +1,9 @@
+Socat does not tend to be installed by default on *NIX systems. 
+If not already installed, it's possible to download and run a statically-linked binary version instead.
 
+On machine01, we'll start a verbose (-ddd) Socat process. 
+It will listen on TCP port 2345 (TCP-LISTEN:2345), fork into a new subprocess when it receives a connection (fork) instead of dying after a single connection, then forward all traffic it receives to TCP port 5432 on machine2 (TCP:10.4.50.x:5432).
+
+We'll listen on port 2345 as it's not in the privileged port range (0-1024), which means we don't need elevated privileges to use it.
+
+user@machine01:/opt/bin$ socat -ddd TCP-LISTEN:2345,fork TCP:10.4.50.x:5432
