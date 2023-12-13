@@ -1,1 +1,160 @@
+DNS Enumeration
+The Domain Name System (DNS) is one of the most critical systems on the Internet and is a distributed database responsible for translating user-friendly domain names into IP addresses.
+
+This is facilitated by a hierarchical structure that is divided into several zones, starting with the top-level root zone. 
+Let's take a closer look at the process and servers involved in resolving a hostname like www.megacorpone.com.
+
+The process starts when a hostname is entered into a browser or other application. 
+The browser passes the hostname to the operating system's DNS client and the operating system then forwards the request to the external DNS server it is configured to use. 
+This first server in the chain is known as the DNS recursor and is responsible for interacting with the DNS infrastructure and returning the results to the DNS client. 
+The DNS recursor contacts one of the servers in the DNS root zone. 
+The root server then responds with the address of the server responsible for the zone containing the Top Level Domain (TLD), in this case, the .com TLD.
+
+Once the DNS recursor receives the address of the TLD DNS server, it queries it for the address of the authoritative nameserver for the megacorpone.com domain. 
+The authoritative nameserver is the final step in the DNS lookup process and contains the DNS records in a local database known as the zone file. 
+It typically hosts two zones for each domain, the forward lookup zone that is used to find the IP address of a specific hostname and the reverse lookup zone (if configured by the administrator), which is used to find the hostname of a specific IP address. 
+Once the DNS recursor provides the DNS client with the IP address for www.megacorpone.com, the browser can contact the correct web server at its IP address and load the webpage.
+
+To improve the performance and reliability of DNS, DNS caching is used to store local copies of DNS records at various stages of the lookup process. 
+It is for this reason that some modern applications, such as web browsers, keep a separate DNS cache.
+ In addition, the local DNS client of the operating system also maintains its own DNS cache along with each of the DNS servers in the lookup process. 
+ Domain owners can also control how long a server or client caches a DNS record via the Time To Live (TTL) field of a DNS record.
+ 
+Interacting with a DNS Server
+Each domain can use different types of DNS records. 
+Some of the most common types of DNS records include:
+
+    NS - Nameserver records contain the name of the authoritative servers hosting the DNS records for a domain.
+    A - Also known as a host record, the "a record" contains the IP address of a hostname (such as www.megacorpone.com).
+    MX - Mail Exchange records contain the names of the servers responsible for handling email for the domain. A domain can contain multiple MX records.
+    PTR - Pointer Records are used in reverse lookup zones and are used to find the records associated with an IP address.
+    CNAME - Canonical Name Records are used to create aliases for other host records.
+    TXT - Text records can contain any arbitrary data and can be used for various purposes, such as domain ownership verification.
+
+Due to the wealth of information contained within DNS, it is often a lucrative target for active information gathering.
+To demonstrate this, we'll use the host command to find the IP address of www.example.com:
+
+host www.example.com
+
+kali@kali:~$ host www.example.com
+www.example.com has address 38.100.193.x
+Using host to find the A host record for www.example.com
+
+
+By default, the host command looks for an A record, but we can also query other fields, such as MX or TXT records. 
+To do this, we can use the -t option to specify the type of record we are looking for:
+
+Using host to find the MX and TXT records for example.com
+kali@kali:~$ host -t mx example.com
+example.com mail is handled by 10 fb.mail.gandi.net.
+example.com mail is handled by 50 mail.example.com.
+example.com mail is handled by 60 mail2.example.com.
+example.com mail is handled by 20 spool.mail.gandi.net.
+
+kali@kali:~$ host -t txt example.com
+example.com descriptive text "Pieces Pieces all gone."
+   
+
+Forward Lookup Brute Force
+Brute force is a trial-and-error technique that seeks to find valid information, including directories on a webserver, username and password combinations, or in this case, valid DNS records. 
+By using a wordlist that contains common hostnames, we can attempt to guess DNS records and check the response for valid hostnames.
+In the examples so far, we used forward lookups, which request the IP address of a hostname, to query both a valid and an invalid hostname. 
+If host successfully resolves a name to an IP, this could be an indication of a functional server.
+We can automate the forward DNS lookup of common hostnames using the host command in a Bash one-liner.
+First, let's build a list of possible hostnames:
+
+Some DNS wordlists:
+/usr/share/seclists/discovery/dns
+bitquark-subdomains-top100000.txt
+deepmagic.com-prefixes-top50000.txt
+fierce-hostlist.txt
+namelist.txt             
+shubs-subdomains.txt
+subdomains-top1million-110000.txt 
+tlds.txt
+bug-bounty-program-subdomains-trickest-inventory.txt
+deepmagic.com-prefixes-top500.txt
+italian-subdomains.txt  
+sortedcombined-knock-dnsrecon-fierce-reconng.txt 
+subdomains-top1million-20000.txt
+combined_subdomains.txt      
+dns-Jhaddix.txt      
+n0kovo_subdomains.txt  
+shubs-stackoverflow.txt 
+subdomains-spanish.txt     
+subdomains-top1million-5000.txt
+
+A small list of possible hostnames
+kali@kali:~$ cat list.txt
+www
+ftp
+mail
+owa
+proxy
+router
+
+Next, we can use a Bash one-liner to attempt to resolve each hostname:
+
+Using Bash to brute force forward DNS name lookups:
+kali@kali:~$ for ip in $(cat list.txt); do host $ip.example.com; done
+www.example.com has address 38.100.193.x      38.100.193.x       38.100.193.x
+Host ftp.example.com not found: 3(NXDOMAIN)
+mail.example.com has address 38.100.193.x
+Host owa.example.com not found: 3(NXDOMAIN)
+Host proxy.example.com not found: 3(NXDOMAIN)
+router.example.com has address 38.100.193.x
+    
+
+With this simplified wordlist, we discovered entries for "www", "mail", and "router". The hostnames "ftp", "owa", and "proxy", however, were not found. 
+
+Reverse Lookup Brute Force
+Our DNS forward brute force enumeration revealed a set of scattered IP addresses in the same approximate range (38.100.193.X). 
+If the DNS administrator of example.com configured PTR records for the domain, we could scan the approximate range with reverse lookups to request the hostname for each IP.
+
+Let's use a loop to scan IP addresses 38.100.193.50 through 38.100.193.x. 
+We will filter out invalid results by showing only entries that do not contain "not found" (with grep -v):
+
+Using Bash to brute force reverse DNS names:
+kali@kali:~$ for ip in $(seq  50 100); do host 38.100.x.$ip; done | grep -v "not found"
+69.193.100.x.in-addr.arpa domain name pointer beta.example.com.
+70.193.100.x.in-addr.arpa domain name pointer ns1.example.com.
+72.193.100.x.in-addr.arpa domain name pointer admin.example.com.
+73.193.100.x.in-addr.arpa domain name pointer mail2.example.com.
+76.193.100.x.in-addr.arpa domain name pointer www.example.com.
+77.193.100.x.in-addr.arpa domain name pointer vpn.example.com.
+
+We have managed to resolve a number of IP addresses to valid hosts using reverse DNS lookups. 
+If we were performing an assessment, we could further extrapolate these results, and might scan for "mail1", "mail3", etc and reverse lookup positive results. 
+These types of scans are cyclical; we expand our search based on any information we receive every round.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
