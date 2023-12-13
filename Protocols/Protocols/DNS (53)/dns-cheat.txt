@@ -60,3 +60,14 @@ DNS Zone Transfer
 Figure out dns server: host -t ns foo.org host -t mx foo.org now attempt zone transfer for all the dns servers: host -l foo.org ns1.foo.org
 complete enumeration: dnsenum foo.org following will attempt zone transfer dnsrecon -d megacorpone.com -t axfr
 Vulnerability Scanning nmap --script all <IP>
+
+DNS (53) Zone Transfer check:
+Check if port 53 is open.
+Add host to /etc/hosts.
+dig axfr smasher.htb @10.10.10.x
+Add the extracted domain to /etc/hosts and dig again. 
+
+
+
+
+
