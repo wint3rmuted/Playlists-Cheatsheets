@@ -1,1 +1,106 @@
+SMTP(25)
+A SMTP server is running on port 25. We can use it to enumerate some of the users that are present on the server using smtp-user-enum:
+smtp-user-enum -M VRFY -U /usr/share/wordlists/dirb/common.txt -t 192.168.2.4
+smtp-user-enum -M VRFY -u username -t 192.168.2.4
 
+smtp-user-enum  //in Kali
+smtp-user-enum -M VRFY -U /usr/share/wordlists/metasploit/unix_users.txt -t 10.11.1.22
+
+SMTP sendmail commands:
+
+bash-2.05a$ telnet localhost 25
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+220 barry ESMTP Sendmail 8.11.6/8.11.6; Sun, 20 Aug 2017 00:01:02 +0300
+help
+214-2.0.0 This is sendmail version 8.11.6
+214-2.0.0 Topics:
+214-2.0.0 	HELO	EHLO	MAIL	RCPT	DATA
+214-2.0.0 	RSET	NOOP	QUIT	HELP	VRFY
+214-2.0.0 	EXPN	VERB	ETRN	DSN	AUTH
+214-2.0.0 	STARTTLS
+214-2.0.0 For more info use "HELP <topic>".
+214-2.0.0 To report bugs in the implementation send email to
+214-2.0.0 	sendmail-bugs@sendmail.org.
+214-2.0.0 For local information send email to Postmaster at your site.
+214 2.0.0 End of HELP info
+AUTH
+503 5.3.3 AUTH mechanism  not available
+EHLO barry
+250-barry Hello localhost [127.0.0.1], pleased to meet you
+250-ENHANCEDSTATUSCODES
+250-EXPN
+250-VERB
+250-8BITMIME
+250-SIZE
+250-DSN
+250-ONEX
+250-ETRN
+250-XUSR
+250 HELP
+AUTH LOGIN
+
+smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t 192.168.141.x -p 25
+smtp-user-enum -U /usr/share/wordlists/names.txt -t $TARGET -m 150
+
+Banner Grabbing
+nc -vn $IP 25
+
+openssl s_client -crlf -connect smtp.mailgun.org:465 #SSL/TLS without starttls command
+openssl s_client -starttls smtp -crlf -connect smtp.mailgun.org:587
+
+Finding MX servers of an organization:
+dig +short mx google.com
+
+Enum
+nmap -p25 --script smtp-commands 10.10.10.10
+nmap -p25 --script smtp-open-relay 10.10.10.10 -v
+
+NTLM Auth - Information Diclosure
+If the server supports NTLM auth (windows) you can obtain sensitive info (versions) 
+
+- SMTP(25):
+    - connect
+        > telnet 10.11.1.x 25
+        > nc 10.11.1.217 25
+            > HELO
+            > HELO aaa
+            - Verify users
+                > VRFY <user>
+            - Verify with recipt
+                > MAIL FROM: <valid email address>
+                > RCPT TO: <email address to test>
+            - Send an email
+                > MAIL FROM: <valid email address>
+                > RCPT TO: <email address to test>
+                > DATA
+                    - Type whatever you want, end with a newline starting wtih "." to end and send at the same time
+                
+
+    > SMTP-VRFY root 10.11.1.x 25
+    - Windows server ntlm check
+        > nmap -p 25 --script smtp-ntlm-info --script-args smtp-ntlm-info.domain=htb.local 10.10.10.x -d
+
+    - smtp-user-enum
+        - VRFY (check for users)
+            > smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/Names/names.txt -t 11.10.10.51 | tee _smtp_vrfy_enum
+            > smtp-user-enum -M EXPN -U /usr/share/seclists/Usernames/Names/names.txt -t 10.10.10.51 | tee _smtp_expn_enum
+            > smtp-user-enum -M RCPT -U /usr/share/seclists/Usernames/Names/names.txt -t 10.10.10.51 | tee _smtp_rcpt_enum
+        - Check for users email address
+            > smtp-user-enum -M VRFY -D mail.ignite.lab -u raj -t 192.168.1.x
+    - nmap
+        > nmap --script smtp-enum-users.nse --script-args smtp-enum-users.methods={EXPN,VRFY,RCPT} -p 25 10.10.10.x
+
+    - ismtp
+        > ismtp -h 192.168.1.107:25 -e /usr/share/seclists/Usernames/Names/names.txt
+
+    - swaks
+        > swaks --to root@10.10.10.x --server 10.10.10.x
+        
+- SMTPS(465):
+    - connect
+        > openssl s_client -crlf -connect smtp.mailgun.org:465
+        
+       
+        
