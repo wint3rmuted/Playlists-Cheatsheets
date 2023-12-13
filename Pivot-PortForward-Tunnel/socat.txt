@@ -7,3 +7,13 @@ It will listen on TCP port 2345 (TCP-LISTEN:2345), fork into a new subprocess wh
 We'll listen on port 2345 as it's not in the privileged port range (0-1024), which means we don't need elevated privileges to use it.
 
 user@machine01:/opt/bin$ socat -ddd TCP-LISTEN:2345,fork TCP:10.4.50.x:5432
+
+With the Socat process running, we can run psql on our Kali machine, specifying that we want to connect to machine01 (-h 192.168.50.x) on port 2345 (-p 2345) with the postgres user account (-U postgres). 
+When prompted, we will enter the password, and once connected, we can run the \l command to list the available databases.
+
+kali@kali:~$ psql -h 192.168.50.x -p 2345 -U postgres
+
+We'll then use our SSH client to connect to port 2222 on machine01, as though we are connecting directly to port 22 on machine2. 
+We can use the database_admin user, and the password we just cracked using Hashcat.
+
+kali@kali:~$ ssh database_admin@192.168.50.x -p2222
