@@ -24,3 +24,8 @@ hack.com has SOA record ns1.di­gim­edi­a.com. dns.di­gim­edi­a.com. 201409
 ======­===­===­===­===­===­======
 $ host -t PTR 23.21.2­24.150
 150.22­4.2­1.2­3.i­n-a­ddr.arpa domain name pointer ec2-23­-21­-22­4-1­50.c­om­put­e-1.am­azo­naw­s.com.
+
+host -t ns target.com                    # Show name servers 
+host -t mx target.com                    # Show mail servers
+host www.target.com
+host -l target.com <nameserver>          # Zone transfer
