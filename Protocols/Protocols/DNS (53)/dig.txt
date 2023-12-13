@@ -1,1 +1,23 @@
+Dig
+Query the DNS server
+$ dig [domain] - query dns server for name
+$ dig +nocmd [domain] - drops dig version from query output
+$ dig +nocom­ments [domain] - drops the question and answer section from query output
+$ dig +noque­stion [domain] - drops the question from the query output
+$ dig +noanswer [domain] - drops the answer from the query output
+$ dig +noaut­hority [domain] - drops the inform­ation of author­itative dns from the query output
+$ dig +noadd­itional [domain] - drops additional inform­ation from query output
+$ dig +nostat [domain] - drops statistics from query output
+$ dig +short [domain] - short form of query output
+$ dig [DNS_r­ecord] [domain] - query dns for given DNS record
+$ dig [domain] AXFR - zone transfer
+$ dig -x [ip_ad­dres] - reverse dns lookup
+$ dig @names­erver [domain] - query different name server
+$ dig +search [domain] - uses dns servers from /etc/r­eso­lv.conf
+$ dig -f /path/­to/file - query for hosts specified in the file
+$ dig +noall - set or clear all display flags
 
+Example
+$ dig @8.8.8.8 hack.com
+$ dig @8.8.8.8 +short hack.com
+69.172.20­1.208
