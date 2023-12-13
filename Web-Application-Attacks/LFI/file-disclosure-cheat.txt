@@ -1,4 +1,4 @@
-File Disclosure Cheat Sheet
+File Disclosure Cheat Sheet Linux:
 
 /etc/passwd
 /etc/shadow
