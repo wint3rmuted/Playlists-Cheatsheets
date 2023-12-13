@@ -1,1 +1,121 @@
+Dig
+Query the DNS server
+$ dig [domain] - query dns server for name
+$ dig +nocmd [domain] - drops dig version from query output
+$ dig +nocom­ments [domain] - drops the question and answer section from query output
+$ dig +noque­stion [domain] - drops the question from the query output
+$ dig +noanswer [domain] - drops the answer from the query output
+$ dig +noaut­hority [domain] - drops the inform­ation of author­itative dns from the query output
+$ dig +noadd­itional [domain] - drops additional inform­ation from query output
+$ dig +nostat [domain] - drops statistics from query output
+$ dig +short [domain] - short form of query output
+$ dig [DNS_r­ecord] [domain] - query dns for given DNS record
+$ dig [domain] AXFR - zone transfer
+$ dig -x [ip_ad­dres] - reverse dns lookup
+$ dig @names­erver [domain] - query different name server
+$ dig +search [domain] - uses dns servers from /etc/r­eso­lv.conf
+$ dig -f /path/­to/file - query for hosts specified in the file
+$ dig +noall - set or clear all display flags
+
+Example
+$ dig @8.8.8.8 hack.com
+$ dig @8.8.8.8 +short hack.com
+69.172.20­1.208
+
+
+nslookup
+Query the DNS server
+$ nslookup - brings the intera­ctive mode
+$ > [domain] - query dns server for domain
+$ > [ip_ad­dress] - reverse dns lookup
+$ > server [ip_ad­dress or domain] - change the default (current) DNS server to ip_address or domain
+$ > set root=d­nss­erver - makes the root DNS server the default DNS server for the query session
+$ > domain dnssever - show the IP address of the host domain, but query dnsserver for the inform­ation
+$ > set type=x - determines the type of DNS record that the DNS server will use to answer the query (x = DNS record type)
+$ > set recursive - query other DNS servers if the default server does not have the inform­ation
+$ > ls -a domain - list all canonical (true) names and aliases in domain
+$ > ls -h domain - list HINFO (CPU type and operating system) for domain
+$ > ls -s domain - list the well-known services available on domain
+$ > ls -d domain - list all available records for domain. Includes all DNS record types
+$ > ls -t [type] domain - list all DNS TYPE records for domain
+$ > exit - quit the intera­ctive mode
+
+Example
+$ nslookup
+
+
+whois
+Checks inform­ation about ownership of a domain name
+$ whois [domain] - querying databases that store the registered users or assignees, such as a domain name, an IP addresses
+
+Example:
+$ whois hackme.com
+
+host
+Query the DNS server
+$ host [domain] - query dns server for domain
+$ host [ip_ad­dress] - reverse dns lookup
+$ host -t [DNS_r­ecord] [domain] - query dns for given DNS record
+$ host -l [domain] - zone transfer using AXFR
+
+Example
+$ host hack.com
+hack.com has address 23.21.2­24.150
+hack.com mail is handled by 1000 0.0.0.0.h­ack.com.
+======­===­===­===­===­===­======
+$ host -t A hack.com
+hack.com has address 23.21.2­24.150
+======­===­===­===­===­===­======
+$ host -t AAAA hack.com
+hack.com has no AAAA record
+======­===­===­===­===­===­======
+$ host -t MX hack.com
+hack.com mail is handled by 1000 0.0.0.0.h­ack.com.
+======­===­===­===­===­===­======
+$ host -t SOA hack.com
+hack.com has SOA record ns1.di­gim­edi­a.com. dns.di­gim­edi­a.com. 2014090503 10800 3600 604800 3600
+======­===­===­===­===­===­======
+$ host -t PTR 23.21.2­24.150
+150.22­4.2­1.2­3.i­n-a­ddr.arpa domain name pointer ec2-23­-21­-22­4-1­50.c­om­put­e-1.am­azo­naw­s.com.
+
+Nmap scan report for 192.168.184.149
+Host is up, received conn-refused (0.085s latency).
+Scanned at 2023-01-23 19:07:16 EST for 12s
+Not shown: 989 closed tcp ports (conn-refused)
+PORT     STATE SERVICE          REASON
+53/tcp   open  domain           syn-ack
+88/tcp   open  kerberos-sec     syn-ack
+135/tcp  open  msrpc            syn-ack
+139/tcp  open  netbios-ssn      syn-ack
+389/tcp  open  ldap             syn-ack
+445/tcp  open  microsoft-ds     syn-ack
+464/tcp  open  kpasswd5         syn-ack
+593/tcp  open  http-rpc-epmap   syn-ack
+636/tcp  open  ldapssl          syn-ack
+3268/tcp open  globalcatLDAP    syn-ack
+3269/tcp open  globalcatLDAPssl syn-ack
+
+Nmap scan report for 192.168.184.254
+Host is up, received conn-refused (0.083s latency).
+Scanned at 2023-01-23 19:07:16 EST for 11s
+Not shown: 996 filtered tcp ports (no-response)
+PORT    STATE  SERVICE REASON
+22/tcp  closed ssh     conn-refused
+53/tcp  open   domain  syn-ack
+80/tcp  closed http    conn-refused
+443/tcp closed https   conn-refused
+
+Other addresses for dc.MAILMAN.com (not scanned): 
+
+45.79.19.196 
+45.33.2.79 
+198.58.118.167 
+45.33.20.235 
+96.126.123.244 
+45.33.30.197 
+173.255.194.134 
+45.33.18.44 
+45.56.79.23 
+45.33.23.183 
+72.14.185.43
 
