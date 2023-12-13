@@ -1,1 +1,9 @@
+Lesser known yet handy Wireshark features
+Statistics and analysis tools: Wireshark comes with a range of built-in tools to analyze network data. Examples include the ability to visualize statistics, like protocol hierarchy, endpoints, packet lengths, and more. An example command would be Statistics > Protocol Hierarchy.
+
+Stream Follow: The ability to follow a TCP, UDP, or SSL/TLS stream, which can be very useful for understanding what’s happening in a particular connection. An example would be right-clicking on a packet and selecting Follow > TCP Stream.
+    
+Exporting and Saving Data: Commands for exporting specific packets, saving packet data, or creating PCAP files can also be useful. For example, File > Export Specified Packets....
+Capture Interfaces: Selecting and managing capture interfaces can be helpful. For example, Capture > Options > Manage Interfaces.
+Time Display Format and Precision: Commands for changing the time display format and precision might also be helpful for some users. For example, View > Time Display Format > Seconds Since Beginning of Capture.
 
