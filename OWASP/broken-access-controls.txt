@@ -1,7 +1,8 @@
 Broken Access controls
 The goal of this is to either see data of other users or act on behalf of them
 
-This vulneribilty can also be majorly refered as IDORS (insecure direct object references). In this attack we are able to access data or privileges of a user which we should not have access to. Or if we can access a directory which should be restricted to low priv users. like in a url we have ?id=4 and if we change it to 5,we can see data of another user which we should not be able to see
+This vulneribilty can also be majorly refered as IDORS (insecure direct object references). In this attack we are able to access data or privileges of a user which we should not have access to. 
+Or if we can access a directory which should be restricted to low priv users. like in a url we have ?id=4 and if we change it to 5,we can see data of another user which we should not be able to see
 
     Access to pages by tampring a parameter value
     Accessing api endpoints by different http methods (put,delete,post) etc and upload or delete something
