@@ -1,1 +1,25 @@
+Default Web Directories
+- config.php (adjust after html as needed)
+    - /var/www/html/config.php
+- Apache2
+    - /var/www/html/
+    - /var/log/apache2/access.log
+    - /var/log/apache2/error.log
+    - /etc/apache2/sites-enabled/000-default.conf
+- Apache tomcat
+    - /usr/local/tomcat<version>/webapps/ROOT/
+    - /usr/local/tomcat9/conf/server.xml
+    - /usr/local/tomcat<version>/conf/tomcat-users.xml 
+        - can find the tomcat manager login here
+- nginx
+    - /var/www/html/
+    - /var/log/nginx/error.log
+    - /var/log/nginx/access.log
+    - /etc/nginx/sites-enabled/default
+    - /usr/share/nginx/html/
+- Windows IIS
+    - C:\inetpub\wwwroot\myapp
+    - C:\inetpub\logs\LogFIles
 
+phpmyadmin
+- passwords can be found here "\xampp\phpMyAdmin\config.inc.php"
