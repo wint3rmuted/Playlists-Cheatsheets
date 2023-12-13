@@ -1,0 +1,6 @@
+whois
+Checks inform­ation about ownership of a domain name
+$ whois [domain] - querying databases that store the registered users or assignees, such as a domain name, an IP addresses
+
+Example:
+$ whois hackme.com
