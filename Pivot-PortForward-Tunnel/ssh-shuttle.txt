@@ -1,1 +1,45 @@
+Using sshuttle
+In situations where we have direct access to an SSH server, behind which is a more complex internal network, classic dynamic port forwarding might be difficult to manage. 
+sshuttle is a tool that turns an SSH connection into something similar to a VPN by setting up local routes that force traffic through the SSH tunnel. 
+However, it requires root privileges on the SSH client and Python3 on the SSH server, so it's not always the most lightweight option. 
+In the appropriate scenario, however, it can be very useful.
 
+In our lab environment, we have SSH access to DATABASE01, which we can access through a port forward set up on machine01. 
+Let's run sshuttle through this to observe its capabilities.
+
+First, we can set up a port forward in a shell on machine01, listening on port 2222 on the WAN interface and forwarding to port 22 on DATABASE01.
+
+Forwarding port 2222 on machine01 to port 22 on PGDATABASE01.
+ socat TCP-LISTEN:2222,fork TCP:10.4.50.x:22
+
+Next, we can run sshuttle, specifying the SSH connection string we want to use, as well as the subnets that we want to tunnel through this connection (10.4.50.0/24 and 172.16.50.0/24).
+
+Running sshuttle from our Kali machine, pointing to the forward port on machineE01.
+kali@kali:~$ sshuttle -r database_admin@192.168.50.x:2222 10.4.50.0/24 172.16.50.0/24
+[local sudo] Password: 
+database_admin@192.168.50.x's password: 
+c : Connected to server.
+Failed to flush caches: Unit dbus-org.freedesktop.resolve1.service not found.
+fw: Received non-zero return code 1 when flushing DNS resolver cache.
+    
+
+Although we don't receive much output from sshuttle, in theory, it should have set up the routing on our Kali machine so that any requests we make to hosts in the subnets we specified will be pushed transparently through the SSH connection. 
+Let's test if this is working by trying to connect to the SMB share on HRSHARES in a new terminal.
+
+smbclient -L //172.16.50.x/ -U hr_admin --password=Welcome1234
+
+Connecting to the SMB share on HRSHARES, without any explicit forwarding.
+kali@kali:~$ smbclient -L //172.16.50.x/ -U hr_admin --password=Welcome1234
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        scripts         Disk
+
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 172.16.50.x failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+kali@kali:~$
+    
