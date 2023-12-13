@@ -21,3 +21,8 @@ Example
 $ dig @8.8.8.8 hack.com
 $ dig @8.8.8.8 +short hack.com
 69.172.20­1.208
+
+dig target.com <type>                    # a, mx, ns, soa, srv, txt, any
+dig -x <target IP>                       # Pointer records
+dig @nameserverIP target.com axfr        # Zone transfer
+dig @nameserverIP target.com afro        # Forward zone transfer
