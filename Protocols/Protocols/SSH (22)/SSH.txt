@@ -13,6 +13,8 @@ Authentication
 Testing credentials
 cme ssh 192.168.1.0/24 -u user -p password
 cme ssh 192.168.1.0/24 -u userfile -p passwordfile --no-bruteforce
+cme ssh 192.168.1.0/24 -u userfile -H hashfile
+
 
 Specify Ports
 cme http 192.168.1.0/24 --port 2222
