@@ -1,1 +1,62 @@
+DNS lookups, Zone Transfers & Brute-Force
+whois domain.com
+dig {a|txt|ns|mx} domain.com
+dig {a|txt|ns|mx} domain.com @ns1.domain.com
+host -t {a|txt|ns|mx} megacorpone.com
+host -a megacorpone.com
+host -l megacorpone.com ns1.megacorpone.com
+dnsrecon -d megacorpone.com -t axfr @ns2.megacorpone.com
+dnsenum domain.com
+nslookup -> set type=any -> ls -d domain.com
+for sub in $(cat subdomains.txt);do host $sub.domain.com|grep "has.address";done
 
+
+DNS - TCP/UDP 53
+I can try a zone transfer, but it fails:
+
+oxdf@hacky$ dig +noall +answer @10.10.11.181 axfr absolute.htb
+; Transfer failed.
+
+I can confirm the two names I already know:
+
+oxdf@hacky$ dig +noall +answer @10.10.11.181 absolute.htb
+absolute.htb.           600     IN      A       10.10.11.181
+oxdf@hacky$ dig +noall +answer @10.10.11.181 dc.absolute.htb
+dc.absolute.htb.        3600    IN      A       10.10.11.181
+
+I’ll brute force subdomains with dnsenum. It confirms what I identified manually above, and finds a few other subdomains via bruteforce:
+
+oxdf@hacky$ dnsenum --dnsserver 10.10.11.181 -f /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt absolute.htb
+dnsenum VERSION:1.2.6
+
+dnsenum <DOMAIN>
+dnsrecon -d <DOMAIN>
+
+Zone transfer
+dnsrecon -d megacorpone.com -t axfr @ns2.megacorpone.com
+dnsrecon -d <DOMAIN> -a
+dig axfr <DOMAIN> @ns1.test.com
+
+DNS server discovery
+$ nmap -p 53 10.11.1.1-254 -vv -oA dcs
+
+DNS
+Find DNS server:
+$ nslookup thinc.local 10.11.1.221
+$ dig @10.11.1.221 thinc.local
+
+Forward Lookup Brute Force:
+$ dnsrecon -d example.com -D /usr/share/wordlists/dnsmap.txt -t std --xml dnsrecon.xml
+
+Reverse Lookup Brute Force:
+$ dnsrecon -d demo.com -t rvl
+
+DNS Zone Transfers:
+$ host -l domain > $ip $ dnsrecon -d megacorpone.com -t axfr
+$ dnsenum zonetransfer.me
+
+
+DNS Zone Transfer
+Figure out dns server: host -t ns foo.org host -t mx foo.org now attempt zone transfer for all the dns servers: host -l foo.org ns1.foo.org
+complete enumeration: dnsenum foo.org following will attempt zone transfer dnsrecon -d megacorpone.com -t axfr
+Vulnerability Scanning nmap --script all <IP>
