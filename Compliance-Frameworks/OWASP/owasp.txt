@@ -1,1 +1,18 @@
+OWASP – Open Web Application Security Project
+open web applications security project
 
+This is a very famous methodology used widely by security professionals. It is a non-profit organization focused on advancing software security. OWASP provides numerous tools, guides, and testing methodologies like the OWASP Testing Guide (OTG).
+
+OTG is divided into three primary sections, namely, the OWASP testing framework for web application development, the web application testing methodology, and reporting.
+OWASP Methodology Steps
+
+The following are the stages of the Open Web Application Security Project (OWASP) framework:
+
+    Reconnaissance
+    Scanning
+    Exploitation
+    Maintaining access
+    Reporting
+
+You can download the OTG and the OWASP Application Security Verification Standard 
+OTG has a strong focus on web application security throughout the entire software development lifecycle as opposed to the ISSAF and OSSTMM, both of which are aimed at security testing and implementation.
