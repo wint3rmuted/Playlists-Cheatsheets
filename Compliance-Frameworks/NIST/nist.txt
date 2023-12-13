@@ -1,1 +1,11 @@
+NIST
+National institute of standards and technology
 
+The National Institute of Standards and Technology (NIST) provides a manual that is best suited to improve the overall Cybersecurity of an organization.
+
+With this framework, NIST set its sight on guaranteeing information security in different industries, including banking, communications, and energy. Large and small firms alike can tailor the standards to meet their specific needs.
+
+In order to meet the standards that NIST has set, companies must perform penetration tests on their applications and networks following a pre-established set of guidelines. 
+
+Penetration testing is being referenced in many NIST publications. 
+You can download the NIST special publication 800-115  and the 800-53 
