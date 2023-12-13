@@ -1,1 +1,14 @@
+ssh -N -L [bind_address:]port:host:hostport [username@address]
+ -L parameter specifies the port on the local host that will be forwarded to a remote address and port.
+ 
+ 
+To pull this off, we will execute an ssh command from our Kali Linux attack machine. We will not technically issue any ssh commands (-N) but will set up port forwarding (with -L), bind port 445 on our local machine (0.0.0.0:445) to port 445 on the Windows Server (192.168.1.110:445) and do this through a session to our original Linux target, logging in as student (student@10.11.0.x):
+
+Forwarding TCP port 445 on our Kali Linux machine to TCP port 445 on the Windows Server 2016
+kali@kali:~$ sudo ssh -N -L 0.0.0.0:445:192.168.1.x:445 student@10.11.0.128
+student@10.11.0.128's password:  
+
+
+netstat -ano | grep tcp | grep LIST 
+show listening connections
 
