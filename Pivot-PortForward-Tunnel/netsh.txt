@@ -1,1 +1,119 @@
+Netsh (Network Shell)
+There is a native way to create a port forward on Windows we should explore: the built-in firewall configuration tool Netsh (also known as Network Shell). 
+Using Netsh, we can set up a port forward with the portproxy subcontext within the interface context. 
+While Netsh requires administrative privileges to create a port forward on Windows, it can be very useful in some restrictive situations.
+
+kali@kali:~$ xfreerdp /u:rdp_admin /p:P@ssw0rd! /v:192.168.156.x
+Connecting to the RDP server with xfreerdp.
+
+In our RDP session, we can run cmd.exe as administrator to open a command window.
+
+Using this window, we can run Netsh. 
+We'll instruct netsh interface to add a portproxy rule from an IPv4 listener that is forwarded to an IPv4 port (v4tov4). 
+This will listen on port 2222 on the external-facing interface (listenport=2222 listenaddress=192.168.50.64) and forward packets to port 22 on PGDATABASE01 (connectport=22 connectaddress=10.4.50.215).
+
+The portproxy command being run
+netsh interface portproxy add v4tov4 listenport=2222 listenaddress=192.168.156.x connectport=22 connectaddress=10.4.156.x
+
+C:\Windows\system32>netsh interface portproxy add v4tov4 listenport=2222 listenaddress=192.168.156.x connectport=22 connectaddress=10.4.156.x
+  
+Although we don't receive any output from the command, we can confirm that port 2222 is listening using netstat.
+
+netstat -anp TCP | find "2222"
+
+C:\Windows\system32>netstat -anp TCP | find "2222"
+  TCP    192.168.50.64:2222     0.0.0.0:0              LISTENING
+C:\Windows\system32>
+    netstat showing that TCP/2222 is listening on the external interface.
+
+We can also confirm that the port forward is stored by issuing the show all command in the netsh interface portproxy subcontext.
+
+netsh interface portproxy show all
+
+C:\Windows\system32>netsh interface portproxy show all
+    Listing 62 - Listing all the portproxy port forwarders set up with Netsh.
+Listen on ipv4:             Connect to ipv4:
+Address         Port        Address         Port
+--------------- ----------  --------------- ----------
+192.168.50.x   2222        10.4.50.x     22
+
+
+However, there's a problem. 
+We can't connect to port 2222 from our Kali machine. 
+We'll specifically check port 2222 using nmap.
+
+sudo nmap -sS 192.168.50.x -Pn -n -p2222
+
+kali@kali:~$ sudo nmap -sS 192.168.50.x -Pn -n -p2222
+ Nmap showing that port 2222 on SERVER03 is filtered.
+
+The response shows that port 2222 is filtered. 
+It's most likely that the Windows Firewall is blocking inbound connections to port 2222.
+The Windows firewall blocking our attempt to connect to port 2222 on SERVER03 from our Kali machine on the WAN network
+
+advfirewall set a rule to open a hole to port 2222
+In order to access it, we need to poke a hole in the firewall on MULTISERVER03.
+We'll also need to remember to plug that hole as soon as we're finished with it!
+
+We can use the netsh advfirewall firewall subcontext to create the hole. 
+We will use the add rule command and name the rule "port_forward_ssh_2222". 
+We need to use a memorable or descriptive name, because we'll use this name to delete the rule later on.
+
+We'll allow connections on the local port (localport=2222) on the interface with the local IP address (localip=192.168.50.x) using the TCP protocol, specifically for incoming traffic (dir=in).
+
+Poking a hole in the Windows Firewall with Netsh.
+netsh advfirewall firewall add rule name="port_forward_ssh_2222" protocol=TCP dir=in localip=192.168.156.x localport=2222 action=allow
+
+C:\Windows\system32> netsh advfirewall firewall add rule name="port_forward_ssh_2222" protocol=TCP dir=in localip=192.168.50.x localport=2222 action=allow
+Ok  
+
+The command completes successfully with an "Ok." response. 
+We can check how the port appears from our Kali machine again.
+
+kali@kali:~$ sudo nmap -sS 192.168.50.x -Pn -n -p2222
+Starting Nmap 7.92 ( https://nmap.org ) at 2022-07-21 06:28 EDT
+Nmap scan report for 192.168.50.x
+Host is up (0.00060s latency).
+
+PORT     STATE SERVICE
+2222/tcp open  EtherNetIP-1
+MAC Address: 00:0C:29:A9:9F:3D (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.23 seconds
+Nmap showing that port 2222 on MULTISERVER03 is open.
+
+The port is open! We can now SSH to port 2222 on ERVER03, as though connecting to port 22 on machine01.
+kali@kali:~$ ssh database_admin@192.168.50.64 -p2222
+
+
+
+Cleanup Firewall Rules
+Once we're done with the connection, we need to remember to delete the firewall rule we just created.
+Using netsh advfirewall firewall, we can delete the rule, referencing it by its catchy name: "port_forward_ssh_2222".
+
+netsh advfirewall firewall delete rule name="port_forward_ssh_2222"
+
+C:\Users\Administrator>netsh advfirewall firewall delete rule name="port_forward_ssh_2222"
+
+Deleted 1 rule(s).
+Deleting the firewall rule with Netsh.
+
+The command completes successfully, and we receive confirmation that the firewall rule was deleted.
+We can also delete the port forward we created. 
+This time we'll use the netsh interface subcontext to del the portproxy we created. 
+We will reference the forwarding type (v4tov4) and the listenaddress and listenport we used when creating the rule, so Netsh can determine which rule to delete.
+
+netsh interface portproxy del v4tov4 listenport=2222 listenaddress=192.168.50.64
+
+C:\Windows\Administrator> netsh interface portproxy del v4tov4 listenport=2222 listenaddress=192.168.50.64
+   Deleting the port forwarding rule with Netsh.
+
+When we delete the rule, we don't get any response for a success. 
+Nevertheless, the command completed successfully, and the rule is deleted.
+
+Most Windows Firewall commands have PowerShell equivalents with commandlets like New-NetFirewallRule and Disable-NetFirewallRule. 
+However, the netsh interface portproxy command doesn't. 
+For simplicity, we've stuck with pure Netsh commands in this section. 
+However, for a lot of Windows Firewall enumeration and configuration, PowerShell is extremely useful. 
+You may wish to experiment with it while completing the exercises for this section.
 
