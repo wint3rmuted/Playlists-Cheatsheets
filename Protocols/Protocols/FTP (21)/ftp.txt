@@ -1,1 +1,177 @@
+FTP (21)
+Anonymous Login check:
+ftp <ip address> 
+username:anonymous
+pwd:anonymous
+file upload -→ put shell.php
+
+FTP Commands.
+USER - username
+PASS - password
+HELP - Server shows which commands are supported
+LIST - Send list of files in current folder.
+LIST -R - List recursively
+RETR /path/to/file  - A passive or a port connection must be establish. Then, the FTP server will send the indicated file through that connection
+TYPE i  - Set transfer to binary
+PUT /tmp/file.txt Upload indicated file to the FTP
+PASV This will open a passive connection and will indicate the user were he can connects
+
+Config FIles.
+ftpusers
+ftp.conf
+proftpd.conf
+vsftpd.conf
+
+Enumeration - Banner Grabbing
+nc -vn <IP> 21
+openssl s_client -connect crossfit.htb:21 -starttls ftp #Get certificate if any
+
+Connect to FTP using starttls.
+lftp
+lftp :~> set ftp:ssl-force true
+lftp :~> set ssl:verify-certificate no
+lftp :~> connect 10.10.10.208
+lftp 10.10.10.208:~> login                       
+Usage: login <user|URL> [<pass>]
+lftp 10.10.10.208:~> login username Password
+
+Unauthenticated enum with nmap. 
+sudo nmap -sV -p21 -sC -A 10.10.10.10
+
+You can us the commands HELP and FEAT to obtain some information of the FTP server.
+
+Anonymous Login.
+anonymous : anonymous
+anonymous :
+ftp : ftp
+
+ftp <IP>
+>anonymous
+>anonymous
+>ls -a # List all files (even hidden) (yes, they could be hidden)
+>binary #Set transmission to binary instead of ascii
+>ascii #Set transmission to ascii instead of binary
+>bye #exit
+
+Brute Forcing FTP.
+Seclists - /passwords/default-credentials/ftp-betterdefaultpasslist.txt 
+
+Automated- Anon login and bounce FTP checks are performed by default with nmap's -sC option.
+nmap --script ftp-* -p 21 <ip>
+
+Browser connection. 
+You can connect to a FTP server using a browser like firefox using a URL like:
+ftp://anonymous:anonymous@10.10.10.98
+
+Note that if a web application is sending data controlled by a user directly to a FTP server you can send double URL encode %0d%0a (in double URL encode this is %250d%250a) bytes and make the FTP server perform arbitrary actions. One of this possible arbitrary actions is to download content from a users controlled server, perform port scanning or try to talk to other plain-text based services (like http).
+
+
+Download all files from FTP.
+wget -m ftp://anonymous:anonymous@10.10.10.98 #Donwload all
+wget -m --no-passive ftp://anonymous:anonymous@10.10.10.98 #Download all
+**PORT 127,0,0,1,0,80**This will indicate the FTP server to establish a connection with the IP 127.0.0.1 in port 80 (you need to put the 5th char as "0" and the 6th as the port in decimal or use the 5th and 6th to express the port in hex).
+wget --mirror 'ftp://ftp_user:UTDRSCH53c"$6hys@10.10.10.59'
+
+Post-Exploitation.
+The default configuration of vsFTPd can be found in /etc/vsftpd.conf. In here, you could find some dangerous settings:
+anonymous_enable=YES
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_root=/home/username/ftp - Directory for anonymous.
+chown_uploads=YES - Change ownership of anonymously uploaded files
+chown_username=username - User who is given ownership of anonymously uploaded files
+local_enable=YES - Enable local users to login
+no_anon_password=YES - Do not ask anonymous for password
+write_enable=YES - Allow commands: STOR, DELE, RNFR, RNTO, MKD, RMD, APPE, and SITE
+
+FTPBounce Attack.
+Some FTP servers allow the command PORT. 
+This command can be used to indicate to the server that you wants to connect to other FTP server at some port. 
+Then, you can use this to scan which ports of a host are open through a FTP server.
+
+Internal scan with nmap.
+nmap -b <name>:<pass>@<ftp_server> <victim>
+nmap -Pn -v -p 21,80 -b ftp:ftp@10.2.1.5 127.0.0.1 - Scan ports 21,80 of the FTP
+nmap -v -p 21,22,445,80,443 -b ftp:ftp@10.2.1.5 192.168.0.1/24  - Scan the internal network (of the FTP) ports 21,22,445,80,443
+
+You could also abuse this behaviour to make a FTP server interact with other protocols. 
+You could upload a file containing an HTTP request and make the vulnerable FTP server send it to an arbitrary HTTP server (maybe to add a new admin user?) or even upload a FTP request and make the vulnerable FTP server download a file for a different FTP server.
+The theory is easy: 
+Upload the request (inside a text file) to the vulnerable server. 
+Remember that if you want to talk with another HTTP or FTP server you need to change lines with 0x0d 0x0a
+Use REST X to avoid sending the characters you don't want to send (maybe to upload the request inside the file you needed to put some image header at the begging)
+Use PORTto connect to the arbitrary server and service
+Use RETRto send the saved request to the server.
+
+Its highly probably that this will throw an error like Socket not writable because the connection doesn't last enough to send the data with RETR. 
+Suggestions to try to avoid that are:
+If you are sending an HTTP request, put the same request one after another until ~0.5MB at least. Like this.
+Try to fill the request with "junk" data relative to the protocol (talking to FTP maybe just junk commands or repeating the RETRinstruction to get the file)
+Just fill the request with a lot of null characters or others (divided on lines or not)
+
+Filezilla Server vulnerability.
+FileZilla usually binds to local an Administrative service for the FileZilla-Server (port 14147). 
+If you can create a tunnel from your machine to access this port, you can connect to it using a blank password and create a new user for the FTP service.
+
+FTP - 21
+Brute force
+hydra -V -f -L <USERS_LIST> -P <PASSWORDS_LIST> ftp://<IP> -u -vV
+
+Downloading file
+ftp <IP>
+PASSIVE
+BINARY
+get <FILE>
+
+Uploading file
+ftp <IP>
+PASSIVE
+BINARY
+put <FILE>
+
+FTP
+Vulnerability Scanning
+$ nmap -p 21 --script="+*ftp* and not brute and not dos and not fuzzer" -vv -oN ftp > $ip
+
+Deafult Creds
+$ hydra -s 21 -C /usr/share/sparta/wordlists/ftp-default-userpass.txt -u -f > $ip ftp
+
+FTP MANUAL SCANS
+Anonymous login
+Enumerate the hell out of the machine!
+
+    $ OS version
+    $ Other software you can find on the machine (Prog Files, yum.log, /bin)
+    $ password files
+    $ DLLs for msfpescan / BOF targets
+
+Do you have UPLOAD potential?
+
+    $ Can you trigger execution of uploads?
+    $ Swap binaries?
+
+Public exploits for ftp server software
+
+
+#ftp client commands
+binary - set binary transfer type
+cd - change remote working directory
+lcd - change local working directory
+get - recieve file
+mget - get multiple files
+passive - enter passive transfer mode
+ls - list contents of remote directory
+
+#Traditional ports, though they can be dynmically assigned
+Port 21 - control commands
+Port 20 - data transfer
+
+#Active mode
+Client initiates control session on port 21 and leaves port 20 open for the server to send data, and the server initiates the connection for port 20.
+***If client is behind a firewall, or NAT, then the sever might not be able to connect to send data.
+
+#Passive mode
+Server gives teh client a port to initiate a connection to for data transfer.
+***Most commonly used by browsers, etc.
+
 
