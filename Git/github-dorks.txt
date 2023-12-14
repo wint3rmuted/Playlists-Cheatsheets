@@ -1,1 +1,51 @@
+GitHub dorks
+This is the oldest and most traditional way to access sensitive data from public repositories, and because it's a part of public sources, it can be included in any OSINT research.
+What's needed? Only GitHub account and some basic knowledge about programming variables; in other words, the things you'll be looking for, such as database user and password, secret access keys, tokens, etc.
+
+A few random sensitive keywords :
+
+    password
+    dbpassword
+    dbuser
+    access_key
+    secret_access_key
+    bucket_password
+    redis_password
+    root_password
+
+It took less than 60 seconds to find the first results of GitHub repositories leaking data about database connections — including usernames and passwords — as you can see below:
+
+Leaking data about database connections
+There's an even more effective approach to take, by searching for specific credentials strings in configuration files, such as this example: filename:sftp-config.json password.
+
+Specific credentials strings
+As shown, we were able to obtain the IP address, root password and SSH port credentials.
+
+Another tip that may increase your success in finding leaked data is ordering the results, by setting the GitHub filter to 'Recently indexed', as you see below:
+Recently indexed
+
+What about smtp login credentials? It's easy by searching for strings like: filename:.env MAIL_HOST=smtp.gmail.com. Output example:
+Login credentials
+
+How about SQL dumps? Simply use extension:sql mysql dump, and the results will appear before your very eyes:
+SQL dump
+
+There are numerous GitHub dorks that can be used to scan GitHub repositories, including:
+
+    filename:.npmrc _auth
+    filename:.dockercfg auth
+    extension:pem private
+    extension:ppk private
+    filename:id_rsa or filename:id_dsa
+    extension:sql mysql dump
+    extension:sql mysql dump password
+    filename:credentials aws_access_key_id
+    filename:.s3cfg
+    filename:wp-config.php
+    filename:.htpasswd
+    filename:.env DB_USERNAME NOT homestead
+    filename:.env MAIL_HOST=smtp.gmail.com
+    filename:.git-credentials
+
+
 
