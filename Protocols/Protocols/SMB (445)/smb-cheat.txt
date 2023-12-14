@@ -125,3 +125,17 @@ $ smbclient -L ip -U username -m NT1
 $ smbclient -L ip -U username -m SMB2
 $ smbclient -L ip -U username -m SMB3
 
+smbclient
+After authenticating you will see a smb :\> prompt.
+Use the following commands to navigate and access the file share:
+ls: List files and directories
+cd directory: Change to a specified directory
+get filename: Retrieve a file
+mget file1 file2: Retrieve multiple files
+put filename: Upload a file
+mput file1 file2: Upload multiple files
+mkdir directory: Make a directory
+more filename: Examine the contents of a text file
+tar c all.tar: Retrieve all of the files in the current share directory and subdirectories into a local tar file called all.tar
+exit: Close the session
+
