@@ -1,1 +1,14 @@
+Enumeration from Windows Utilities
+
+To get the Name Table:
+nbtstat -A <targetIP>
+
+To see a list of running shares:
+net view <targetIP>
+
+You can map a share to a drive letter, such as K:
+net use K: \\<targetIP>\share
+
+Testing for null session:
+net use \\<targetIP>\IPC$ "" /u:""
 
