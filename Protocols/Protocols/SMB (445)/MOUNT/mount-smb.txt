@@ -47,5 +47,16 @@ I’ll use mount to mount the share onto a folder on my local system:
 mute@hack$ sudo mount -t cifs -o user=Finance,pass=Acc0unting //10.10.10.59/ACCT /mnt
 mute@hack$ ls /mnt
 
+Ex.2:
+mkdir /tmp/share
+sudo mount -t cifs //<IP>/<SHARE> /tmp/share
+sudo mount -t cifs -o 'username=<USER>,password=<PASSWORD>'//<IP>/<SHARE> /tmp/share
+
+# mount SMB share to a folder
+mount -t auto --source //192.168.31.147/kathy --target /tmp/smb/ -o username=root,workgroup=WORKGROUP
+
+# mount SMB shares in Windows (via cmd)
+C:\WINDOWS\system32> dir \\Computer_name\wwwroot                              
+net use X: \\<server>\<sharename> /USER:<domain>\<username> <password> /PERSISTENT:YES
 
 
