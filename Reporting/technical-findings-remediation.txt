@@ -1,0 +1,69 @@
+Technical Findings and Recommendation
+The Technical Findings and Remediation section is where we include the full technical details relating to our penetration test.
+What we consider to be the appropriate steps required to address the findings.  
+While this is a technical section, we should not assume the audience is made up of penetration testers.
+Not everyone, even those who work within the technologies that were being tested, will fully understand the nuances of the vulnerabilities. 
+While a deep technical dive into the root causes of an exploit is not always necessary, a broad overview of how it was able to take place should usually be provided. 
+It is better to assume less background knowledge on behalf of the audience and give too much information, rather than the opposite.
+
+This section is often presented in tabular form and provides full details of the findings. 
+A finding might cover one vulnerability that has been identified, or may cover multiple vulnerabilities of the same type.
+It's important to note that there might be a need for an attack narrative. 
+This narrative describes, in story format, exactly what happened during the test. 
+This is typically done for a simulated threat engagement, but is also useful at times to describe the more complex exploitation steps required for a regular penetration test. 
+If it is necessary, then writing out the attack path step-by-step, with appropriate screenshots, is generally sufficient. 
+An extended narrative could be placed in an Appendix and referenced from the findings table.
+
+Findings and Recommendations
+Below are three example entries:
+Ref 	Risk 	Issue Description and Implications 	Recommendations
+1 	H 	Account, Password, and Privilege Management is inadequate. Account management is the process of provisioning new accounts and removing accounts that are no longer required. The following issues were identified by performing an analysis of 122,624 user accounts post-compromise: 722 user accounts were configured to never expire; 23,142 users had never logged in; 6 users were members of the domain administrator group; default initial passwords were in use for 968 accounts. 	All accounts should have passwords that are enforced by a strict policy. All accounts with weak passwords should be forced to change them. All accounts should be set to expire automatically. Accounts no longer required should be removed.
+2 	H 	Information enumerated through an anonymous SMB session. An anonymous SMB session connection was made, and the information gained was then used to gain unauthorized user access as detailed in Appendix E.9. 	To prevent information gathering via anonymous SMB sessions: Access to TCP ports 139 and 445 should be restricted based on roles and requirements. Enumeration of SAM accounts should be disabled using the Local Security Policy > Local Policies > Security Options
+3 	M 	Malicious JavaScript code can be run to silently carry out malicious activity. A form of this is reflected cross-site scripting (XSS), which occurs when a web application accepts user input with embedded active code and then outputs it into a webpage that is subsequently displayed to a user. This will cause attacker-injected code to be executed on the user's web browser. XSS attacks can be used to achieve outcomes such as unauthorized access and credential theft, which can in some cases result in reputational and financial damage as a result of bad publicity or fines. As shown in Appendix E.8, the [client] application is vulnerable to an XSS vulnerability because the username value is displayed on the screen login attempt fails. A proof-of-concept using a maliciously crafted username is provided in Appendix E. 	Treat all user input as potentially tainted, and perform proper sanitization through special character filtering. Adequately encode all user-controlled output when rendering to a page. Do not include the username in the error message of the application login.
+
+    
+It's important to understand that what we identify as the severity of an issue based on its vulnerability score is not context-specific business risk.
+It only represents technical severity, even if we adjust it based on likelihood. 
+We can reflect this in our findings as technical severity, or we can work with the client's risk team to gain an understanding of the appropriate level of business risk by including consideration
+of the unique business impact to the client.
+
+We can start our findings description with a sentence or two describing what the vulnerability is, why it is dangerous, and what an attacker can accomplish with it. 
+This can be written in such a way to provide insight into the immediate impact of an attack. 
+We then describe some of the technical details about the vulnerability. 
+There is often no need to go into overwhelming detail; simply explain at a basic level what the vulnerability is and how to exploit it. 
+The intention is to describe a complex exploit in a way that most technical audiences can understand.
+
+We also need to include evidence to prove the vulnerability identified is exploitable, along with any further relevant information. 
+If this is simple, it can be included inline as per the first entry above. Otherwise, it can be documented in an appendix as shown in the second entry.
+
+Once the details of the vulnerability have been explained, we can describe the specific finding that we have identified in the system or application. 
+We will use the notes that we took during testing and the screenshots that support them to provide a detailed account.
+Although this is more than a few sentences, we'll want to summarize it in the table and reference an appendix for the full description.
+
+It's good practice to use our notes and screenshots to walk the reader through how we achieved the result step-by-step. 
+The screenshots should contain a short explanation of what it shows. We should not rely on the screenshot to speak for itself.
+We should present the impact of the vulnerability in a way that frames its severity for the client in an appropriate manner, and is directly relevant to the business or application.
+
+The remediation advice should be detailed enough to enable system and application administrators to implement it without ambiguity. 
+The remediation should be clear, concise, and thorough. It should be sufficient to remove the vulnerability in a manner acceptable to the client and relevant to the application. 
+Presenting remediation that is excessive, unacceptably costly, or culturally inappropriate (e.g. not allowing remote logins for a remote working environment) will lead to the fix never being implemented.
+A strong understanding of the needs of the client is necessary here.
+
+There are several other important items to keep in mind. First, broad solutions should be avoided, in favor of things that drill down into the specifics of the application and the business. 
+Second, theoretical solutions are not effective in combating a vulnerability. Make sure that any solution given has a concrete and practical implementation.
+Finally, do not layer multiple steps into one proposed solution. Each distinct step should be its own solution.
+
+The Technical Findings and Recommendations section will likely be the major part of the report and the time and effort invested in writing it should reflect its importance.
+In describing the findings, we will present the means of replicating them, either in the body of the report or in an appendix. 
+We need to show exactly where the application was affected, and how to trigger the vulnerability. 
+A full set of steps to replicate the finding should be documented with screenshots. 
+This includes steps that we take for granted (such as running with administrative privileges), as these may not be obvious to the reader.
+
+The details should be separated into two sections:
+
+    The affected URL/endpoint
+    A method of triggering the vulnerability
+
+If multiple areas are affected by the vulnerability, we should include a reference to each area. 
+If there is a large number of similar issues, then it's often acceptable to provide samples with a caveat that these are not the only areas where the issue occurs. 
+In the latter case, we would recommend a systemic remediation.
