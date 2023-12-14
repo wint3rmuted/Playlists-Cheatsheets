@@ -3,22 +3,12 @@ snmpwalk
 snmpwalk -v X -c public <IP> NET-SNMP-EXTEND-MIB::nsExtendOutputFull
 └─$ snmpwalk -v 1 -c public 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
 └─$ snmpwalk -v2c -c public 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
-
 └─$ snmpwalk -c public -v2c 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendObjects   
-
-
-
 
 Brute force community string
 onesixtyone -c /home/liodeus/wordlist/SecLists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt <IP>
 snmpbulkwalk -c <COMMUNITY_STRING> -v<VERSION> <IP>
 snmp-check <IP>
-
-Modifying SNMP values
-http://net-snmp.sourceforge.net/tutorial/tutorial-5/commands/snmpset.html
-
-└─$ snmpwalk -c public -v2c 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendObjects
-
 
  SNMP(161):
     > sudo nmap -sU --open -p 161 10.11.1.0/24 -oG open-snmp.txt
@@ -114,7 +104,7 @@ snmpwalk -v [VERSION_SNMP] -c [COMM_STRING] [DIR_IP] NET-SNMP-EXTEND-MIB::nsExte
 
 Add NET-SNMP-EXTEND-MIB::nsExtendObjects to the snmpwalk, you can refer to https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp#enumerating-snmp
 
- snmpwalk -v [VERSION_SNMP] -c [COMM_STRING] [DIR_IP] NET-SNMP-EXTEND-MIB::nsExtendObjects
+snmpwalk -v [VERSION_SNMP] -c [COMM_STRING] [DIR_IP] NET-SNMP-EXTEND-MIB::nsExtendObjects
 snmpwalk -c public -v1 192.168.217.156 NET-SNMP-EXTEND-MIB::nsExtendObjects
 
 └─$ snmpwalk -c public -v1 192.168.217.156 NET-SNMP-EXTEND-MIB::nsExtendObjects 
