@@ -1,0 +1,26 @@
+To scan for open SNMP ports, we can run nmap, using the -sU option to perform UDP scanning and the --open option to limit the output and display only open ports.
+
+Using nmap to perform a SNMP scan
+kali@kali:~$ sudo nmap -sU --open -p 161 192.168.50.1-254 -oG open-snmp.txt
+PORT    STATE SERVICE
+161/udp open  snmp
+
+Nmap done: 1 IP address (1 host up) scanned in 0.49 seconds
+
+onesixtyone 
+Alternatively, we can use a tool such as onesixtyone,2 which will attempt a brute force attack against a list of IP addresses. 
+First, we must build text files containing community strings and the IP addresses we wish to scan.
+
+kali@kali:~$ echo public > community
+kali@kali:~$ echo private >> community
+kali@kali:~$ echo manager >> community
+
+kali@kali:~$ for ip in $(seq 1 254); do echo 192.168.50.$ip; done > ips
+
+Using onesixtyone to brute force community strings:
+kali@kali:~$ onesixtyone -c community -i ips
+
+Scanning 254 hosts, 3 communities
+192.168.50.151 [public] Hardware: Intel64 Family 6 Model 79 Stepping 1 AT/AT COMPATIBLE - Software: Windows Version 6.3 (Build 17763 Multiprocessor Free)
+    
+    
