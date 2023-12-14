@@ -46,7 +46,7 @@ It is our job as penetration testers and consultants to inform the client of all
 This is done so that they can improve on the next iteration of testing and get the most value for the money they are paying. 
 It is important to note that not every issue needs to be highlighted, and regardless of the circumstances of the test, we need to ensure the report is professional.
 
-We'll consider three potential states with regard to extenuating circumstances:
+Three potential states with regard to abnormal circumstances:
 
     Positive Outcome: "There were no limitations or extenuating circumstances in the engagement. The time allocated was sufficient to thoroughly test the environment."
     Neutral Outcome: "There were no credentials allocated to the tester in the first two days of the test. However, the attack surface was much smaller than anticipated. Therefore, this did not have an impact on the overall test. OffSec recommends that communication of credentials occurs immediately before the engagement begins for future contracts, so that we can provide as much testing as possible within the allotted time."
