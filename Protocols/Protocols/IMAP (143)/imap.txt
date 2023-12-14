@@ -1,0 +1,10 @@
+- IMAP (143)
+    - connect
+        > nc -nv 192.168.103.39 143
+    - Login
+        > A001 login <username> <password>
+
+- IMAP secure (993)
+    - connect
+        > openssl s_client -connect 192.168.103.39:993 -quiet
+        > ncat --ssl 192.168.103.339 993
