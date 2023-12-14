@@ -1,3 +1,5 @@
+└─$ snmpwalk -c public -v2c 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendObjects
+
 Once we find SNMP services, we can start querying them for specific MIB data that might be interesting.
 We can probe and query SNMP values using a tool such as snmpwalk, provided we know the SNMP read-only community string, which in most cases is "public".
 
@@ -13,6 +15,7 @@ Using some of the MIB values provided above, we can attempt to enumerate their c
 Let's try the following example against a known machine in the labs, which has a Windows SNMP port exposed with the community string "public".
 This command enumerates the entire MIB tree using the -c option to specify the community string, and -v to specify the SNMP version number as well as the -t 10 option to increase the timeout period to 10 seconds:
 
+Using snmpwalk to enumerate the entire MIB tree
 kali@kali:~$ snmpwalk -c public -v1 -t 10 192.168.50.151
 
 iso.3.6.1.2.1.1.1.0 = STRING: "Hardware: Intel64 Family 6 Model 79 Stepping 1 AT/AT COMPATIBLE - Software: Windows Version 6.3 (Build 17763 Multiprocessor Free)"
@@ -23,7 +26,6 @@ iso.3.6.1.2.1.1.5.0 = STRING: "dc01.megacorptwo.com"
 iso.3.6.1.2.1.1.6.0 = ""
 iso.3.6.1.2.1.1.7.0 = INTEGER: 79
 iso.3.6.1.2.1.2.1.0 = INTEGER: 24
-    Listing 53 - Using snmpwalk to enumerate the entire MIB tree
 
 Revealed another way, we can use the output above to obtain target email addresses. 
 This information can be used to craft a social engineering attack against the newly-discovered contacts.
