@@ -1,1 +1,48 @@
+Mount Share
+I’ll mount the share so I can easily access it:
+
+root@kali# mount -t cifs "//10.10.10.103/Department Shares" /mnt
+
+Password for root@//10.10.10.103/Department Shares:
+root@kali:/mnt# ls
+ Accounting   Audit   Banking   CEO_protected   Devops   Finance   HR   Infosec   Infrastructure   IT   Legal  'M&A'   Marketing  'R&D'   Sales   Security   Tax   Users   ZZ_ARCHIVE
+
+Enumeration
+There’s a bunch of empty directories. In fact, only one directory has files:
+
+root@kali:/mnt/ZZ_ARCHIVE# ls                                      
+AddComplete.pptx       DebugMove.mpg          EditMount.doc    ExitEnter.mpg     JoinEnable.ram      NewInitialize.doc    RequestJoin.mpeg2    SuspendWatch.mp4       UpdateRead.mpeg                             
+AddMerge.ram           DebugSelect.mpg        EditSuspend.mp3  ExportEdit.ogg    LimitInstall.doc    OutConnect.mpeg2     RequestOpen.ogg      SwitchConvertFrom.mpg  WaitRevoke.pptx
+ConfirmUnprotect.doc   DebugUse.pptx          EnableAdd.pptx   GetOptimize.pdf   LimitStep.ppt       PingGet.dot          ResetCompare.avi     UndoPing.rm            WriteUninstall.mp3
+ConvertFromInvoke.mov  DisconnectApprove.ogg  EnablePing.mov   GroupSend.rm      MergeBlock.mp3      ReceiveInvoke.mpeg2  ResetUninstall.mpeg  UninstallExpand.mp3                                                
+ConvertJoin.docx       DisconnectDebug.mpeg2  EnableSend.ppt   HideExpand.rm     MountClear.mpeg2    RemoveEnter.mpeg3    ResumeCompare.doc    UnpublishSplit.ppt
+CopyPublish.ogg        EditCompress.xls       EnterMerge.mpeg  InstallWait.pptx  MoveUninstall.docx  RemoveRestart.mpeg   SelectPop.ogg        UnregisterPing.pptx
+
+And all these files are just filled with nulls:
+
+root@kali:/mnt/ZZ_ARCHIVE# cat AddComplete.pptx | xxd                                                    
+00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................                       
+00000020: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000030: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000040: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+...[snip]...
+
+root@kali:/mnt/ZZ_ARCHIVE# cat * | xxd | grep -v "0000 0000 0000 0000 0000 0000 0000 0000"
+01466650: 0000 
+
+There’s a users directory:
+root@kali:/mnt/Users# ls
+amanda  amanda_adm  bill  bob  chris  henry  joe  jose  lkys37en  morgan  mrb3n  Public
+
+I can’t see any files in there, but this does give me a list of usernames.
+root@kali# mount -t cifs -o username=amanda,password=Ashare1972 "//10.10.10.103/CertEnroll" /mnt
+
+
+Example mount:
+I’ll use mount to mount the share onto a folder on my local system:
+oxdf@hacky$ sudo mount -t cifs -o user=Finance,pass=Acc0unting //10.10.10.59/ACCT /mnt
+oxdf@hacky$ ls /mnt
+
+
 
