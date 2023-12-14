@@ -1,3 +1,28 @@
+Traffic, Packet Captures and Wireshark
+The Libpcap, Winpcap, and Npcap software libraries implement packet capture functionality
+These libraries are what will allow us to the save captured traffic to .pcap files
+
+Wireshark is a flexible application that can be used to capture network traffic.
+ It is usually used via its streamlined Graphical User Interface (GUI), but it also has a command line version called tshark
+
+We'll explore capture filters first. 
+These will allow the user to decide which data they want Wireshark to store. 
+For example, if we want to only capture data traveling to/from a specific IP address, we can use the host capture filter host 192.168.12.34.
+
+we need to first take a brief detour and learn what a network interface is, since we'll be filtering traffic based on it. 
+A network interface (or just interface) is a physical or virtual device that allows machines to connect to each other
+
+the eth0 network interface on Linux represents the network card that is physically installed into a computer
+
+right click and follow tcp stream , use display filters, save pcap files. 
+
+One of the most interesting set of options from a security perspective is the ability to export objects. 
+By exporting an object, we can recreate and save any files of interest that have been transferred during recording of the pcap. 
+Within the File > Export Objects menu, we find that Wireshark supports exporting objects for a number of application layer protocols. 
+By clicking on a protocol, Wireshark will scan and display all identified objects in that protocol's data streams. 
+We can then save whichever objects we'd like to further assess to our local disk.
+
+
 Lesser known yet handy Wireshark features
 Statistics and analysis tools: Wireshark comes with a range of built-in tools to analyze network data. Examples include the ability to visualize statistics, like protocol hierarchy, endpoints, packet lengths, and more. An example command would be Statistics > Protocol Hierarchy.
 
