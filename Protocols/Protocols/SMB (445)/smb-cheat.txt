@@ -114,18 +114,14 @@ smbclient -L 10.11.1.31 -U anonymous
 smbclient //192.168.25.67/wwwroot -U anonymous 
 smbclient -L //$TARGET <-- null session
 
-
-
-
-
-
-
-
-
-
-
 # null session
 rpcclient -U "" $TARGET
 smbclient -L //$TARGET
 enum4linux $TARGET
+
+Protocol Negotiation failed - Use -m to figure out the minimum SMB version is for the server. 
+$ smbclient -L ip -U username -m SMB2  
+$ smbclient -L ip -U username -m NT1
+$ smbclient -L ip -U username -m SMB2
+$ smbclient -L ip -U username -m SMB3
 
