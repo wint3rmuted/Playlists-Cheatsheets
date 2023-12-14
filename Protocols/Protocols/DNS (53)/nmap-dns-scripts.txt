@@ -1,1 +1,44 @@
+Brute force DNS
+nmap -Pn -script=dns-brute domain.com
 
+nmap 192.168.1.1-50 -sL -dns-server 192.168.1.1	  ← Query the Internal DNS for hosts, list targets only
+
+Manually specify DNS servers 	
+nmap –dns-servers [servers] [target]
+
+Manually specify DNS server
+The --dns-servers option is used to manually specify DNS servers to be queried when scanning.
+Syntax: nmap --dns-servers server1 server2 target
+
+Alternative DNS lookup
+nmap –system-dns [target]
+
+Force reverse DNS resolution
+nmap -R [target]
+
+Disable reverse DNS resolution
+nmap -n [target]
+
+List scan
+The -sL option will display a list and performs a reverse DNS lookup of the specified IP addresses.
+nmap –sL target
+
+Alternative DNS lookup method
+The --system-dns option instructs Nmap to use the host system's DNS resolver instead of its own internal method.
+Syntax:nmap --system-dns target
+
+Disable reverse DNS resolution
+The -n parameter is used to disable reverse DNS lookups.
+Syntax:nmap –n target
+
+Reverse DNS can significantly slow an Nmap scan. Using the -n option greatly reduces scanning times - especially when scanning a large number of hosts. This option is useful if you don't care about the DNS information for the target system and prefer to perform a scan which produces faster results.
+
+nmap -sU -p 22 --script=*dns* 192.168.1.200
+
+## find DNS (A) records by trying a list of common sub-domains from a wordlist.
+nmap -p 80 --script dns-brute.nse domain.com
+python dnscan.py -d domain.com -w ./subdomains-10000.txt
+
+
+Attempts to pull a zone file (AXFR) from a DNS server:
+nmap --script dns-zonetransfer.nse --script-args dns-zonetransfer.domain=<domain> -p53 192.168.0.1
