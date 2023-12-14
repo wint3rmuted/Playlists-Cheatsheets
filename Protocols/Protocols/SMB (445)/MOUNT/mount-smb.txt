@@ -1,3 +1,6 @@
+One of the benefits of mounting an smb share is you can search for files quickly:
+mute@hack$ find . -type f | grep -v cap$
+
 Mount Share
 I’ll mount the share so I can easily access it:
 
@@ -41,8 +44,8 @@ root@kali# mount -t cifs -o username=amanda,password=Ashare1972 "//10.10.10.103/
 
 Example mount:
 I’ll use mount to mount the share onto a folder on my local system:
-oxdf@hacky$ sudo mount -t cifs -o user=Finance,pass=Acc0unting //10.10.10.59/ACCT /mnt
-oxdf@hacky$ ls /mnt
+mute@hack$ sudo mount -t cifs -o user=Finance,pass=Acc0unting //10.10.10.59/ACCT /mnt
+mute@hack$ ls /mnt
 
 
 
