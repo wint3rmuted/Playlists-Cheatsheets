@@ -1,1 +1,19 @@
+crackmapexec smb 10.10.10.10 -u '' -p '' --shares
+crackmapexec smb 10.10.10.10 -u 'sa' -p '' --shares
+crackmapexec smb 10.10.10.10 -u 'sa' -p 'sa' --shares
+crackmapexec smb 10.10.10.10 -u '' -p '' --share share_name
+crackmapexec smb 192.168.0.115 -u '' -p '' --shares --pass-pol
 
+SMB Enumeration
+enumeration with crackmapexec as unauthenticated
+crackmapexec smb 10.10.10.x --pass-pol -u '' -p ''
+
+enumeration with crackmapexec (authenticated)
+crackmapexec smb 10.10.11.129 --pass-pol -u usernames.txt -p $pass --continue-on-sucess
+crackmapexec smb 10.10.11.129 --pass-pol -u xlsx_users -p $pass --continue-on-sucess
+
+provide a password or a list of passwords to test against users
+crackmapexec smb 10.10.13.100 --pass-pol -u users.lst -p password_list
+
+Enumerate some users
+crackmapexec smb 10.10.13.100 -u users.txt -p $pass --users | tee userlist.txt
