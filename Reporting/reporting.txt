@@ -1,1 +1,86 @@
+We have to be very clear about the Rules of Engagement (RoE) under which the testing is done. 
+There may be constraints placed on testing such as not carrying out denial of service attacks, or not engaging in social engineering. 
+Furthermore, the testing work may be in response to the client's regulatory compliance requirements and may need to follow a specific methodology such as the OWASP. Constraints need to be very clear from the start.
+
+Executive Summary:
+
+Pertinent Details
+- Scope: https://site.org/login.php
+- Timeframe: Jan 3 - 5, 2022
+- OWASP/PCI Testing methodology was used
+- Social engineering and DoS testing were not in scope
+- No testing accounts were given; testing was black box from an external IP address
+- All tests were run from 192.168.1.2
+
+Describing the Engagement:
+First include a few sentences describing the engagement:
+- "The Client hired <company> to conduct a penetration test of their site.org web application in October of 2025. The test was conducted from a remote IP between the hours of 9 AM and 5 PM, with no users
+provided by the Client."
+
+Identifying the positives:
+Add a couple sentences that talk about some effective hardening we observed:
+- "The application had many forms of hardening in place. First, I was unable to upload malicious files due to the strong filtering in place. I was also unable to brute force user accounts
+because of the robust lockout policy in place. Finally, the strong password policy made trivial password attacks unlikely to succeed. This points to a commendable culture of user account protections."
+     
+Watch your language here. Do not say something like "It was impossible to upload malicious files", you must be careful to make sure our language does not preclude the possibility that we were simply unable to find a flaw that does actually exist and remains undetected.
+
+Explaining a vulnerability:
+Next, we introduce a discussion of the vulnerabilities discovered:
+- "However, there were still areas of concern within the application. I was able to inject arbitrary JavaScript into the browser of an unwitting victim that would then be run in the context of that
+victim. In conjuction with the username enumeration on the login field, there seems to be a trend of unsanitized user input compounded by verbose error messages being returned to the user. This can lead
+to some impactful issues, such as password or session stealing. It is recommended that all input and error messages that are returned to the user be sanitized and made generic to prevent this class of issue from cropping up."
+    
+Concise conclusion
+Finally the Executive Summary should conclude with an engagement wrap-up:
+"These vulnerabilities and their remediations are described in more detail below. Should any questions arise, We are happy to provide further advice and remediation help."
+     
+
+
+First section of the full report should detail issues that affected testing.
+
+It is our job as testers and consultants to inform the client of all circumstances and limitations that affected the engagement. 
+This is done so that they can improve on the next iteration of testing and get the most value for the money they are paying. 
+
+We'll consider three potential states with regard to extenuating circumstances:
+    Positive Outcome: "There were no limitations or extenuating circumstances in the engagement. The time allocated was sufficient to thoroughly test the environment."
+    Neutral Outcome: "There were no credentials allocated to the tester in the first two days of the test. However, the attack surface was much smaller than anticipated. Therefore, this did not have an impact on the overall test. We recommend that communication of credentials occurs immediately before the engagement begins for future contracts, so that we can provide as much testing as possible within the allotted time."
+    Negative Outcome: "There was not enough time allocated to this engagement to conduct a thorough review of the application, and the scope became much larger than expected. It is recommended that more time is allocated to future engagements to provide more comprehensive coverage."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
