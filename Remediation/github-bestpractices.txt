@@ -1,1 +1,13 @@
+GitHub security best practices
+
+A few key practices can definitely help you avoid security issues, or if it's too late for that, they can quickly resolve issues and prevent them in the future. Take note and be prepared:
+
+    Review your code, always: this will help you identify bad security practices by any of your employees.
+    Clear your GitHub history, to safeguard you most sensitive information.
+    Use ENV variables to store critical information in CI/CD. Tools like Vault are one of the top suggestions for these cases.
+    If you're certain you've already exposed data, make sure to invalidate tokens and passwords.
+    Configure a 2FA for all your GitHub accounts, as this type of data-leak can not only affect public repositories, but private ones too, if attackers gain access by brute forcing or through other aggressive methods.
+    Write and publish a disclosure policy in your SECURITY.md file.
+    Never allow your company devs to share GitHub credentials with anyone.
+    As soon as employees no longer work for your company, be sure to revoke all their accesses.
 
