@@ -1,6 +1,0 @@
-- POP3 secure (995):
-    - connect
-        > openssl s_client -connect 10.10.10.51:995 -crlf -quiet 
-    - ntlm info
-        > telnet 192.168.103.39 143
-        > a1 AUTHENTICATE NTLM
