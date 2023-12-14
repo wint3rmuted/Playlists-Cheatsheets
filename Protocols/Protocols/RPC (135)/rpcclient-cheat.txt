@@ -1,19 +1,17 @@
 $ rpcclient -U <username> <WinIPaddr>			Linux: connect to share
-$ rpcclient -U "" -N <IP>						Linux: connect via anonymous/NULL
+$ rpcclient -U "" -N <IP>						      Linux: connect via anonymous/NULL
 
-rpcclient $> srvinfo							Get hostname information. Refer to here.
-rpcclient $> enumdomusers						Get usernames and RIDs
-rpcclient $> enumalsgroups domain				Enumerate domain groups
+rpcclient $> srvinfo							        Get hostname information. Refer to here.
+rpcclient $> enumdomusers						      Get usernames and RIDs
+rpcclient $> enumalsgroups domain			  	Enumerate domain groups
 rpcclient $> enumalsgroups builtin				Enumerate builtin groups
-rpcclient $> queryuser <RID>					Query detailed user information based on RID
-Note here that the output shows the last logon time for the user, as well as the Password last set Time. That kind of stuff is immensely valuable for auditors and penetration testers alike.
-rpcclient $> querygroup <RID>					Query groups based on RID
-If querygroup doesn't work, try queryaliasmem
+rpcclient $> queryuser <RID>					    Query detailed user information based on RID
+rpcclient $> querygroup <RID>					    Query groups based on RID ,If querygroup doesn't work, try queryaliasmem
 rpcclient $> queryaliasmem <groupName> <RID>	Query groups, get user SIDs
-rpcclient $> querygroupmem <RID>				Query users' group membership
+rpcclient $> querygroupmem <RID>				  Query users' group membership
 
-rpcclient $> getdompwinfo						Query for password complexity settings
-rpcclient $> getusrdompwinfo 0x44f (rid)			Query users password properties
+rpcclient $> getdompwinfo					      	Query for password complexity settings
+rpcclient $> getusrdompwinfo 0x44f (rid)	Query users password properties
 
 Other commands
 enumalsgroups enumdomains  enumdrivers  enumkey   enumprivs
