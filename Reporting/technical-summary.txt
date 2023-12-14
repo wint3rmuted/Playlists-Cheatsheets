@@ -1,0 +1,25 @@
+Technical Summary
+Should be a list of all of the key findings in the report, written out with a summary and recommendation for a technical person, like a security architect, to learn at a glance what needs to be done.
+This section should group findings into common areas. 
+For example, all weak account password issues that have been identified would be grouped, regardless of the testing timeline. 
+An example of the structure of this section might be:
+
+    User and Privilege Management
+    Architecture
+    Authorization
+    Patch Management
+    Integrity and Signatures
+    Authentication
+    Access Control
+    Audit, Log Management and Monitoring
+    Traffic and Data Encryption
+    Security Misconfigurations
+
+Example Technical Summary
+An example of a technical summary for Patch Management is as follows:
+4. Patch Management
+
+Windows and Ubuntu operating systems that are not up to date were identified. These are shown to be vulnerable to publicly-available exploits and could result in malicious execution of code, theft
+of sensitive information, or cause denial of services which may impact the infrastructure. Using outdated applications increases the possibility of an intruder gaining unauthorized access by exploiting
+known vulnerabilities. Patch management ought to be improved and  updates should be applied in conjunction with change management.
+
