@@ -1,3 +1,24 @@
+DNS
+== DOMAIN info: ==
+whois domain.com
+whois x.x.x.x
+http://netcraft.com/       //domain and hosting information
+https://archive.org/web/   //Wayback machine
+
+== DNS enumeration ==
+dnsrecon -r 192.168.13.200-192.168.13.254 -n 192.168.13.220   //reverse lookup. dns server is -n
+dnsrecon -d acme.local -D /usr/share/golismero/wordlist/dns/dnsrecon.txt -t brt  //bruteforce the acme.local domain for domains and subdomains
+dnsrecon -a -d thinc.local -n 192.168.13.220  ## trying zone transfer. -n is the DNS server
+nmap -sU -p 22 --script=*dns* 192.168.1.200
+
+## find DNS (A) records by trying a list of common sub-domains from a wordlist.
+nmap -p 80 --script dns-brute.nse domain.com
+python dnscan.py -d domain.com -w ./subdomains-10000.txt
+
+Attempts to pull a zone file (AXFR) from a DNS server:
+nmap --script dns-zonetransfer.nse --script-args dns-zonetransfer.domain=<domain> -p53 192.168.0.1
+
+
 DNS lookups, Zone Transfers & Brute-Force
 whois domain.com
 dig {a|txt|ns|mx} domain.com
