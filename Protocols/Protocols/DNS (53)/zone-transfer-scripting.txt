@@ -1,1 +1,143 @@
+DNS Zone Transfers
+A successful zone transfer does not directly result in a network breach, although it does facilitate the process.
+The host command syntax for performing a zone transfer is as follows:
 
+host -l <domain name> <dns server address>
+Using host to perform a DNS zone transfer
+
+From our host command , we noticed that three DNS servers serve the example.com domain: ns1, ns2, and ns3. 
+Let's try a zone transfer against each one.
+
+We will use host -l (list zone) to attempt the zone transfers:
+
+kali@kali:~$ host -l example.com ns1.example.com
+Using domain server:
+Name: ns1.example.com
+Address: 38.100.193.70#53
+Aliases: 
+Host example.com not found: 5(REFUSED)
+; Transfer failed.
+The first zone transfer attempt fails
+
+Unfortunately, it looks like the first nameserver, ns1, does not allow DNS zone transfers, so our attempt has failed.
+Let's try to perform the same steps using the second nameserver, ns2:
+
+Using host to illustrate a DNS zone transfer:
+kali@kali:~$ host -l example.com ns2.example.com
+Using domain server:
+Name: ns2.example.com
+Address: 38.100.193.x#53
+Aliases:
+
+example.com name server ns1.example.com.
+example.com name server ns2.example.com.
+example.com name server ns3.example.com.
+admin.example.com has address 38.100.193.x
+beta.example.com has address 38.100.193.x
+fs1.example.com has address 38.100.193.x
+intranet.example.com has address 38.100.193.x
+mail.example.com has address 38.100.193.x
+mail2.example.com has address 38.100.193.x
+ns1.example.com has address 38.100.193.x
+
+
+This server allows zone transfers and provides a full dump of the zone file for the example.com domain, delivering a convenient list of IP addresses and corresponding DNS hostnames!
+
+The example.com domain has very few DNS servers to check. 
+However, some larger organizations might host many DNS servers, or we might want to attempt zone transfer requests against all the DNS servers in a given domain.
+Bash scripting can help with this task.
+
+To attempt a zone transfer with the host command, we need two parameters: a nameserver address and a domain name. 
+We can get the nameservers for a given domain with the following command:
+
+Using host to obtain DNS servers for a given domain name:
+kali@kali:~$ host -t ns example.com | cut -d " " -f 4
+ns1.example.com.
+ns2.example.com.
+ns3.example.com.
+
+Bash DNS zone transfer script
+Taking this a step further, we can write a Bash script to automate the process of identifying the relevant nameservers and attempting a zone transfer from each:
+
+#!/bin/bash
+# Simple Zone Transfer Bash Script
+# $1 is the first argument given after the bash script
+# Check if argument was given, if not, print usage
+
+if [ -z "$1" ]; then
+  echo "[*] Simple Zone transfer script"
+  echo "[*] Usage   : $0 <domain name> "
+  exit 0
+fi
+
+# if argument was given, identify the DNS servers for the domain
+
+for server in $(host -t ns $1 | cut -d " " -f4); do
+  # For each of these servers, attempt a zone transfer
+  host -l $1 $server |grep "has address"
+done
+
+
+Running the DNS zone transfer Bash script
+Let's make the script executable and run it against example.com.
+kali@kali:~$ chmod +x dns-axfr.sh
+kali@kali:~$ ./dns-axfr.sh example.com
+admin.example.com has address 38.100.193.x
+beta.example.com has address 38.100.193.x
+fs1.example.com has address 38.100.193.x
+intranet.example.com has address 38.100.193.x
+mail.example.com has address 38.100.193.x
+mail2.example.com has address 38.100.193.x
+ns1.example.com has address 38.100.193.x
+ns2.example.com has address 38.100.193.x
+ns3.example.com has address 38.100.193.x
+router.example.com has address 38.100.193.x
+
+
+
+
+Relevant Tools in Kali Linux
+There are several tools in Kali Linux that can automate DNS enumeration. 
+Two notable examples are DNSRecon and DNSenum, which have useful options that we'll explore in the following sections.
+DNSRecon
+
+DNSRecon is an advanced, modern DNS enumeration script written in Python. 
+Running dnsrecon against example.com using the -d option to specify a domain name, and -t to specify the type of enumeration to perform (in this case a zone transfer), produces the following output:
+
+Using dnsrecon to perform a zone transfer:
+kali@kali:~$ dnsrecon -d example.com -t axfr
+
+[*] Testing NS Servers for Zone Transfer
+[*] Checking for Zone Transfer for example.com name servers
+
+Based on the output above, we have managed to perform a successful DNS zone transfer against the example.com domain. 
+The result is basically a full dump of the zone file for the domain.
+
+Let's try to brute force additional hostnames using the list.txt file we created previously for forward lookups. 
+That list looks like this:
+
+kali@kali:~$ cat list.txt 
+www
+ftp
+mail
+owa
+proxy
+router
+List to be used for subdomain brute forcing using dnsrecon
+
+To begin the brute force attempt, we will use the -d option to specify a domain name, -D to specify a file name containing potential subdomain strings, and -t to specify the type of enumeration to perform (in this case brt for brute force):
+
+Brute forcing hostnames using dnsrecon:
+kali@kali:~$ dnsrecon -d example.com -D ~/list.txt -t brt
+
+[*] Performing host and subdomain brute force against example.com
+[*] 	 A router.example.com 38.100.193.x
+[*] 	 A www.example.com 38.100.193.x
+[*] 	 A mail.example.com 38.100.193.x
+[+] 3 Records Found
+
+DNSenum
+DNSEnum is another popular DNS enumeration tool. 
+To show a different output, let's run dnsenum against the zonetransfer.me domain (which is owned by DigiNinja2 and specifically allows zone transfers):
+
+kali@kali:~$ dnsenum zonetransfer.me
