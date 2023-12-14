@@ -1,0 +1,78 @@
+RPC (135)
+rpcdump.py 10.11.1.121 -p 135
+rpcdump.py 10.11.1.121 -p 135 | grep ncacn_np // get pipe names
+rpcmap.py ncacn_ip_tcp:10.11.1.121[135]
+
+ rpc client commands (135)
+    > rpcinfo -p 192.168.1.197
+        - Check out all the services running under rpc, a few that are exploitable are "YP", "ttdserver" and "cmsd"
+    - Logon on with default creds
+        > rpcclient -U "" 192.168.1.197
+    - Logon with user creds
+        > rpcclient -U dave%password -c "queryusers dog" 192.168.1.197
+    - rpc commands
+        - look up all users
+            > enumdomusers
+        - look up all groups
+            > enumdomgroups
+        - look up users
+            > queryuser <username>
+        - look up domain info
+            > querydominfo
+        - lookup privledges
+            > enumprivs
+    - winexe
+        > winexe -U '.\administrator%u6!4ZwgwOM#^OBf#Nwnh' //10.10.10.97 cmd.exe
+        
+135 rpcclient
+        
+$ rpcclient -U "" <RHOST>
+srvinfo
+netshareenum
+netshareenumall
+netsharegetinfo
+netfileenum
+netsessenum
+netdiskenum
+netconnenum
+getanydcname
+getdcname
+dsr_getdcname
+dsr_getdcnameex
+dsr_getdcnameex2
+dsr_getsitename
+enumdomusers
+enumdata
+enumjobs
+enumports
+enumprivs
+queryuser <USERNAME>       
+
+
+
+RPC over DC Enumeration
+also known as Null Sessions.
+rpcclient -U "" -c enumdomusers $IP
+rpcclient -U "" $IP -N -c "lsaquery"
+rpcclient -U "" $IP -N -c "lookupnames Guest"
+rpcclient -U "" $IP -N -c "lookupnames Administrator"
+
+Afterwards check https://github.com/trustedsec/ridenum.git
+RPC Enumeration
+
+Look for port 111 rpcbind
+rpcinfo $IP
+rpcinfo -p $IP
+
+
+
+rpcinfo -p $TARGET
+nbtscan $TARGET
+
+#list shares
+smbclient -L //$TARGET -U ""
+
+# null session
+rpcclient -U "" $TARGET
+smbclient -L //$TARGET
+enum4linux $TARGET
