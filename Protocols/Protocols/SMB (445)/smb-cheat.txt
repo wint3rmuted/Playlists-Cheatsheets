@@ -1,1 +1,29 @@
+SMB (139,445):
+nbtscan -r 10.11.1.0/24
+enum4linux -a 10.11.1.5
+nmap -p 139,445 --script=vuln 10.11.1.1
+rpcclient -U "" 10.11.1.1
+rpcinfo -p $TARGET
+nbtscan $TARGET
+
+#list shares
+smbclient -L //$TARGET -U ""
+smbclient -L 10.11.1.31 -U anonymous
+smbclient //192.168.25.67/wwwroot -U anonymous 
+smbclient -L //$TARGET <-- null session
+
+
+
+
+
+
+
+
+
+
+
+# null session
+rpcclient -U "" $TARGET
+smbclient -L //$TARGET
+enum4linux $TARGET
 
