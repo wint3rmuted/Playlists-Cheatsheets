@@ -1,3 +1,105 @@
+Enumerating SMB, RPC, and NetBIOS for Pentesting (Ports 445, 135-139)
+
+Using NMAP
+Scan for popular RCE exploits.
+sudo nmap -p 139,445 --script smb-vuln* <ip-addr> -oA nmap/smb-vuln
+
+Identify the SMB/OS version.
+nmap -v -p 139,445 --script=smb-os-discovery.nse <ip-addr>
+
+Enumerate users once you have valid credentials:
+sudo nmap --script=smb-enum-users -p 445 10.130.40.70 --script-args smbuser=<user>,smbpass=<password>
+
+Using NBTSCAN
+To scan a subnet for list of hostnames:
+nbtscan -v <targetRange>
+
+
+Using SMBMAP
+To list out the shares and associated permissions with Anonymous Access:
+smbmap -H <ip-addr>
+
+To list out shares recursively from hosts in a file and enumerate OS:
+smbmap.py --host-file <targets.txt> -v -R -g
+
+To list out the shares recursively:
+smbmap -R <sharename> -H <ip-addr>
+
+To list shares as an authenticated user:
+smbmap -d <domain> -u <username> -p <password> -H <ip-addr>
+
+To list the shares as a Guest user, just provide a username that doesn’t exist.
+smbmap -u DoesNotExist -H <ip-addr>
+
+To download a particular file.
+smbmap -R <sharename> -H <ip-addr> -A <filename> -q
+
+Using SMBCLIENT
+To list out the shares:
+smbclient -L \\\\<ip-addr>
+
+To connect to shares:
+sudo smbclient \\\\<ip-addr>\\<share>
+
+Downloading files:
+Once connected, you can download files. You’ll want to disable interactive prompts and turn recursive mode ON.
+
+smb: /> prompt
+smb: /> recurse
+smb: /> mget *
+
+
+Using RPCCLIENT
+Testing for Null or Authenticated Sessions:
+To test for null sessions, you can use the following command. If it connects, then you’ll be able to issue rpc client commands for further enumeration.
+rpcclient -U "" -N [ip]
+
+Have valid credentials? Use them to connect:
+rpcclient -U <user> 10.10.10.193
+
+Once connected, there are various queries you can run.
+
+To enumerate printers:
+enumprinters
+
+To enumerate users and groups:
+enumdomusers
+enumdomgroups
+
+The above command will output user/group RIDs. You can pass those into further queries like:
+querygroup <RID>
+querygroupmem <RID>
+queryuser <RID>
+
+
+Using ENUM4LINUX
+The following command will attempt to establish a null session with the target and then use RPC to extract useful information.
+enum4linux -a [ip]
+
+Example output is long, but some highlights to look for:
+
+    Listing of file shares and printers.
+    Domain/Workgroup information.
+    Password policy information.
+    RID cycling output to enumerate users and groups.
+
+
+Using METASPLOIT
+Bruteforcing credentials:
+use auxiliary/scanner/smb/smb_login
+set BLANK_PASSWORDS true
+set PASS_FILE /usr/share/seclists/Passwords/Common-Credentials/best15.txt
+set USER_FILE /usr/share/seclists/Usernames/top-usernames-shortlist.txt
+set RHOSTS <ipAddr>
+
+
+Mounting SMB Shares in Linux
+The following command will mount the remote file-share to /mnt/smb/ (this directory must exist first) and prompt you for the password.
+mount -t cifs -o username=<user> //<targetIP>/<shareName> /mnt/smb/
+
+Another way to mount a share from Linux is as follows:
+sudo mount.cifs //<targetIP>/share /mnt/share username=,password=
+
 SMB (139,445):
 nbtscan -r 10.11.1.0/24
 enum4linux -a 10.11.1.5
