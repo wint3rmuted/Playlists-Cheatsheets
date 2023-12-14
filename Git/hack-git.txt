@@ -1,1 +1,28 @@
 
+To dump a .git folder from a URL use:
+https://github.com/arthaud/git-dumper
+
+or https://pypi.org/project/git-dumper/
+
+You can use https://www.gitkraken.com/ to inspect the content
+
+wget
+If a .git directory is found in a web application you can download all the content using wget -r http://web.com/.git. Then, you can see the changes made by using git diff.
+
+These tools can be used to retrieve the content of a git directory:
+https://github.com/dnoiz1/git-money
+https://github.com/evilpacket/DVCS-Pillage
+https://github.com/internetwache/GitTools
+
+This tool can be used to search for CVEs and security vulnerability messages inside commits messages.
+https://github.com/cve-search/git-vuln-finder
+
+Search for sensitive data in the repositories of an organisations and its employees.
+https://github.com/michenriksen/gitrob
+
+https://github.com/UKHomeOffice/repo-security-scanner
+is a command line-based tool that was written with a single goal: to help you discover GitHub secrets that developers accidentally made by pushing sensitive data. 
+And like the others, it will help you find passwords, private keys, usernames, tokens and more.
+
+https://github.com/dxa4481/truffleHog
+searches through GitHub repositories and digs through the commit history and branches, looking for accidentally committed secrets
