@@ -1,8 +1,8 @@
 # Playlists-Cheatsheets
 My offensive playlists and cheatsheets.
 
-1.[AD Attacks](https://github.com/wint3rmuted/Playlists-Cheatsheets/tree/main/AD-Attacks)
-2.[Bruteforcing](https://github.com/wint3rmuted/Playlists-Cheatsheets/tree/main/Bruteforcing)
+[AD Attacks](https://github.com/wint3rmuted/Playlists-Cheatsheets/tree/main/AD-Attacks)***
+[Bruteforcing](https://github.com/wint3rmuted/Playlists-Cheatsheets/tree/main/Bruteforcing)
 
 [Commands](https://github.com/wint3rmuted/Playlists-Cheatsheets/tree/main/Commands)
 
