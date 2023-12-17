@@ -65,6 +65,7 @@ which got turned into:
 tedeveloper.com">test</a>
 As you can see, I was able to inject a bunch of HTML into the <a> tag. As a result,
 HackerOne rolled back the fix and began working on escaping single quote again.
+
 Takeaways
 Just because code is updated, doesn’t mean something is fixed. Test things out.
 When a change is deployed, that also means new code which could contain bugs.
