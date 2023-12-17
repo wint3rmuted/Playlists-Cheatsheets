@@ -1,1 +1,110 @@
+CRLF Injection
+Description
+Carriage Return Line Feed (CRLF) Injection is a type of vulnerability that occurs when a
+user manages to insert a CRLF into an application. The CRLF characters represent an end
+of line for many internet protocols, including HTML, and are %0D%0A which decoded
+represent \r\n. These can be used to denote line breaks and when combined with HTTP
+Request / Response Headers, can lead to different vulnerabilities, including HTTP Request
+Smuggling and HTTP Response Splitting.
+
+In terms of HTTP Request Smuggling, this usually occurs when an HTTP request is passed
+through a server which processes it and passes it to another server, like a proxy or
+firewall. This type of vulnerability can result in:
+• Cache poisoning, a situation where an attacker can change entries in the cache and serves malicious pages (e.g., containing javascript) instead of the proper page
+• Firewall evasion, a situation where a request can be crafted to avoid security checks, typically involving CRLF and overly large request bodies
+• Request Hijacking, a situation where an attacker can steal HttpOnly cookies and HTTP authentication information. This is similar to XSS but requires no interaction between the attacker and client
+
+Now, while these vulnerabilities exist, they are difficult to achieve. I’ve referenced them here so you have an understanding of how severe Request Smuggling can be.
+With regards to HTTP Response Splitting, attackers can set arbitrary response headers,control the body of the response or split the response entirely providing two responses
+instead of one as demonstrated in Example #2 - v.shopify.com Response Splitting 
+
+1. Twitter HTTP Response Splitting
+Description:
+In April 2015, it was reported that Twitter had a vulnerability which allowed hackers to
+set an arbitrary cookie by tacking on additional information to the request to Twitter.
+Essentially, after making the request to the URL above (a relic of Twitter’s which allowed
+people to report ads), Twitter would return a cookie for the parameter reported_tweet_id.
+However, according to the report, Twitter’s validation confirming whether the Tweet was
+numeric was flawed.
+
+While Twitter validated that the new line character, 0x0a, could not be submitted, the
+validation could be bypassed by encoding the characters as UTF-8 characters. In doing
+so, Twitter would convert the characters back to the original unicode thereby avoiding
+the filter. Here’s the example provided:
+%E5%E98%8A => U+560A => 0A
+
+This is significant because, new line characters are interpreted on the server as doing
+just that, creating a new line which the server reads and executes, in this case to tack on
+a new cookie.
+
+Now, CLRF attacks can be even more dangerous when they allow for XSS attacks (see
+the Cross-Site Scripting chapter for more info). In this case, because Twitter filters were
+bypassed, a new response could be returned to the user which included an XSS attack.
+Here’s the URL:
+https://twitter.com/login?redirect_after_login=https://twitter.com:21/%E5%98%8A%\
+E5%98%8Dcontent-type:text/html%E5%98%8A%E5%98%8Dlocation:%E5%98%8A%E5%98%8D%E5%9\
+8%8A%E5%98%8D%E5%98%BCsvg/onload=alert%28innerHTML%28%29%E5%98%BE
+
+Notice the %E5%E98%8A peppered throughout it. If we take those characters out and
+actually add line breaks, here’s what the header looks like:
+https://twitter.com/login?redirect_after_login=https://twitter.com:21/
+content-type:text/html
+location:%E5%98%BCsvg/onload=alert%28innerHTML%28%29%E5%98%BE
+
+As you can see, the line breaks allow for the creation of a new header to be returned with
+executable Javascript code - svg/onload=alert(innerHTML). With this code, a malicious
+user could steal an unsuspecting victim’s Twitter session information.
+
+Takeaways
+Good hacking is a combination of observation and skill. In this case, the reporter,
+@filedescriptor, knew of a previous Firefox encoding bug which mishandled
+encoding. Drawing on that knowledge led to testing out similar encoding on
+Twitter to get line returns inserted.
+When you are looking for vulnerabilities, always remember to think outside the
+box and submit encoded values to see how the site handles the input
+
+2. v.shopify.com Response Splitting
+Description:
+Shopify includes some behind the scenes functionality that will set a cookie on your
+browser pointing to the last store you have logged into. It does that via the endpoint,
+/last_shop?SITENAME.shopify.com
+
+In December 2015, it was discovered that Shopify wasn’t validating the shop parameter
+being passed into the call. As a result, using Burp Suite, a White Hat was able to alter the
+request with %0d%0a and generate a header returned to the user. Here’s a screenshot:
+
+Here’s the malicious code:
+
+%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Type:%20te\
+xt/html%0d%0aContent-Length:%2019%0d%0a%0d%0a<html>deface</html>
+
+In this case, the %20 represents a space and %0d%0a is a CRLF. As a result, the browser
+received two headers and rendered the second which could have led to a variety of
+vulnerabilities, including XSS.
+
+Takeaways
+Be on the lookout for opportunities where a site is accepting your input and
+using it as part of its return headers. In this case, Shopify creates a cookie
+with last_shop value which was actually pulled from a user controllable URL
+parameter. This is a good signal that it might be possible to expose a CRLF
+injection vulnerability.
+
+Summary
+Good hacking is a combination of observation and skill. Knowing how encoded characters
+can be used to expose vulnerabilities is a great skill to have. %0D%0A can be used to test
+servers and determine whether they may be vulnerability to a CRLF Injection. If it is, take
+it a step further and try to combine the vulnerability with an XSS injection
+On the other hand, if the server doesn’t respond to %0D%0A think about how you could
+encode those characters again and test the server to see if it will decode the doubled
+encoded characters just like @filedescriptor did.
+Be on the lookout for opportunities where a site is using a submitted value to return
+some type of header, like creating a cookie.
+
+
+
+
+
+
+
+
 
