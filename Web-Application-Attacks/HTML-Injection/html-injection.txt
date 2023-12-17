@@ -76,9 +76,44 @@ exploit by reading XSS Jigsaw’s blog.innerht.ml (it’s included in the Resour
 chapter) but much later.
 
 
+3. Within Security Content Spoofing
+Description:
+Though content spoofing is technically a different type of vulnerability than HTML
+injection, I’ve included it here as it shares the similar nature of an attacker having a site
+rendered content of their choosing.
+Within Security was built on the Wordpress platform which includes the login path
+withinsecurity.com/wp-login.php (the site has since been merged with the HackerOne
+core platform). A hacker noticed that during the login process, if an error occurred,
+Within Security would render access_denied, which also corresponded to the error
+parameter in the url:
+https://withinsecurity.com/wp-login.php?error=access_denied
 
+Noticing this, the hacker tried modifying the error parameter and found that whatever
+value was passed was rendered by the site as part of the error message presented to
+users. Here’s the example used:
+https://withinsecurity.com/wp-login.php?error=Your%20account%20has%20%hacked
 
+The key here was noticing the parameter in the URL being rendered on the page. Though
+they don’t explain, I would assume the hacker noticed that access_denied was being
+displayed on the page but was also included in the URL. A simple test changing the
+access_denied parameter probably revealed the vulnerability in this case, which they
+reported.
 
+Takeaways
+Keep an eye on URL parameters which are being passed and rendered as
+site content. They may present opportunities for attackers to trick victims into
+performing some malicious action.
+
+Summary
+HTML Injection presents a vulnerability for sites and developers because it can be used
+to mislead users and trick them into submitting sensitive information to, or visiting,
+malicious websites. Otherwise known as phishing attacks.
+
+Discovering these vulnerabilities isn’t always about submitting plain HTML but exploring
+how a site might render your inputted text, like URI encoded characters. And while not
+entirely the same as HTML injection, content spoofing is similar in that it involves having
+some input reflected back to a victim in the HTML page. Hackers should be on the lookout
+for the opportunity to manipulate URL parameters and have them rendered on the site
 
 
 
