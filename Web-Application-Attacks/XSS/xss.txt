@@ -1,1 +1,280 @@
+Cross-Site Scripting Attacks
+Description
+Cross-site scripting, or XSS, involve a website including unintended Javascript code which is subsequently passes on to users who then execute that code via their browsers.
+A harmless example of this is:
+alert(‘XSS’);
+
+This will create the Javascript function alert and create a simple popup with the letters XSS. 
+I recommended you use this example whenreporting. That is, until a very successful hacker told me it was a “terrible example”,
+explaining that often the receiver of a vulnerability report may not understand the severity of the issue and may award a lower bounty because of the harmless example.
+
+So, on that note, use the example to determine if a XSS vulnerability exists, but when reporting, think through how the vulnerability could impact the site and explain that. 
+By that, I don’t mean tell the company what XSS is, but explain what you could achieve with this that directly impacts their site.
+Part of that should include identifying which kind of XSS you are reporting, as there’s
+more than one:
+
+• Reflective XSS: These attacks are not persisted, meaning the XSS is delivered and executed via a single request and response.
+
+• Stored XSS: These attacks are persisted, or saved, and then executed when a page is loaded to unsuspecting users.
+
+• Self XSS: These attacks are also not persisted and are usually used as part of tricking a person into running the XSS themselves.
+
+When you are searching for vulnerabilities, you will often find that companies are not concerned with Self XSS, they only care when their users could be impacted through no
+fault of their own as is the case with Reflective and Stored XSS. 
+However, that doesn’t mean you should totally disregard Self XSS.
+If you do find a situation where Self XSS can be executed but not stored, you need to thinkabout how that vulnerability could be exploited, is there something you could combine
+it with so it is no longer a Self XSS?
+
+One of the most famous examples of a XSS exploitation was the MySpace Samy Worm executed by Samy Kamkar. 
+In October, 2005, Samy exploited a stored XSS vulnerability on MySpace which allowed him to upload Javascript code. 
+The code was then executed whenever anyone visited his MySpace page, thereby making any viewer of Samy’s profilehis friend. 
+But, more than that, the code also replicated itself across the pages of Samy’s new friends so that viewers of the infected profile pages now had their profile pages
+updated with the text, “but most of all, samy is my hero”. While Samy’s exploitation wasn’t overly malicious, XSS exploits make it possible to steal
+usernames, passwords, banking information, etc. Despite the potential implications,fixing XSS vulnerabilities is often easy, only requiring software developers to escape user
+input (just like HTML injection) when rendering it. Though, some sites also strip potential malicious characters when an attacker submits them.
+
+
+1. Shopify Wholesale
+Description:
+Shopify’s wholesale site is a simple webpage with a distinct call to action – enter a product name and click “Find Products”
+
+The XSS vulnerability here was the most basic you could find - text entered into the search
+box wasn’t escaped so any Javascript entered was executed. Here’s the submitted text
+from the vulnerability disclosure: test’;alert(‘XSS’);’
+The reason this works is Shopify took the input from the user, executed the search
+query and when no results were returned, Shopify would print a message saying that
+no products were found by that name and then reprint the user input without escaping
+it. As a result, the submitted Javascript was printed back to the webpage and browsers
+interpreted it as Javascript to be executed.
+
+Takeaways
+Test everything, paying particular attention for situations where text you enter
+is being rendered back to you. Test to determine whether you can include HTML
+or Javascript to see how the site handles it. Also try encoded input 
+
+XSS vulnerabilities don’t have to be intricate or complicated. This vulnerability
+was the most basic you can find - a simple input text field which did not sanitize
+a user’s input. And it was discovered on December 21, 2015 and netted the
+hacker $500! All it required was a hacker’s perspective.
+
+2. Shopify Giftcard Cart
+Shopify’s hardward giftcard site5 allows users to design their own gift cards with an
+HTML form including a file upload input box, some text boxes for details, etc. Here’s
+a screenshot
+
+The XSS vulnerability here occurred when Javascript was entered into the image’s name
+field on the form. A pretty easy task when done with an HTML proxy. So here, the original
+form submission would include:
+Content-Disposition: form-data; name="properties[Artwork file]"
+
+Which would be intercepted and changed to:
+Content-Disposition: form-data; name="properties[Artwork file<img src='test' onm\ouseover='alert(2)'>]"
+
+Takeaways
+There are two things to note here which will help when finding XSS vulnerabili-
+ties:
+1. The vulnerability in this case wasn’t actually on the file input field itself -
+it was on the name property of the field. So when you are looking for XSS
+opportunities, remember to play with all input values available.
+2. The value here was submitted after being manipulated by a proxy. This is
+key in situations where there may be Javascript validating values on the
+client side (your browser) before any values actually get back to the site’s
+server
+
+In fact, any time you see validation happening in real time in your browser,
+it should be a redflag that you need to test that field! Developers may make
+the mistake of not validating submitted values for malicious code once the values
+get to their server because they think the browser Javascript code has already
+handling validations before the input was received.
+
+3. Shopify Currency Formatting
+Description:
+Shopify’s store settings include the ability to change currency formatting. On December
+9, it was reported that the values from those input boxes weren’t be properly sanitized
+when setting up social media pages.
+In other words, a malicious user could set up a store and change the currency settings
+for the store to the following:
+
+Then, the user could enable the social media sales channels, in the case of the report,
+Facebook and Twitter, and when users clicked on that sale channel tab, the Javascript
+was executed resulting in a XSS vulnerability.
+
+Takeaways
+XSS vulnerabilities result when the Javascript text is rendered insecurely. It is
+possible that the text will be used in multiple places on a site and so each and
+every location should be tested. In this case, Shopify does not include store or
+checkout pages for XSS since users are permitted to use Javscript in their own
+store. It would have been easy to write this vulnerability off before considering
+whether the field was used on the external social media sites.
+
+4. Yahoo Mail Stored XSS
+Description:
+Yahoo’s mail editor allowed people to embed images in an email via HTML with an IMG
+tag. This vulnerability arose when the HTML IMG tag was malformed, or invalid.
+Most HTML tags accept attributes, additional information about the HTML tag. For
+example, the IMG tag takes a src attribute pointing to the address of the image to render.
+Furthermore, some attributes are referred to as boolean attributes, meaning if they are
+included, they represent a true value in HTML and when they are omitted, they represent
+a false value.
+With regards to this vulnerability, Jouko Pynnonen found that if he added boolean
+attributes to HTML tags with a value, Yahoo Mail would remove the value but leave the
+equal signs. Here’s an example from the Klikki.fi website:
+<INPUT TYPE="checkbox" CHECKED="hello" NAME="check box">
+Here, an input tag may include a checked attribute denoting whether the check box
+would be rendered as checked off. Following the parsing described above, this would
+become:
+<INPUT TYPE="checkbox" CHECKED= NAME="check box">
+Notice that the HTML goes from having a value for checked to no value but still including
+the equal sign.
+Admittedly this looks harmless but according to HTML specifications, browsers read this
+as CHECKED having the value of NAME=”check and the input tag having a third attribute
+named box which does not have a value. This is because HTML allows zero or more space
+characters around the equals sign, in an unquoted attribute value.
+To exploit this, Jouko submitted the following IMG tag:
+<img ismap='xxx' itemtype='yyy style=width:100%;height:100%;position:fixed;left:\
+0px;top:0px; onmouseover=alert(/XSS/)//'>
+which Yahoo Mail filtering would turn into:
+<img ismap=itemtype=yyy style=width:100%;height:100%;position:fixed;left:0px;top\
+:0px; onmouseover=alert(/XSS/)//>
+
+
+As a result, the browser would render an IMG tag taking up the whole browser window
+and when the mouse hovered over the image, the Javascript would be executed.
+
+Takeaways
+Passing malformed or broken HTML is a great way to test how sites are parsing
+input. As a hacker, it’s important to consider what the developers haven’t. For
+example, with regular image tags, what happens if you pass two src attributes?
+How will that be rendered?
+
+5. Google Image Search
+Description:
+In September 2015, Mahmoud Jamal was using Google Images to find an image for his
+HackerOne profile. While browsing, he noticed something interesting in the image URL
+from Google:
+http://www.google.com/imgres?imgurl=https://lh3.googleuser.com/...
+Notice the reference to the imgurl in the actual URL. When hovering over the thumbnail,
+Mahmoud noticed that the anchor tag href attribute included the same URL. As a result,
+he tried changing the parameter to javascript:alert(1) and noticed that the anchor tag
+href also changed to the same value.
+Excited at this point, he clicked on the link but no Javascript was executed as the Google
+URL was changed to something different. Turns out, Google code changed the URL value
+when a mouse button was clicked via the onmousedown Javascript callback.
+Thinking about this, Mahmoud decided to try his keyboard and tabbing through the page.
+When he got to the View Image button, the Javascript was triggered resulting in an XSS
+vulnerability. Here’s the image:
+
+Takeaways
+Always be on the lookout for vulnerabilities. It’s easy to assume that just because
+a company is huge or well known, that everything has been found. However,
+companies always ship code.
+In addition, there are a lot of ways javascript can be executed, it would have
+been easy in this case to give up after seeing that Google changed the value with
+an onmousedown event handler, meaning anytime the link was clicked, with a
+mouse.
+
+6. Google Tagmanager Stored XSS
+In October 2014, Patrik Fehrehbach found a stored XSS vulnerability against Google. The
+interesting part about the report is how he managed to get the payload past Google.
+Google Tagmanager is an SEO tool that makes it easy for marketers to add and update
+website tags - including conversion tracking, site analytics, remarketing, and more￿. To
+do this, it has a number of webforms for users to interact with. As a result, Patrik started
+out by entering XSS payloads into the available form fields which looked like #>img src=/
+onerror=alert(3)>. If accepted, this would close the existing HTML > and then try to load
+an nonexistent image which would execute the onerror Javascript, alert(3).
+However, this didn’t work. Google was properly sanitizing input. However, Patrik noticed
+an alternative - Google provides the ability to upload a JSON file with multiple tags. So
+he downloaded the sample and uploaded:
+"data": {
+"name": "#"><img src=/ onerror=alert(3)>",
+"type": "AUTO_EVENT_VAR",
+"autoEventVarMacro": {
+"varType": "HISTORY_NEW_URL_FRAGMENT"
+}
+}
+
+Here, you’ll notice the name of the tag is his XSS payload. Turns out, Google wasn’t
+sanitizing the input from the uploaded files and the payload executed.
+
+Takeaways
+Two things are interesting here. First, Patrik found an alternative to providing
+input - be on the look out for this and test all methods a target provides to
+enter input. Secondly, Google was sanitizing the input but not escaping when
+rendering. Had they escaped Patrik’s input, the payload would not have fired
+since the HTML would have been converted to harmless characters
+
+
+Summary
+XSS vulnerabilities represent real risk for site developers and are still prevalent on sites,
+often in plain sight. By simply submitting a call to the Javascript alert method, alert(‘test’),
+you can check whether an input field is vulnerable. Additionally, you could combine this
+with HTML Injection and submit ASCII encoded characters to see if the text is rendered
+and interpreted.
+When searching for XSS vulnerabilities, here are some things to remember:
+
+1. Test Everything
+Regardless of what site you’re looking at and when, always keep hacking! Don’t
+ever think that a site is too big or too complex to be vulnerable. Opportunities
+may be staring you in the face asking for a test like wholesale.shopify.com.
+The stored Google Tagmanager XSS was a result of finding an alternative way
+to add tags to a site.
+
+2. Vulnerabilities can exist on any form value
+For example, the vulnerability on Shopify’s giftcard site was made possible by
+exploiting the name field associated with an image upload, not the actual file
+field itself.
+
+3. Always use an HTML proxy when testing
+When you try submitting malicious values from the webpage itself, you may
+run into false positives when the site’s Javascript picks up your illegal values.
+Don’t waste your time. Submit legitimate values via the browser and then
+change those values with your proxy to executable Javascript and submit that.
+
+4. XSS Vulnerabilities occur at the time of rendering
+Since XSS occurs when browsers render text, make sure to review all areas of
+a site where values you enter are being used. It’s possible that the Javascript
+you add won’t be rendered immediately but could show up on subsequent
+pages. It’s tough but you want to keep an eye out for times when a site is
+filtering input vs escaping output. If its the former, look for ways to bypass
+the input filter as developers may have gotten lazy and aren’t escaping the
+rendered input.
+
+5. Test unexpected values
+Don’t always provide the expected type of values. When the HTML Yahoo
+Mail exploit was found, an unexpected HTML IMG attribute was provided.
+Think outside the box and consider what a developer is looking for and
+then try to provide something that doesn’t match those expectations. This
+includes finding innovative ways for the potential Javascript to be executed,
+like bypassing the onmousedown event with Google Images.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
