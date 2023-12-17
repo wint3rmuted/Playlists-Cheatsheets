@@ -175,6 +175,27 @@ for all forms by default (though it can be turned off). However, clearly this is
 the case for API’s created with the framework. Lastly, be on the lookout for any calls which
 change server data (like delete actions) which are being performed by a GET request.
 
+4. HackerOne Signal Manipulation
+Description:
+At the end of 2015, HackerOne introduced new functionality to the site called Signal.
+Essentially, it helps to identify the effectiveness of a Hacker’s previous vulnerability
+reports once those reports are closed. It’s important to note here, that users can close
+their own reports on HackerOne which is supposed to result in no change for their
+Reputation and Signal
+
+So, as you can probably guess, in testing the functionality out, a hacker discovered that
+the functionality was improperly implemented and allowed for a hacker to create a
+report to any team, self close the report and receive a Signal boost.
+And that’s all there was to it
+
+Takeaways
+Though a short description, the takeaway here can’t be overstated, be on the
+lookout for new functionality!. When a site implements new functionality, it’s
+like fresh meat for hackers. New functionality represents the opportunity to test
+new code and search for bugs. This was the same for the Shopify Twitter CSRF
+and Facebook XSS vulnerabilities. To make the most of this, it’s a good idea to
+familiarize yourself with companies and subscribe to company blogs so you’re
+notified when something is released. Then test away.
 
 
 
