@@ -1,1 +1,165 @@
+HTTP Parameter Pollution
+Description
+HTTP Parameter Pollution, or HPP, occurs when a website accepts input from a user and
+uses it to make an HTTP request to another system without validating that user’s input.
+
+This can happen one of two ways, via the server (or back end) and via the client side.
+On StackExchange, SilverlightFox provides a great example of a HPP server side attack;
+suppose we have the following website, https://www.example.com/transferMoney.php,
+which is accessible via a POST method taking the following parameters:
+amount=1000&fromAccount=12345
+
+When the application processes this request, it makes its own POST request to another
+back end system, which in turn actually processes the transaction with a fixed toAccount
+parameter.
+
+Separate back end URL: https://backend.example/doTransfer.php
+Separate back end Parameters: toAccount=9876&amount=1000&fromAccount=12345
+
+Now, if the back end only takes the last parameter when duplicates are provided and
+suppose a hacker alters the POST to the website to submit a toAccount param like this:
+amount=1000&fromAccount=12345&toAccount=99999
+
+A site vulnerable to an HPP attack would forward the request to the other back end
+system looking like:
+toAccount=9876&amount=1000&fromAccount=12345&toAccount=99999
+
+In this case, the second toAccount parameter submitted by the malicious user could
+override the back end request and transfer the money into the malicious user’s submit-
+ted account (99999) instead of the intended account set by the system (9876).
+This is useful if an attacker were to amend their own requests, which are processed
+through a vulnerable system. But it can be also more useful to an attacker if that attacker
+can generate a link from another website and entice users to unknowingly submit the
+malicious request with the extra parameter added by the attacker.
+On the other hand, HPP client side involves injecting additional parameters to links and
+other src attributes. Borrowing an example from OWASP, suppose we had the following
+code:
+
+<? $val=htmlspecialchars($_GET['par'],ENT_QUOTES); ?>
+<a href="/page.php?action=view&par='.<?=$val?>.'">View Me!</a>
+
+This takes a value for par from the URL, makes sure it’s safe and creates a link out of it.
+Now, if an attacker submitted:
+http://host/page.php?par=123%26action=edit
+
+the resulting link would look like:
+<a href="/page.php?action=view&par=123&amp;action=edit">View Me!</a>
+
+This could lead to the application then accepting the edit action instead of the view action.
+Both HPP server side and client side depend on which back end technology is being
+used and how it behaves when receiving multiple parameters with the same name. For
+example, PHP/Apache uses the last occurrence, Apache Tomcat uses the first occurrence,
+ASP/IIS uses all occurrences, etc. As a result, there is no single guaranteed handling for
+submitting multiple parameters with the same name and finding HPP will take some
+experimentation to confirm how the site you’re testing works.
+
+Description: HackerOne includes links to share content on popular social media sites
+like Twitter, Facebook, etc. These social media links include specific parameters for the
+social media link.
+
+A vulnerability was discovered where a hacker could tack on another URL parameter
+to the link and have it point to any website of their choosing, which HackerOne would
+include in the POST to the social media site, thereby resulting in unintended behaviour.
+The example used in the vulnerability report was changing the URL:
+https://hackerone.com/blog/introducing-signal
+to
+https://hackerone.com/blog/introducing-signal?&u=https://vk.com/durov
+
+Notice the added u parameter. If the maliciously updated link was clicked on by
+HackerOne visitors trying to share content via the social media links, the malicious link
+would look like:
+https://www.facebook.com/sharer.php?u=https://hackerone.com/blog/introducing-signal?&u=https://vk.com/durov
+
+Here, the last u parameter was given precedence over the first and subsquently used
+in the Facebook post. When posting to Twitter, the suggested default text could also be
+changed:
+https://hackerone.com/blog/introducing-signal?&u=https://vk.com/durov&text=another_site:https://vk.com/durov
+
+Takeaways
+Be on the lookout for opportunities when websites are accepting content and
+appear to be contacting another web service, like social media sites.
+In these situations, it may be possible that submitted content is being passed on
+without undergoing the proper security checks.
+
+2. Twitter Unsubscribe Notifications
+Description:
+In August 2015, hacker Mert Tasci noticed an interesting URL when unsubscribing from
+receiving Twitter notifications:
+https://twitter.com/i/u?t=1&cn=bWV&sig=657&iid=F6542&uid=1134885524&nid=22+26
+
+Did you notice the parameter UID? This happens to be your Twitter account user ID. Now, noticing that, he did what I assume most of
+us hackers would do, he tried changing the UID to that of another user and ... nothing.
+Twitter returned an error.
+Determined where others may have given up, Mert tried adding a second uid parameter
+so the URL looked like (again I shortened this):
+
+https://twitter.com/i/u?iid=F6542&uid=2321301342&uid=1134885524&nid=22+26
+and ... SUCCESS! He managed to unsubscribe another user from their email notifications.
+Turns out, Twitter was vulnerable to HPP unsubscribing users.
+
+Takeaways
+Though a short description, Mert’s efforts demonstrate the importance of per-
+sistence and knowledge. If he had walked away from the vulnerability after
+testing another UID as the only parameter or had he not know about HPP type
+vulnerabilities, he wouldn’t have received his $700 bounty.
+Also, keep an eye out for parameters, like UID, being included in HTTP requests
+as I’ve seen a lot of reports during my research which involve manipulating their
+values and web applications doing unexpected things.
+
+3. Twitter Web Intents
+Description:
+According to their documentation, Twitter Web Intents, provide popup-optimized flows
+for working with Tweets & Twitter Users: Tweet, Reply, Retweet, Like, and Follow. They
+make it possible for users to interact with Twitter content in the context of your site,
+without leaving the page or having to authorize a new app just for the interaction. Here’s
+an example of what this looks like:
+
+Testing this out, hacker Eric Rafaloff found that all four intent types, following a user,
+liking a tweet, retweeting and tweeting, were vulnerable to HPP.
+According to his blog post, if Eric created a URL with two screen_name parameters:
+https://twitter.com/intent/follow?screen_name=twitter&scnreen_name=erictest3
+
+Twitter would handle the request by giving precedence to the second screen_name over
+the first. According to Eric, the web form looked like:
+
+<form class="follow " id="follow_btn_form" action="/intent/follow?screen_name=er\
+icrtest3" method="post">
+<input type="hidden" name="authenticity_token" value="...">
+<input type="hidden" name="screen_name" value="twitter">
+<input type="hidden" name="profile_id" value="783214">
+<button class="button" type="submit" >
+<b></b><strong>Follow</strong>
+</button>
+</form>
+
+A victim would see the profile of the user defined in the first screen_name, twitter, but
+clicking the button, they’d end up following erictest3.
+Similarly, when presenting intents for liking, Eric found he could include a screen_name
+parameter despite it having no relevance to liking the tweet. For example:
+https://twitter.com/intent/like?tweet_id=6616252302978211845&screen_name=erictest3
+
+Liking this tweet would result in a victim being presented with the correct owner profile
+but clicking follow, they would again end up following erictest3.
+
+Takeaways
+This is similar to the previous Twitter vulnerability regarding the UID. Unsur-
+prisingly, when a site is vulnerable to an flaw like HPP, it may be indicative of a
+broader systemic issue. Sometimes if you find a vulnerability like this, it’s worth
+taking the time to explore the platform in its entirety to see if there are other
+areas where you might be able to exploit similar behaviour. In this example, like
+the UID above, Twitter was passing a user identifier, screen_name which was
+susceptible to HPP based on their backend logic.
+
+Summary
+The risk posed by HTTP Parameter Pollution is really dependent on the actions performed
+by a site’s back end and where the polluted parameters are being submitted to.
+Discovering these types of vulnerabilities really depends on experimentation, more so
+than other vulnerabilities because the back end actions of a website may be a complete
+black box to a hacker. More often than not, as a hacker, you will have very little insight
+into what actions a back end server takes after having received your input.
+Through trial and error, you may be able to discover situations where a site is communi-
+cating with another server and then start testing for Parameter Pollution. Social media
+links are usually a good first step but remember to keep digging and think of HPP when
+you might be testing for parameter substitutions like UIDs.
+
 
