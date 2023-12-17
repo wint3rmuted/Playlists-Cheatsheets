@@ -1,1 +1,36 @@
+HTML Injection
+Description
+Hypertext Markup Language (HTML) injection is also sometimes referred to as virtual  defacement. This is an attack made possible by a site allowing a malicious user
+to inject HTML into its web page(s) by not handling that user’s input properly. In other words, an HTML injection vulnerability is caused by receiving HTML, typically via some
+form input, which is then rendered as is on the page. This is separate and distinct from injecting Javascript, VBscript etc.
 
+Since HTML is the language used to define the structure of a web page, if an attacker can inject HTML, they can essentially change what a browser renders. Sometimes this
+could result in completely changing the look of a page or in other cases, creating forms to trick users. For example, if you could inject HTML, you might be able to add a <form> tag
+to the page, asking the user to re-enter their username and password. However, when submitting this form, it actually sends the information to an attacker.
+
+Description:
+For this vulnerability, the reporter identified that Coinbase was actually decoding URI encoded values when rendering text. For those unfamiliar, characters in a URI are either reserved or unreserved. According to Wikipedia,reserved are characters that sometimes have special meaning like / and &. Unreserved characters are those without any special meaning, typically just letters.
+
+So, when a character is URI encoded, it is converted into its byte value in the American Standard Code for Information Interchange (ASCII) and preceded with a percent sign (%). 
+So, / becomes %2F, & becomes %26. As an aside, ASCII is a type of encoding which was most common on the internet until UTF-8 came along, another encoding type.
+
+Example, if an attacker entered HTML like:
+<h1>This is a test</h1>
+
+Coinbase would actually render that as plain text, exactly as you see above. However, if the user submitted URL encoded characters, like:
+%3C%68%31%3E%54%68%69%73%20%69%73%20%61%20%74%65%73%74%3C%2F%68%31%3E
+
+Coinbase would actually decode that string and render the corresponding letters, or:
+This is a test
+
+With this, the reporting hacker demonstrated how he could submit an HTML form with username and password fields, which Coinbase would render. Had the hacker been
+malicious, Coinbase could have rendered a form which submitted values back to a malicious website to capture credentials (assuming people filled out and submitted the
+form).
+
+Takeaways
+When you’re testing out a site, check to see how it handles different types of input, including plain text and encoded text. Be on the lookout for sites that are
+accepting URI encoded values like %2F and rendering their decoded values, in this case /. While we don’t know what the hacker was thinking in this example,
+it’s possible they tried to URI encode restricted characters and noticed that Coinbase was decoding them. They then went one step further and URI encoded all characters.
+
+A great URL Encoder is http://quick-encoder.com/url. You’ll notice using it that it will tell you unrestricted characters do not need encoding and give you the
+option to encode url-safe characters anyway. That’s how you would get the same encoded string used on Coinbase.
