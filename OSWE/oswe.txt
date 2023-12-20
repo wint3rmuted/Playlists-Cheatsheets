@@ -6,6 +6,7 @@ Before registering for the OSWE Exam:
         Code analysis to gaining RCE
         Magento 2.3.1: Unauthenticated Stored XSS to RCE
         Mybb 18.20 From Stored XSS to RCE
+
     Bypassing File Upload Restrictions:
         [Paper] File Upload Restrictions Bypass
         Shell the web - Methods of a Ninja
@@ -13,16 +14,19 @@ Before registering for the OSWE Exam:
         Atlassian Crowd Pre-auth RCE
         Popcorn machine from HackTheBox
         Vault machine from HackTheBox
+
     Authentication Bypass to RCE
         ATutor 2.2.1 Authentication Bypass
         ATutor LMS password_reminder TOCTOU Authentication Bypass
         ATutor 2.2.1 - Directory Traversal / Remote Code Execution
         Cubecart Admin Authentication Bypass
         Trendmicro smart protection bypass to RCE
+
     Password Reset Vulnerability
         Testing Password rest functionalities
         OWASP - Forgot Password Cheatsheet
         How we hacked multiple user accounts using weak reset tokens for passwords
+
     SQL Injection:
         RCE with SQL Injection - MSSQL
         SQL Injection to LFI to RCE - MySQL
@@ -35,6 +39,7 @@ Before registering for the OSWE Exam:
         SQL Injection Cheat Sheet - PentestMonkey
         SQL Injection Cheat Sheet - PayloadAllTheThings
         Exploiting H2 SQL injection to RCE
+
     JavaScript Injection:
         Server Side JS Injection
         Remote Code Execution in math.js
@@ -44,6 +49,7 @@ Before registering for the OSWE Exam:
         Pentesting Node.js Application : Nodejs Application Security
         NodeJS remote debugging with vscode
         Escape NodeJS Sandboxes
+
     PHP Type Juggling:
         OWASP - PHPMagicTricks TypeJuggling
         PHP Type Juggling - Introduction
@@ -54,6 +60,7 @@ Before registering for the OSWE Exam:
         Detailed Explanation of PHP Type Juggling Vulnerabilities
         [Video] PHP Type Juggling Vulnerabilities, Netsparker
         [Video] Falafel machine from HackTheBox
+
     Deserialization:
         Deserialization_Cheat_Sheet
         Insecure deserialization - PayloadAllthethings
@@ -88,23 +95,27 @@ Before registering for the OSWE Exam:
             Attacking Deserialization in JS
             Node.js Deserialization Attack – Detailed Tutorial
             [Video] Celestial machine from HackTheBox - Ippsec
+
     XML External Entity (XXE) Attack
         A Deep Dive into XXE Injection
         From XXE to RCE: Pwn2Win CTF 2018 Writeup
         Blind XXE to RCE
         Apache Flex BlazeDS XXE Vulnerabilty
         WebLogic EJBTaglibDescriptor XXE
+
     Server Side Template Injection (SSTI)
         [Portswigger Research] Server Side Template Injection
         [Video] SSTI : RCE For The Modern Web App - albinowax
         Server Side Template Injection
         Jinja2 template injection filter bypasses
         Exploitation of Server Side Template Injection with Craft CMS plugin SEOmatic <=3.1.3
+
     Websocekts InSecurity
         Introduction to WebSockets
         [Video] Hacking with Websocket - BlackHat
         Remote Hardware takeover via Websocket Hijacking
         Cross-Site WebSocket Hijacking to full Session Compromise
+
     Source Code Audit
         Introduction to Code Review [PentesterLab]
         Static code analysis writeups
