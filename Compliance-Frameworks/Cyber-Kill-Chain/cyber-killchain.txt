@@ -1,1 +1,95 @@
+Cyber Kill Chain A seven-step process of mapping attacks from their beginning to end.
+
+What is a kill chain in cyber security?
+
+You may have heard of the phrase ‘kill chain’ being used in reference to military operations: when an enemy attack is identified, broken down into stages, and preventative measures are put in place. This is the exact concept that inspired the original cyber security kill chain, which was initially created by Lockheed Martin in 2011. 
+
+A cyber kill chain’s purpose is to bolster an organization's defenses against advanced persistent threats (APTs), aka sophisticated cyberattacks. The most common threats include the deployment of:
+
+    Malware
+    Ransomware
+    Trojan horses
+    Phishing
+    Other social engineering techniques
+
+Cyber kill chains allow enterprises to be prepared and stay one step ahead of hackers at every stage of an attack, from conceptualization to execution.
+Cyber kill chain vs MITRE ATT&CK
+
+The cyber kill chain is often compared to the MITRE ATT&CK framework. MITRE ATT&CK also illustrates the phases of a cyberattack, many of which are similar to the cyber kill chain model. The key difference between the cyber kill chain and MITRE ATT&CK is the fact that MITRE tactics are listed in no particular order — unlike the specific grouping of stages and linear structure of the kill chain. 
+
+Another difference is that the cyber kill chain framework addresses the cyberattack process in seven phases at a high level, while MITRE ATT&CK explores various techniques and procedures that relate to the granular details of a cyberattack. Elements of both the kill chain and ATT&CK can be incorporated into cybersecurity strategy.
+
+The 7 stages of a cyber kill chain
+The original Lockheed Martin cyber kill chain model describes seven steps. This is the most commonly referenced framework in the industry. Lockheed’s 7-stage cyber kill chain explores the methodology and motivation of a cybercriminal across the entire attack timeline, helping organizations to understand and combat threats. These seven phases are:
+
+    Reconnaissance
+    Weaponization
+    Delivery
+    Exploitation
+    Installation
+    Command and control
+    Action
+
+1. Reconnaissance
+The first stage of the cyber security kill chain is reconnaissance, which is essentially the research stage of the operation. Attackers scope out their target to identify any vulnerabilities and potential entry points. This can be as simple as gathering public email addresses, to the advanced deployment of spying tools and automated scanners to detect the types of security systems or third-party applications used.
+
+Reconnaissance is a pivotal step in any sophisticated cyberattack and can be done both online and offline. The more intelligence attackers gain at this stage, the more successful the attack is likely to be.  
+
+2. Weaponization
+Once the perpetrator has gathered their information on the target, they can strategize to take advantage of their weaknesses. This is the weaponization stage of the cyber kill chain, in which the attacker creates malware or malicious payloads to use against the target. The process can include:
+
+    Designing new forms of malware
+    Modifying existing programs to better match the vulnerabilities they’re trying to exploit
+
+3. Delivery
+Following weaponization is the delivery stage — when cybercriminals try to infiltrate their target’s network or security system.
+
+Typically, these actors deploy malware into the system via phishing emails and other social engineering tools. It can also involve hacking into a network and exploiting vulnerabilities in an organization’s hardware or software. 
+4. Exploitation
+
+After the successful delivery of malware or other forms of hacking, the next step is exploiting the weaknesses they uncovered in the previous cyber kill chain phases. Attackers can now further infiltrate a target’s network and learn of additional vulnerabilities that they were unaware of prior to entering.
+
+At this stage, they often move laterally across a network from one system to another, spotting more potential entry points on the way. Vulnerabilities are much easier to identify now if there are no deception measures in place on the network. 
+5. Installation
+
+Next is the installation stage (also known as the privilege escalation phase). The attacker tries to install malware and deploy other cyberweapons within the target network in order to gain additional control of more systems, accounts, and data. Strategies include installing malware via:
+
+    Trojan horses
+    Access token manipulation
+    Command-line interfaces
+    Backdoors
+
+Tactics begin to intensify, as attackers forcefully infiltrate the target network, seeking out unprotected security credentials and changing permissions on compromised accounts. 
+
+6. Command and Control
+One of the crucial steps of the cyber security kill chain is the development of a command and control channel (also known as the C2 phase). After gaining control of part of their target’s system or accounts, the attacker can now track, monitor and guide their deployed cyberweapons and tool stacks remotely. This stage can be broken down into two methods:
+
+    Obfuscation is the process by which an attacker makes it look like no threat is present, essentially covering their tracks. This includes methods such as file deletion, binary padding and code signing.
+    Denial of service (DoS) is when cybercriminals cause problems in other systems/areas to distract security teams from uncovering the core objectives of the attack. This often involves network denial of service or endpoint denial of service, as well as techniques like resource hijacking and system shutdowns. 
+
+7. Action
+The 7 stages of the cyber kill chain culminate with action: the final phase in which cybercriminals execute the underlying objective of the attack. This phase of the cyber kill chain process can take several weeks or months depending on the success of previous steps. Common end goals of a strategic cyberattack include:
+
+    Supply chain attacks
+    Data exfiltration
+    Data encryption
+    Data compression
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
