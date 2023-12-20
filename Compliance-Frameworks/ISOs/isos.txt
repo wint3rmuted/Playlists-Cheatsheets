@@ -1,1 +1,4 @@
-
+ISO 27001 A standard covering security control objectives for information systems.
+ISO 27002 A standard describing the actual controls that an organization may implement to meet cybersecurity objectives.
+ISO 27701 A standard that contains guidance for managing privacy controls.
+ISO 31000 A standard that provides guidelines for risk management programs.
