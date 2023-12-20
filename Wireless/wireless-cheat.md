@@ -37,13 +37,6 @@ aireplay-ng -2 -b <AP_MAC> -d ff:ff:ff:ff:ff:ff <interface>
 
 ```
 
-## Bypassing WEP (SKA)
-```
-
-
-```
-
-
 ## WPS attack
 **Dependencies:** reaver
 
