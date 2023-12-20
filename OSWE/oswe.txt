@@ -1,1 +1,117 @@
+Before registering for the OSWE Exam:
+
+    XSS to RCE
+        AtMail Email Server Appliance 6.4 - Persistent Cross-Site Scripting
+        Chaining XSS, CSRF to achieve RCE
+        Code analysis to gaining RCE
+        Magento 2.3.1: Unauthenticated Stored XSS to RCE
+        Mybb 18.20 From Stored XSS to RCE
+    Bypassing File Upload Restrictions:
+        [Paper] File Upload Restrictions Bypass
+        Shell the web - Methods of a Ninja
+        Unrestricted File Upload
+        Atlassian Crowd Pre-auth RCE
+        Popcorn machine from HackTheBox
+        Vault machine from HackTheBox
+    Authentication Bypass to RCE
+        ATutor 2.2.1 Authentication Bypass
+        ATutor LMS password_reminder TOCTOU Authentication Bypass
+        ATutor 2.2.1 - Directory Traversal / Remote Code Execution
+        Cubecart Admin Authentication Bypass
+        Trendmicro smart protection bypass to RCE
+    Password Reset Vulnerability
+        Testing Password rest functionalities
+        OWASP - Forgot Password Cheatsheet
+        How we hacked multiple user accounts using weak reset tokens for passwords
+    SQL Injection:
+        RCE with SQL Injection - MSSQL
+        SQL Injection to LFI to RCE - MySQL
+        From SQLi to SHELL (I and II) - PentesterLab
+        Pre-Auth Takeover of OXID eShops
+        Blind SQL Injection
+        [Paper] PostgreSQL Injection
+        Having Fun With PostgreSQL
+        Blind Postgresql Sql Injection Tutorial
+        SQL Injection Cheat Sheet - PentestMonkey
+        SQL Injection Cheat Sheet - PayloadAllTheThings
+        Exploiting H2 SQL injection to RCE
+    JavaScript Injection:
+        Server Side JS Injection
+        Remote Code Execution in math.js
+        Arbitrary code execution in fast-redact
+        NVIDIA GeForce Experience OS Command Injection - CVE-2019-5678
+        SetTimeout and SetInterval use eval therefore are evil
+        Pentesting Node.js Application : Nodejs Application Security
+        NodeJS remote debugging with vscode
+        Escape NodeJS Sandboxes
+    PHP Type Juggling:
+        OWASP - PHPMagicTricks TypeJuggling
+        PHP Type Juggling - Introduction
+        Type Juggling, PHP Object Injection, SQLi
+        Writing Exploits For PHP Type Juggling
+        Type Juggling Authentication Bypass Vulnerability in CMS Made Simple
+        PHP Magic Hashes
+        Detailed Explanation of PHP Type Juggling Vulnerabilities
+        [Video] PHP Type Juggling Vulnerabilities, Netsparker
+        [Video] Falafel machine from HackTheBox
+    Deserialization:
+        Deserialization_Cheat_Sheet
+        Insecure deserialization - PayloadAllthethings
+        [Paper] Deserialization Vulnerability
+        Serialization : A Big Threat
+        JAVA Deserialization
+            Understanding & practicing java deserialization exploits
+            Understanding JAVA Deserialization
+            Exploiting blind Java deserialization with Burp and Ysoserial
+            Details on Oracle Web Logic Desrialization
+            Analysis of Weblogic Deserialization
+            [Video] Matthias Kaiser - Exploiting Deserialization Vulnerabilities in Java
+        .NET Deserialization
+            Use of Deserialization in .NET Framework Methods and Classes.
+            Exploiting Deserialisation in ASP.NET via ViewState
+            Remote Code Execution via Insecure Deserialization in Telerik UI
+            [Video] Friday the 13th: JSON Attacks - BlackHat
+            [Paper] Are you My Type?
+            [Video] JSON Machine from HackTheBox - Ippsec
+        PHP Object Injection/Deserialization
+            What is PHP Object Injection
+            phpBB 3.2.3: Phar Deserialization to RCE
+            Exploiting PHP Desrialization
+            Analysis of typo3 Deserialization Vulnerability
+            Attack Surface of PHP Deserialization Vulnerability via Phar
+            [Video] Intro to PHP Deserialization / Object Injection - Ippsec
+            [Video] Advanced PHP Deserialization - Phar Files - Ippsec
+            [Video] Exploiting PHP7 unserialize (33c3)
+        NodeJS Deserialization
+            Exploiting Node.js deserialization bug for Remote Code Execution
+            The good, the bad and RCE on NodeJS applications
+            Attacking Deserialization in JS
+            Node.js Deserialization Attack – Detailed Tutorial
+            [Video] Celestial machine from HackTheBox - Ippsec
+    XML External Entity (XXE) Attack
+        A Deep Dive into XXE Injection
+        From XXE to RCE: Pwn2Win CTF 2018 Writeup
+        Blind XXE to RCE
+        Apache Flex BlazeDS XXE Vulnerabilty
+        WebLogic EJBTaglibDescriptor XXE
+    Server Side Template Injection (SSTI)
+        [Portswigger Research] Server Side Template Injection
+        [Video] SSTI : RCE For The Modern Web App - albinowax
+        Server Side Template Injection
+        Jinja2 template injection filter bypasses
+        Exploitation of Server Side Template Injection with Craft CMS plugin SEOmatic <=3.1.3
+    Websocekts InSecurity
+        Introduction to WebSockets
+        [Video] Hacking with Websocket - BlackHat
+        Remote Hardware takeover via Websocket Hijacking
+        Cross-Site WebSocket Hijacking to full Session Compromise
+    Source Code Audit
+        Introduction to Code Review [PentesterLab]
+        Static code analysis writeups
+        TrendMicro - Secure Coding Dojo
+        Bug Hunting with Static Code Analysis [Video]
+        Shopify Remote Code Execution - Hackerone
+        Finding vulnerabilities in source code ( APS.NET)
+        A deep dive into ASP.NET Deserialization
+        Writeups by mr_me
 
