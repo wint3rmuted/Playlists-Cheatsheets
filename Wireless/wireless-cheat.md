@@ -71,10 +71,6 @@ reaver -i <interface> -b <AP_MAC> -p "" -N
 airdump-ng -c <channel> --bssid <AP_MAC> -w <capture> <interface>
 aircrack-ng -a 2 -b <AP_MAC> -w <wordlist> <capture>
 ```
-### PMKID Capture (client-less) & Cracking
-```
-
-```
 
 ## WPA Enterprise
 
