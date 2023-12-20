@@ -3,3 +3,6 @@ A software development model that is both iterative and incremental. The Agile
 methodology focuses on individuals and interactions over process and tools, working
 software over comprehensive documentation, customer collaboration over negotiation, and
 responding to change rather than following a plan.
+
+Pair programming
+An Agile software development technique that places two developers at one workstation
