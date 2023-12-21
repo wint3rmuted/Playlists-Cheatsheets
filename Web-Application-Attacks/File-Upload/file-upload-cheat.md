@@ -48,7 +48,7 @@ Inject your payload in Image Metadata/Comments
 Well there are alot of hacks we can do with our image file some of them is injecting the payload into the metadata header using exiftools or you can use a tool named "edjpgcom.exe".
 Use command line "edjpgcom.exe yourimagefilename.jpg" to add comment to your image.
 ```
-
+### Bypassing Extension Black Listing
 ```
 3. Bypassing the Extension Black Listing
 Some times developers use black listing approach against the shell uploading, the problem with Black listing approad is always the same which is you always forget to block something or a new bypass may fuck your security.
@@ -90,7 +90,7 @@ Now lets choose a file extention which is not blacklisted, one of my favorite in
 So here is a htaccess configration which you have to cope in a .htaccess file and then upload in the folder and then upload your php shell with a name shell.shell and boom!! it will execute.
 AddType application/x-httpd-php .shell
 ```
-
+### Bypassing Extension White Listing
 ```
 4. Bypassing the Extension White Listing
 In some cases developers have used the extension white listing, bypassing such security is usually web server or Language based bypasses.
@@ -110,7 +110,7 @@ In such cases we can use shell.php.jpg, shell.php:.jpg, shell.php;.jpg sometimes
 Invalid Extension Bypass
 Here is another server side exploit, sometimes when we use extentions like .test which is not recognized by the operating system, then the first extension is used, so we can try uploading shell.php.test.
 ```
-
+### Bypassing Content Length and Malicious Script checks
 ```
 5. Bypassing the Content Length and Malicious script checks
 Content Length Bypass
