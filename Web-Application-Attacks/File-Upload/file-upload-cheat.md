@@ -25,7 +25,7 @@ You have sucessfully redirected the traffic via BURP. Now goto Proxy->Intercept 
 Now lets say there is a website where you are trying to upload shell and it shows error, that you can only upload image files, simply rename your shell.php to shell.php.jpg and upload the file.
 When you will click submit, a request will go from BURP. Change file filename back to shell.php and luckily if there is no check on server side then you will get your shell uploaded.
 ```
-
+### Bypassing Content/type Verification
 ```
 2. Bypassing Content/type Verification
 1. Change Content-Type using Request Modification.
