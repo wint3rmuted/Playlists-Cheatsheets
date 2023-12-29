@@ -1,6 +1,6 @@
-### NetExec Cheatsheet
+## NetExec Cheatsheet
 
-## Installation
+### Installation
 ```
 Installing NetExec with pipx
 Using pipx to install NetExec is recommended. This allows you to use NetExec and the nxcdb system-wide.
@@ -13,7 +13,7 @@ NetExec
 nxcdb
 ```
 
-## Protocols
+### Protocols
 ```
 Available Protocols
 smb
@@ -28,14 +28,14 @@ mssql
 Not all protocols support the same functionality, be sure to check each protocol's options.
 ```
 
-## Protocol Options
+### Protocol Options
 ```
 Using Protocol Options
 To view a protocols options, run: nxc <protocol> --help
 Then use those options: nxc <protocol> <protocol options>
 ```
 
-## Viewing Available Protocols
+### Viewing Available Protocols
 ```
 Running nxc --help will list general options and protocols that are available (Notice the 'protocols' section below):
 #~ nxc --help
@@ -65,3 +65,98 @@ protocols:
     vnc                 own stuff using VNC
     mssql               own stuff using MSSQL
 ```
+
+## Target Formatting
+```
+Every protocol supports targets by CIDR notation(s), IP address(s), IP range(s), hostname(s), a file containing a list of targets or combination of all of the latter:
+
+netexec <protocol> poudlard.wizard
+netexec <protocol> 192.168.1.0 192.168.0.2
+netexec <protocol> 192.168.1.0/24
+netexec <protocol> 192.168.1.0-28 10.0.0.1-67
+netexec <protocol> ~/targets.txt
+```
+
+## Using Credentials
+```
+Every protocol supports using credentials in one form or another.
+For details on using credentials with a specific protocol, see the appropriate wiki section.
+Generally speaking, to use credentials, you can run the following commands:
+netexec <protocol> <target(s)> -u username -p password
+
+Special Symbols
+When using usernames or passwords that contain special symbols (especially exclaimation points!), wrap them in single quotes to make your shell interpret them as a string:
+netexec <protocol> <target(s)> -u username -p 'October2022!'
+```
+
+## Using a Credential Set From the Database
+```
+By specifying a credential ID (or multiple credential IDs) with the -id flag nxc will automatically pull that credential from the back-end database and use it to authenticate (saves a lot of typing):
+netexec <protocol> <target(s)> -id <cred ID(s)>
+```
+
+## Multi-Domain Environment
+```
+You can use nxc with mulitple domain environment
+netexec <protocol> <target(s)> -p FILE -u password
+
+Where FILE is a file with usernames in this format:
+DOMAIN1\user
+DOMAIN2\user
+```
+
+## Brute Forcing and Password Spraying
+```
+All protocols support brute-forcing and password spraying. For details on brute-forcing/password spraying with a specific protocol, see the appropriate wiki section.
+By specifying a file or multiple values nxc will automatically brute-force logins for all targets using the specified protocol:
+
+netexec <protocol> <target(s)> -u username1 -p password1 password2
+netexec <protocol> <target(s)> -u username1 username2 -p password1
+netexec <protocol> <target(s)> -u ~/file_containing_usernames -p ~/file_containing_passwords
+netexec <protocol> <target(s)> -u ~/file_containing_usernames -H ~/file_containing_ntlm_hashes
+```
+
+## Password Spraying Without Bruteforce
+```
+Can be usefull for protocols like WinRM and MSSQL. This option avoid the bruteforce when you use files (-u file -p file)
+netexec <protocol> <target(s)> -u ~/file_containing_usernames -H ~/file_containing_ntlm_hashes --no-bruteforce
+netexec <protocol> <target(s)> -u ~/file_containing_usernames -p ~/file_containing_passwords --no-bruteforce
+
+By default nxc will exit after a successful login is found.
+Using the --continue-on-success flag will continue spraying even after a valid password is found. Usefull for spraying a single password against a large user list.
+
+netexec <protocol> <target(s)> -u ~/file_containing_usernames -H ~/file_containing_ntlm_hashes --no-bruteforce --continue-on-success
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
