@@ -189,8 +189,118 @@ Simply define all the modules you want, each proceeded by a -m option flag:
 nxc <protocol> <target(s)> -u Administrator -p 'P@ssw0rd' -M spooler -M printnightmare -M shadowcoerce -M petitpotam
 ```
 
+## Database Usage
+```
+nxc automatically stores all used/dumped credentials (along with other information) in its database which is setup on first run.
+Each protocol has its own database which makes things much more sane and allows for some awesome possibilities.
+Additionally, there are workspaces (like Metasploit), to separate different engagements/pentests.
+For details and usage of a specific protocol's database see the appropriate wiki section.
+All workspaces and their relative databases are stored in ~/.nxc/workspaces
+```
 
+## Interacting with the Database
+```
+nxc ships with a secondary command line script nxcdb which abstracts interacting with the back-end database.
+Typing the command nxcdb will drop you into a command shell:
 
+#~ nxcdb
+nxcdb (default) >
+```
+
+## Listing Help
+```
+At anytime, just type "help" for a list of commands:
+
+nxcdb (default)(smb) > help
+
+Documented commands (type help <topic>):
+========================================
+clear_database  creds  dpapi  exit  export  groups  help  hosts  shares  wcc
+
+Undocumented commands:
+======================
+back  import
+```
+
+## Workspaces
+```
+The default workspace name is called 'default' (as represented within the prompt), once a workspace is selected everything that you do in nxc will be stored in that workspace.
+To create a workspace:
+nxcdb (default) > workspace create test
+[*] Creating workspace 'test'
+<-- CUT -->
+nxcdb (test) >
+
+To switch workspace:
+nxcdb (test) > workspace default
+nxcdb (default) >
+
+To list workspaces:
+nxcdb (test) > workspace list
+[*] Enumerating Workspaces
+default
+==> test
+```
+
+## Accessing a Protocols DB
+```
+To access a protocol's database simply run proto <protocol>, for example:
+nxcdb (test) > proto smb
+nxcdb (test)(smb) >
+
+As you can see by the prompt, we are now in the workspace called 'test' and using the SMB protocol's database.
+Every protocol database has its own set of commands, you can run help to view available commands.
+Please refer to the appropriate wiki section for details and usage of a specific protocol's database.
+To switch protocol database:
+nxcdb (test)(smb) > back
+nxcdb (test) > proto http
+nxcdb (test)(http) >
+```
+
+## Exporting from a DB (new!)
+```
+You can export information from the database in a few different ways:
+nxcdb (test)(smb) > export shares detailed file.csv
+
+For all of the up to date options, type help export
+nxcdb (default)(smb) > help export
+
+export [creds|hosts|local_admins|shares|signing|keys] [simple|detailed|*] [filename]
+Exports information to a specified file
+
+* hosts has an additional third option from simple and detailed: signing - this simply writes a list of ips of
+hosts where signing is enabled
+* keys' third option is either "all" or an id of a key to export
+    export keys [all|id] [filename]
+```
+
+## Bloodhound Integration
+```
+NetExec will set user as 'owned' on BloodHound when an account is found ! Very usefull when lsassy finds 20 credentials in one dump :)
+First you need to configure your config file in you home folder: ~/.nxc/nxc.conf and add the following lines:
+[BloodHound]
+bh_enabled = True
+bh_uri = 127.0.0.1
+bh_port = 7687
+bh_user = user
+bh_pass = pass
+
+To ingest the data directly follow this page:
+https://www.netexec.wiki/ldap-protocol/bloodhound-ingestor
+```
+
+## Logging (new!)
+```
+Log every output and command into a file.
+There are two ways to log results:
+Using the nxc.conf file
+Set "log_mode = True"
+This will log everything
+
+Using the option --log file
+This will log only the current command
+You can use both at the same time if you wish to log to two separate files
+```
 
 
 
