@@ -1,43 +1,44 @@
 ## Checklist
 ```
-A quick Linux Privilege Escalation Checklist:
-	Credential Access
-		Reused Password
-		Credentials from Configuration Files
-		Credentials from Local Database
-		Credentials from Bash History
-		SSH Keys
-		Sudo Access, Sudo Rights (.sh, nano,vi)
-		Group Privileges (Docker, LXD, etc.)
-	Exploit
-		Services Running on Localhost
-		Kernel Version
-		Binary File Version
-	Misconfiguration
-		Cron Jobs
-			Writeable Cron Job
-			Writeable Cron Job Dependency (File, Python Library, etc.)
-		SUID/SGID Files
-		Interesting Capabilities on Binary
-  Sensitive files and permission misconfigurations (SSH Keys, Shadow Files)
-		Sensitive Files Writeable
-			/etc/passwd
-			/etc/shadow
-			/etc/sudoers
-			Configuration Files
-		Sensitive Files Readable 
-			/etc/shadow
-			/root/.ssh/id_rsa (SSH Private Keys)
-		Writeable PATH
-			Root $PATH Writeable
-			Directory in PATH Writeable
-    Path Hijacking
-		LD_PRELOAD Set in /etc/sudoers
-  Internal Ports
-  Mounted filesystems
-  Interesting Groups https://book.hacktricks.xyz/linux-unix/privilege-escalation/interesting-groups-linux-pe
-  Process Injection https://github.com/nongiach/sudo_inject - Invalid sudo tokens
-  Docker PS
+My Personal Checklist over time:
+
+Kernel Enumeration / Exploitation
+Device Drivers
+OS Operating System Information
+Installed Tools
+Interesting Directories 
+Web Root Locations
+Environment Variables (Hard-Coded Credentials)
+Users and Groups
+File Ownership and Permissions
+Sudoers Group
+Sudo Rights / Abuse (GTFObins)
+Hidden History
+User History
+Networking Information
+Internal Ports
+Firewall Information
+Printer Information
+Applications / Services
+Root Services
+Service Footprints
+Service Settings Configurations
+Packages
+Processes
+Cronjobs Abuse / Systemd Timers
+Searching for Passwords and Cleartext Credentials
+SSH Key Abuse
+Git Files
+Shell Escape Sequences
+Mounted Share Abuse
+NFS Abuse
+SUID / GUID / Sticky Bits
+/etc/passwd Abuse
+/etc/shadow Abuse
+Docker Escalation
+World Writeables
+Exploit Research / Compilation
+Cleanup
 ```
 
 ## Quick Environment Check:
