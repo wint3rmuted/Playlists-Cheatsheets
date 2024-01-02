@@ -1,3 +1,5 @@
+## DCSync
+```
 lsadump::dcsync /user:krbtgt
 lsadump::dcsync /user:domain\krbtgt /domain:lab.local
 
@@ -24,3 +26,4 @@ The dcsync attack is a powerful technique to obtain any domain user credentials.
 By impersonating a domain controller, we can use replication to obtain user credentials from a domain controller. 
 However, to perform this attack, we need a user that is a member of Domain Admins, Enterprise Admins, or Administrators, because there are certain rights required to start the replication. 
 Alternatively, we can leverage a user with these rights assigned, though we're far less likely to encounter one of these in a real penetration test.
+```
