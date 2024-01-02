@@ -1,3 +1,5 @@
+## CrackMapExec is now known as NetExec, please see the NetExec section now.
+```
 Enumerating AD users without wordlists using crackmapexec (RID bruteforce)
     crackmapexec smb $ip -u anonymous -p '' -d domain.name --rid-brute (anonymous login)
 
@@ -98,3 +100,4 @@ OR
 OR
 
     lsadump::lsa /patch (for Windows AD server)
+```
