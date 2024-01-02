@@ -1,4 +1,5 @@
-Directory Bruteforce
+## Directory Bruteforce
+```
 Master filetype list: php,html,htm,asp,aspx,js,xml,git,txt,pdf,zip,tar,gz,md,sh,log,md,doc,docx,xls,xlsx,json,ini,bak,jpg,jpeg,png,gif,mpg,mp3,old
 
 -x php,html,txt 
@@ -68,3 +69,4 @@ APACHE
 target=10.0.0.1; gobuster -u http://$target -r -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt -t 150 -l | tee $target-gobuster
 target=10.0.0.1; nikto -h http://$target:80 | tee $target-nikto
 target=10.0.0.1; wpscan --url http://$target:80 --enumerate u,t,p | tee $target-wpscan-enum
+```
