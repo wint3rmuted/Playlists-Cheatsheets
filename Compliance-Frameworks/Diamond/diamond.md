@@ -1,7 +1,6 @@
 ## Diamond Model of Intrusion Analysis
 ```
-Diamond Model of Intrusion Analysis An intrusion analysis model that focuses on adver-
-saries, infrastructure, victims, and capabilities using a diamond shape to guide analysis
+Diamond Model of Intrusion Analysis An intrusion analysis model that focuses on adversaries, infrastructure, victims, and capabilities using a diamond shape to guide analysis
 through the connected vertices.
 
 The Theory of Diamond Model
