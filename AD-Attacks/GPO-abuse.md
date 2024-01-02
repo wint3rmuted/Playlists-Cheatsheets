@@ -5,7 +5,8 @@ If we see GPO mentioned in bloodhound graph,then that means we can perform actio
 SharpGPOAbuse is an excellent tool for GP related attacks
 gpp attack (group policy preferences) MS14-025
 
-In this attack we utilize a windows misconfiguration in which we can read credentials which admin stores in a xml file named Groups.xml. This policy is stored in SYSVOL share which is readbale by every authenticated domain user to access policies etc we can get local admins and domain admins credentials which are utilizing the policies in SYSVOL share
+In this attack we utilize a windows misconfiguration in which we can read credentials which admin stores in a xml file named Groups.xml.
+This policy is stored in SYSVOL share which is readbale by every authenticated domain user to access policies etc we can get local admins and domain admins credentials which are utilizing the policies in SYSVOL share
 
 we get password in a cpassword type but we can decrypt it from kali or online because the key to this encryption was leaked from microsoft
 
