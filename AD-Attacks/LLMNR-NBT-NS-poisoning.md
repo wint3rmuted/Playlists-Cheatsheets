@@ -1,4 +1,5 @@
-LLMNR/NBT-NS poisoning
+## LLMNR/NBT-NS poisoning
+```
 This attack happens when any user or computer request a resource or ip which the network dns fails to resolve(Meaning they either mistyped or requesting non existing resource). LLMNR is a Windows AD feature which tries to resolve request when DNS fails.  We as an attacker can respond to the user using a tool called responder and act as a LLMNR server. LLMNR key flaw is that it requires user hash to work. We request users hash from the user and say we will resolve their request and this way we perform a mitm attack inside a AD network
 
 NOte: This attack assumes we have network access same as the target
@@ -69,3 +70,4 @@ Mitigation:
     enable smb signing on every device across the network
     Disable ntlm authentication on the network(kerberos more secure)
     Limit local administrators across the network(a admin of single workstation is also admin of many other workstations which allows this attack)
+```
