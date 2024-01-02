@@ -1,3 +1,5 @@
+## SAM / System Files
+```
 reg save hklm\sam C:\Users\Public\SAM
 reg save hklm\SYSTEM C:\Users\Public\SYSTEM
 
@@ -26,3 +28,4 @@ windows\repair\SAM
 System file can be found here:
 SYSTEMROOT%\repair\system
 %SYSTEMROOT%\System32\config\RegBack\system
+```
