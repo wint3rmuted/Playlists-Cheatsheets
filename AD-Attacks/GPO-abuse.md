@@ -1,4 +1,5 @@
-GPO Abuse
+## GPO Abuse
+```
 If we see GPO mentioned in bloodhound graph,then that means we can perform actions on behalf of that group policy object
 
 SharpGPOAbuse is an excellent tool for GP related attacks
@@ -31,3 +32,4 @@ we can also use a powershell script called Get-GPPPassword
 If we get access of Groups.xml in any other way we can copy the password stored in cpassword variable and decrypt using a tool called gpp decrypt
 
     gpp-decrypt passwordhash
+```
