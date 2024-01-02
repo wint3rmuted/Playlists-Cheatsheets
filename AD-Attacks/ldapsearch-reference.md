@@ -1,5 +1,5 @@
-# LDAP Search Reference Guide
-
+## LDAP Search Reference Guide
+```
 # Basic Search (Anonymous)
 ldapsearch -x -h <hostname> -p <port> -b "dc=example,dc=com" "(objectclass=*)"
 
@@ -35,3 +35,4 @@ ldapsearch -x -h <hostname> -p <port> -b "dc=example,dc=com" -E "pr=<page_size>/
 
 # Extended options with -o
 ldapsearch -x -h <hostname> -p <port> -b "dc=example,dc=com" -o ldif-wrap=no "(objectclass=*)"
+```
