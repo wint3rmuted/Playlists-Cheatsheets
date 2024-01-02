@@ -1,4 +1,6 @@
-Recursion
+## FFUF
+```
+Recursion (super dodgy I like to use dirsearch to search recursively, good for speed tho)
 ffuf -u https://site.io/FUZZ -w ./wordlist -recursion <--Does not work, I like to use dirsearch for recursion
 
 Extensions
@@ -39,4 +41,4 @@ ffuf -w /path/to/postdata.txt -X POST -d "username=admin\&password=FUZZ" -u http
 # Fuzz POST JSON data. Match all responses not containing text "error".
 ffuf -w entries.txt -u https://example.org/ -X POST -H "Content-Type: application/json" \
       -d '{"name": "FUZZ", "anotherkey": "anothervalue"}' -fr "error"
-
+```
