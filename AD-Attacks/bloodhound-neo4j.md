@@ -1,3 +1,5 @@
+## Bloodhound / Neo4j 
+```
 sudo neo4j start
 sudo bloodhound 
 
@@ -45,3 +47,4 @@ I changed on my machine neo4j : hello
     NOw upload the zip file on bloodhound console
     Now simply click analysis and click any type of query and we can see graph of AD
     We can view varius types of permissions etc
+```
