@@ -3,7 +3,8 @@
 Invoke-Kerberoast.ps1 is a PowerShell script that is part of the PowerShell Empire post-exploitation framework.
 
 There are two ways that we can use this script: 
-If you have a PowerShell prompt on the victim, download the script to disk, use dot sourcing to load it into the current session, and then run the following command to request a ticket and receive the hash in a hashcat crackable format:
+If you have a PowerShell prompt on the victim, download the script to disk, use dot sourcing to load it into the current session,
+ and then run the following command to request a ticket and receive the hash in a hashcat crackable format:
 
 . .\Invoke-Kerberoast.ps1
 Invoke-Kerberoast -OutputFormat hashcat | fl
