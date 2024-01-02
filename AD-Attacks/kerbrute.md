@@ -1,4 +1,5 @@
-Enumerating AD users for kerberos attack (requires dc ip and wordlist)
+## Kerbrute 
+```Enumerating AD users for kerberos attack (requires dc ip and wordlist)
 using tool called kerbrute
 
 To enumerate avalible users for kerberos authentication use command
@@ -24,5 +25,5 @@ Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
 [*] Blocked/Disabled user => krbtgt
 [*] Valid user => svc_apache$
 [*] No passwords were discovered :'(
-
+```
 
