@@ -1,3 +1,5 @@
+## Gobuster
+```
 GoBuster:
 Gobuster gobuster dir -u http://ip-address -w wordlists -x extensions -o output.txt  -t 90
 gobuster dir -u http://192.168.155.145 -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt -x php,html,txt -t 80  -o gobuster/RaftFilesLarge.txt
@@ -14,7 +16,8 @@ gobuster -u http://10.10.10.103/ -w /usr/share/wordlists/dirbuster/directory-lis
 gobuster dir -u http://192.168.196.155 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt,git -t 90
 gobuster dir -u http://192.168.155.145 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 80
 gobuster dir -u http://192.168.155.145/openemr/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 80
-gobuster dir -u http://192.168.174.56:8295 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 80                                                                                gobuster dir -u http://192.168.170.110 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 90
+gobuster dir -u http://192.168.174.56:8295 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 80                                                                                
+gobuster dir -u http://192.168.170.110 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 90
 gobuster dir -u http://192.168.195.117:50000/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 90        
 gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://192.168.239.63/ -x "aspx" 
 gobuster dir -u http://192.168.137.145/openemr/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 80
@@ -32,3 +35,4 @@ root@kali# gobuster -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.
 root@kali# gobuster -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x txt,php,html -u http://10.10.10.88/webservices -o gobuster/port80webservices -t 30
 
 Gobuster gobuster dir -u http://ip-address -w wordlists -x extentions -o output.txt
+```
