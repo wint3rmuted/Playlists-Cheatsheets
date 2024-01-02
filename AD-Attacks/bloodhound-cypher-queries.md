@@ -1,4 +1,5 @@
-Bloodhound Cypher Queries
+## Bloodhound Cypher Queries
+```
 Return all users
 
 MATCH (u:User) RETURN u 
@@ -56,4 +57,4 @@ MATCH (u:User {hasspn:true}) MATCH (g:Group) WHERE g.objectid ENDS WITH '-512' M
 Find machines Domain Users can RDP into
 
 match p(g:Group)-[:CanRDP]->(c:Computer) where g.objectid ENDS WITH '-513' return p
-
+```
