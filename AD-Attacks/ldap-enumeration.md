@@ -1,3 +1,5 @@
+## Ldap Enumeration
+```
 Ldap nmap scripts:
 Enumeration with nmap scripts
 nmap -p 389 --script ldap-search 10.10.10.x
@@ -72,4 +74,4 @@ $ ldapsearch -x -b “dc=devconnected,dc=com” -H ldap://192.168.x.x -D “cn=a
 For example, if you are interested only in the user CN, UID, and home directory, you would run the following LDAP search
 $ ldapsearch -x -b <search_base> -H <ldap_host> -D <bind_dn> -W "objectclass=account" cn uid homeDirectory
 ldapsearch -x -b “dc=devconnected,dc=com” -H ldap://192.168.x.x -D “cn=admin,dc=devconnected,dc=com” -W “objectclass=account)” cn uid homeDirectory
-
+```
