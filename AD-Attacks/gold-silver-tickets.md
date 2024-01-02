@@ -1,4 +1,5 @@
-Golden and silver tickets
+## Golden and silver tickets
+```
 A silver ticket can sometimes be better used in engagements rather than a golden ticket because it is a little more discreet. If stealth and staying undetected matter then a silver ticket is probably a better option than a golden ticket however the approach to creating one is the exact same. The key difference between the two tickets is that a silver ticket is limited to the service that is targeted whereas a golden ticket has access to any Kerberos service.
 
 A specific use scenario for a silver ticket would be that you want to access the domain's SQL server however your current compromised user does not have access to that server. You can find an accessible service account to get a foothold with by kerberoasting that service, you can then dump the service hash and then impersonate their TGT in order to request a service ticket for the SQL service from the KDC allowing you access to the domain's SQL server.
@@ -338,3 +339,4 @@ After we are a domain admin, now our goal is to gather as much information as po
     The most useful feature of windows server in post exploitation is going in tools tab and then enumerating different things going around on network
 
     One important is the users and computers information tool whihc shows active users and sometimes people leave their passswords in the description so they dont forget
+```
