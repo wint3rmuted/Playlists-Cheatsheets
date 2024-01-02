@@ -1,3 +1,5 @@
+## PowerView.ps1 
+```
 Post Compromise Enumeration
 Once we have gained access in a machine from the network
 
@@ -227,3 +229,4 @@ Get-DomainTrust -SearchBase "GC://$($ENV:USERDNSDOMAIN)"
 ​Get-NetForestTrust #Get forest trusts (it must be between 2 roots, trust between a child and a root is just an external trust)
 ​Get-DomainForeingUser #Get users with privileges in other domains inside the forest
 Get-DomainForeignGroupMember #Get groups with privileges in other domains inside the forest
+```
