@@ -1,4 +1,5 @@
-wfuzz
+## wfuzz
+```
 wfuzz -w /usr/share/wfuzz/wordlist/general/big.txt -u http://<RHOST>/FUZZ/<FILE>.php --hc '403,404'
 
 Write to File
@@ -42,7 +43,7 @@ wpscan --url https://<RHOST> --disable-tls-checks
 wpscan --url https://<RHOST> --disable-tls-checks --enumerate u
 target=<RHOST>; wpscan --url http://$target:80 --enumerate u,t,p | tee $target-wpscan-enum
 wpscan --url http://<RHOST> -U <USERNAME> -P passwords.txt -t 50
-
+```
 
 
 
