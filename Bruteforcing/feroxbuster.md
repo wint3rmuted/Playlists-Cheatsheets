@@ -1,3 +1,5 @@
+## Feroxbuster
+```
 Feroxbuster:
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt --filter-status 403,404
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt
@@ -49,3 +51,4 @@ Include Headers:
 
 Write to outfile:
 -o, --output <FILE>
+```
