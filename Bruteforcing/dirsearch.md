@@ -1,3 +1,5 @@
+## Dirsearch
+```
 Dirsearch:
 dirsearch -u http://192.168.237.120/ -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt -r -t 90 -x 403,404 ← SEARCH RECUSIVELY with 80 threads filtering out 403,404
 dirsearch -u http://192.168.237.120/ -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt -r -t 90 -x 403,404 ← SEARCH RECUSIVELY
@@ -40,3 +42,4 @@ python3 dirsearch.py -e php -u https://geeksforgeeks.org -o report.txt
 
 
 root@kali# python3 /opt/dirsearch/dirsearch.py -u http://10.10.10.x/ -e php -x 403,404 -t 50
+```
