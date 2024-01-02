@@ -1,3 +1,5 @@
+## Cewl
+```
 cewl http://192.168.233.x:8081/ | grep -v CeWL > custom-wordlist.txt
 cewl --lowercase http://192.168.233.x:8081/ | grep -v CeWL  >> custom-wordlist.txt
 
@@ -29,3 +31,4 @@ cewl -a -meta_file <file> <url>
 
 # To spider a site and store email adresses in a separate file
 cewl -e -email_file <file> <url>
+```
