@@ -1,4 +1,5 @@
-Token Impersonation
+## Token Impersonation
+```
 https://adsecurity.org/?page_id=1821#TOKENElevate https://steflan-security.com/linux-privilege-escalation-token-impersonation/
 
 Whenever a user logs in a machine, windows create a token called delegate token and injects into session. If we have got any access of the machine,we can steal the token and impersonate as that user. If a domain admin logs in the machine,then his token is also available and we can simply impersonate as domain admin using that token. We can then dump ntds.dit and own the domain.
@@ -46,4 +47,4 @@ Mitigations:
     Domain admins only access domain controllers,limiting attackers attack surface
     Limit Local Admin restriction
     Local Admin passwords must be complex and not same across the network
-
+```
