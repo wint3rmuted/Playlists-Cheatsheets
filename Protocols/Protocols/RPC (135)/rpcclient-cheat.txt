@@ -10,6 +10,28 @@ rpcclient $>
 
 (I have seen, on rare occasions, rpcclient refuse to connect unless it has the name of the target Windows machine inside of /etc/hosts. If it doesn't work, simply append into /etc/hosts a line that has the IP address of the target Windows machine and the hostname of that machine.)
 
+$ rpcclient -U "" <RHOST>
+srvinfo
+netshareenum
+netshareenumall
+netsharegetinfo
+netfileenum
+netsessenum
+netdiskenum
+netconnenum
+getanydcname
+getdcname
+dsr_getdcname
+dsr_getdcnameex
+dsr_getdcnameex2
+dsr_getsitename
+enumdomusers
+enumdata
+enumjobs
+enumports
+enumprivs
+queryuser <USERNAME>
+
 
 
 $ rpcclient -U <username> <WinIPaddr>			Linux: connect to share
