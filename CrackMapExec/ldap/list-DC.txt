@@ -1,5 +1,0 @@
-List DC IP
-List DC
-ldap --dc-list flag listing Domain Controllers and finds IP Addresses (If accessible)
-​
-crackmapexec ldap <ip> -u user -p pass --dc-ip

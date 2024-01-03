@@ -1,8 +1,0 @@
-Domain Computers
-To locate domain computers, the find-computer module searches for specified text. For instance, if we need to find all servers within the domain, we can use the -o option with the TEXT parameter set to “servers”.
-We can also look for Windows workstations and servers by searching for “windows” or operating system versions, such as “2003, 2008, 2016”, to identify older systems.
-
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M find-computer -o TEXT='server'
-
-To locate domain computers
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M find-computer -o TEXT='server'

@@ -1,4 +1,0 @@
-Enumerate trusts
-Domain trusts
-Identify Trust Relationships And Direction
-crackmapexec ldap <ip> -u user -p pass -M enum_trusts

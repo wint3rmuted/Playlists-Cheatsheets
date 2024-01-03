@@ -1,9 +1,0 @@
-User Information
-Another useful module is the whoami; it allows us to obtain information about the user we are authenticated as or specify another user with -o option and the USER parameter.
-
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M whoami
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M whoami -o USER=alina
-
-Users Information
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M whoami
-crackmapexec ldap 10.129.204.x -u grace -p Inlanefreight01! -M whoami -o USER=alina
