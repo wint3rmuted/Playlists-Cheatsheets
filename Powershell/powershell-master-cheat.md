@@ -168,6 +168,8 @@ PS C:\> Get-NetFirewallRule –all
 
 Make a new NetFirewallRule named LetMeIn allowing connections from remote address:
 PS C:\> New-NetFirewallRule -Action Allow -DisplayName LetMeIn -RemoteAddress 10.10.10.25
+
+'Firewall Config' = 'Start-Process "netsh" -ArgumentList "firewall show config" -NoNewWindow -Wait | ft';
 ```
 
 ## Anti-Virus: 
