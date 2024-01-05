@@ -52,12 +52,44 @@ $command = "Write-Host 'hello world'"; $bytes = [System.Text.Encoding]::Unicode.
 ```
 Conduct a ping sweep:
 PS C:\> 1..255 | % {echo "10.10.10.$_";ping -n 1 -w 100 10.10.10.$_ | SelectString ttl}
+
+ping-sweep.ps1:
+#$ip = "127.0.0.1"
+param($p1)
+
+if (!$p1){
+    Write-Output "Usage: ./script.ps1 <ip>"
+    Write-Output "Example: ./script.ps1 192.168.0"
+} else {
+    Write-Output "Host's Response:"
+    foreach ($final in 1..254){ #class A networks only
+        try{
+            $response = ping -c 1 "$p1.$final" | Select-String "64","bytes=32"
+            $response.Line.split(':')[0]
+        } catch{}
+    }
+}
 ```
 
 ## Port Scan:
 ```
 Conduct a port scan:
 PS C:\> 1..1024 | % {echo ((new-object Net.Sockets.TcpClient).Connect("10.10.10.10",$_)) "Port $_ is open!"} 2>$null
+
+port-scan.ps1:
+param($ip)
+
+if(!ip){
+    Write-Output "Usage: ./script.ps1 <ip>"
+}else {
+    foreach ($port in 1..65535){
+        if(Test-NetConnection 127.0.0.1 -Port 80 -WarningAction SilentlyContinue -InformationLevel Quiet){
+            Write-Output "$port is open"
+        }else{
+            write-Output "$port is closed"
+        } 
+    }
+}
 ```
 
 
