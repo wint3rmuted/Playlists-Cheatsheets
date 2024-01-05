@@ -48,11 +48,13 @@ Bypass Execution Policy using encoding:
 $command = "Write-Host 'hello world'"; $bytes = [System.Text.Encoding]::Unicode.GetBytes($command);$encoded = [Convert]::ToBase64String($bytes); powershell.exe -EncodedCommand $encoded
 ```
 
-## Ping Sweep:
+## PS Ping Sweep:
 ```
+One-Liner:
 Conduct a ping sweep:
 PS C:\> 1..255 | % {echo "10.10.10.$_";ping -n 1 -w 100 10.10.10.$_ | SelectString ttl}
 
+Script-it:
 ping-sweep.ps1:
 #$ip = "127.0.0.1"
 param($p1)
@@ -71,11 +73,13 @@ if (!$p1){
 }
 ```
 
-## Port Scan:
+## PS Port Scan:
 ```
+One-Liner
 Conduct a port scan:
 PS C:\> 1..1024 | % {echo ((new-object Net.Sockets.TcpClient).Connect("10.10.10.10",$_)) "Port $_ is open!"} 2>$null
 
+Script-it:
 port-scan.ps1:
 param($ip)
 
@@ -191,6 +195,15 @@ PS C:\> ls -r c:\users -file | %{Select-String -path $_ -pattern password}
 
 Display file contents (cat, type, gc):
 PS C:\> Get-Content file.txt
+
+To get all of the file system drives, you can use the following command, gdr is an alias for Get-PSDrive, which includes all of the "virtual drives" for the registry, etc.
+gdr -PSProvider 'FileSystem'
+
+Find flag.txt:
+gdr -PSProvider 'FileSystem' | %{ls -r $_.root} 2>$null | where { $_.name -eq "flag.txt"} -verbose
+
+Find all DOC files:
+Get-ChildItem -Recurse -Include *.doc | % {Copy-Item $_.FullName -destination c:\temp}
 ```
 
 ## Firewalls:
