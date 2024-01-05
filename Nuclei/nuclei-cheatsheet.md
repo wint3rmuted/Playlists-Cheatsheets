@@ -64,3 +64,62 @@ If we need to run templates in a certain sequence we can use a workflow file, th
 Workflow files are a collection of templates and conditions that trigger the templates.
 The documentation contains many examples that will help explain concepts which allow us to quickly make templates and workflows we can use in our engagements:
 https://docs.projectdiscovery.io/templates/introduction
+```
+
+## Writing a Nuclei Template
+```
+Three Steps:
+1. Start by understanding the structure of the Template
+2. Write the HTTP request within the yaml template
+3. Use the Nuclei matchers to find and match some specific strings in the response we get
+
+Writing a simple template for detecting an HTTP server written in node.js, more specifcally a popular library called Express:
+We do this by sending out a simple HTTP request which is a GET request, to the target server, once we get the response we check if the response has the specific type of header which indicates the server was written in node.js Express.
+Before you write any code understand the structure of a simple nuclei template.
+Nuclei Template are written in yet another markup language or YAML. Its fairly simple mostly consisting of key value pairs,
+On a high level it has mainly three sections:
+UNIQUE ID  <-- The Unique ID for the template
+INFO  <-- Where you define things like name, description, tags reference. Commonly used for filtering templates.  
+PROTOCOL <-- Define things like HTTP Requests.
+
+Creating the template:
+create first-template.yaml
+
+Define the first sections, Unique ID:
+
+# UNIQUE ID
+id: node-express  <--Note that ID's may not contain any spaces
+
+# INFORMATION SECTION
+info:
+  name: Node Express Technology
+  author: pwnfunction <-- Note that the author field is mandatory, you can validate that your template contains the necesary information with nuclei -t ./first-template.yaml
+
+# PROTOCOL SECTION
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"  <-- BaseURL is a dynamic value and we cannot hard-code it into our template, but fortunately, nuclei actually injects some variables into a template while its running it. 
+    matchers:
+      - type: word    <-- Can be Words, Binary Data, HTTP Status Codes
+        name: express
+        words:
+          - "X-Powered-By: Express"
+        part: header
+
+
+Matchers
+after testing with nuclei -t ./first-template.yaml, our HTTP request was successfully sent, we now want to be able and analyze the response.
+To do this, we can use nuclei matchers, a powerful feature build in helps us match certain parts of the response. 
+
+Matchers are like Rulesets that can help you figure out a vulnerability or misconfiguration or other security issues. Matchers check to see they match the pattern you've already defined
+
+
+
+
+
+
+
+
+
+
