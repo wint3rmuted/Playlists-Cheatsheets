@@ -64,29 +64,3 @@ If we need to run templates in a certain sequence we can use a workflow file, th
 Workflow files are a collection of templates and conditions that trigger the templates.
 The documentation contains many examples that will help explain concepts which allow us to quickly make templates and workflows we can use in our engagements:
 https://docs.projectdiscovery.io/templates/introduction
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
