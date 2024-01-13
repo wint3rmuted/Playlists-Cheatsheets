@@ -33,7 +33,7 @@ net user %username%
 whoami /groups | findstr Level
 ```
 
-## Disable UAC in Registry
+## CMD Disable UAC in Registry
 ```
 # try to disable UAC
 cmd> reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /d 0 /t REG_DWORD
