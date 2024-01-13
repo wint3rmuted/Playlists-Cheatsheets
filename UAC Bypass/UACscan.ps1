@@ -22,7 +22,7 @@ Write-ColoredText @"
  _     _ _______ _______ _______ _______ _______ __   _
  |     | |_____| |       |______ |       |_____| | \  |
  |_____| |     | |_____  ______| |_____  |     | |  \_|
-                    by @wint3rmute
+                            by @wint3rmute
 "@ "Cyan"
 
 # Define the registry path for UAC settings
