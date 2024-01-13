@@ -35,7 +35,7 @@ $enableLUA = Get-ItemProperty -Path $uacRegistryPath -Name EnableLUA
 $consentPromptBehaviorAdmin = Get-ItemProperty -Path $uacRegistryPath -Name ConsentPromptBehaviorAdmin
 
 # Display the UAC settings with colored text
-Write-ColoredText "UAC Settings:" "Pink"
+Write-ColoredText "UAC Settings:" "White"
 Write-ColoredText "EnableLUA: $($enableLUA.EnableLUA)" "White"
 Write-ColoredText "ConsentPromptBehaviorAdmin: $($consentPromptBehaviorAdmin.ConsentPromptBehaviorAdmin)" "White"
 
