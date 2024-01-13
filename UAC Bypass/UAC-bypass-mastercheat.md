@@ -448,7 +448,7 @@ eventvwr-bypassuac-64.exe
 eventvwr-bypassuac-32.exe
 ```
 
-## Empire
+## Empire (bypassuac module)
 ```
 Here's an example of how to use the bypassuac module in the Empire client console:
 [+] New agent Y4LHEV83 checked in
