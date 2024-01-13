@@ -1,5 +1,10 @@
 # A PowerShell script to query the UAC.
 # Retrieves the values of the LocalAccountTokenFilterPolicy and FilterAdministratorToken registry keys, and take user input to save the output to a .txt file
+# For Reference: 
+# If EnableLUA=0 or doesn't exist, no UAC for anyone
+# If EnableLua=1 and LocalAccountTokenFilterPolicy=1 , No UAC for anyone
+# If EnableLua=1 and LocalAccountTokenFilterPolicy=0 and FilterAdministratorToken=0, No UAC for RID 500 (Built-in Administrator)
+# If EnableLua=1 and LocalAccountTokenFilterPolicy=0 and FilterAdministratorToken=1, UAC for everyone
 
 # Function to print colored text
 function Write-ColoredText {
