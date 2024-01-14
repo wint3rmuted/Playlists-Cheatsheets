@@ -5,6 +5,8 @@ feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Di
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-directories.txt
 feroxbuster -u http://192.168.106.101:<port> -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-extensions.txt
 feroxbuster -u http://192.168.x.x -x pdf -x js,html -x php txt json,docx –no-recursion -vv -o, --output <FILE>
+feroxbuster --url http://example.com --recursive
+
 
 Master Filetype List:
 -x php,txt,json,docx,js,html,
