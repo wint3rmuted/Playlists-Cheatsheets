@@ -1,5 +1,7 @@
 ## sqlmap Tamper Scripts
 ```
+from jhaddix
+
 Hey All,
 
 You all prob know about SQLmap’s ability to load tamper script rules to evade filters and WAF’s but what I didn’t know until a few months back was that you can use all of them in one line like so:
