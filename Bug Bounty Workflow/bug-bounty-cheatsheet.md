@@ -1,8 +1,5 @@
 ## Methodology
 ```
-
-So here's my general concept for how I plan to do most of my bug hunting for now:
-
     monitor / list all subs with sublist3r and cert.sh
     hook into discord webhook api so I can get notifications about new domains etc
     when a new sub is found 
@@ -18,3 +15,4 @@ So here's my general concept for how I plan to do most of my bug hunting for now
         nikto cause why not?
         look for open panels with nuclei
         use other custom nuclei templates and ones that make sense to use that others may be using as well
+```
