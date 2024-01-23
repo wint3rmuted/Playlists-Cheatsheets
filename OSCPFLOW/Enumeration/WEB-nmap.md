@@ -53,6 +53,7 @@ PORT   STATE SERVICE
 
 Nmap done: 1 IP address (1 host up) scanned in 1.03 seconds
 
+NSE HTTP Scripts:
 http-adobe-coldfusion-apsa1301.nse
 http-affiliate-id.nse
 http-apache-negotiation.nse
