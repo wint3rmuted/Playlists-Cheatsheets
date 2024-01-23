@@ -1,3 +1,5 @@
+## DNS Subdomain Bruteforcing with Nmap
+```
 1. DNS Brute Force ( dns-brute.nse)
 Find sub-domains with this script. Detecting sub-domains associated with an organization's domain can reveal new targets when performing a security assessment.
 The discovered hosts may be virtual web hosts on a single web server or distinct hosts on IP addresses spread across the world in different data centres.
@@ -20,3 +22,4 @@ Host script results:
 |_    dev.vulnweb.com - 176.28.50.165
 
 Nmap done: 1 IP address (1 host up) scanned in 28.41 seconds
+```
