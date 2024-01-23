@@ -1,10 +1,10 @@
 ## HTTP Enumeration with Nmap
 ```
-HTTP Recon
+HTTP Recon ( http-enum.nse)
 Nmap comes with a wide range of NSE scripts for testing web servers and web applications.
 An advantage of using the NSE scripts for your HTTP reconnaissance is that you are able to test aspects of a web server against large subnets.
 This can quickly provide a picture of the types of servers and applications in use within the subnet.
-4. http-enum.nse
+http-enum.nse
 
 One of the more aggressive tests, this script effectively brute forces a web server path in order to discover web applications in use. Attempts will be made to find valid paths on the web server that match a list of known paths for common web applications. The standard test includes testing of over 2000 paths, meaning that the web server log will have over 2000 entries that are HTTP 404 not found, not a stealthy testing option! This is very similar to the famous Nikto web server testing tool (that performs 6000+ tests).
 
