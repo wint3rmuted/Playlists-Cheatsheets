@@ -1,5 +1,9 @@
 ## HTTP Enumeration with Nmap
 ```
+While Nmap is not a vulnerability scanner in the traditional sense, it can be very useful for similar tasks. 
+Use --script vuln to run all scripts in the "vuln" category against a target:
+kali@kali:~$ sudo nmap --script vuln 10.11.1.10
+
 HTTP Recon ( http-enum.nse)
 Nmap comes with a wide range of NSE scripts for testing web servers and web applications.
 An advantage of using the NSE scripts for your HTTP reconnaissance is that you are able to test aspects of a web server against large subnets.
