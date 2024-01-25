@@ -74,8 +74,6 @@ user' or 1=1 LIMIT 1;#
 user' or 1=1 LIMIT 0,1;#    
 ```
 
-
-```
 # Post-Methods
 ## 1. Finding total number of columns with order by or group by or having :
 ```
