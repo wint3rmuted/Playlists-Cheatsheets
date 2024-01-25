@@ -1,4 +1,4 @@
-## SQL Injection
+# SQL Injection
 Here are some quick methods to detect the SQL Injection vulnerability, though the methods are not limited. There are various tricks and tools.
 
 ## Methods To Find Sqli
@@ -39,7 +39,7 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   4. Submit certain payloads that results in time delay.
 ```
 
-## Authentication Bypass
+# Authentication Bypass
 ```
 Login Bypass - Testing for SQLi Authentication Bypass
 In some cases, SQL injection can lead to authentication bypass.
