@@ -37,6 +37,7 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   2. Submit SQL specific query.
   3. Submit Boolean conditions such as or 1=1 and or 1=0, and looking application's response.
   4. Submit certain payloads that results in time delay.
+```
 
 ## Authentication Bypass
 ```
