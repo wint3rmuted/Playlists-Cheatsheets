@@ -1,7 +1,7 @@
-# SQL Injection
+## SQL Injection
 Here are some quick methods to detect the SQL Injection vulnerability, though the methods are not limited. There are various tricks and tools.
 
-# Methods To Find Sqli
+## Methods To Find Sqli
 
 ## 1. Using Burpsuite :
 ```
