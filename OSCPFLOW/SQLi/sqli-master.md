@@ -10,8 +10,7 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   3. Proceed with active scan.
   4. Once the scan is finished, look for SQL vulnerability that has been detected.
   5. Manually try SQL injection payloads.
-  6. Use SQLMAP to speed up the process.
-```
+  ```
 ## 2. Using waybackurls and other bunch of tools :
 ```
   1. sublist3r -d target | tee -a domains (you can use other tools like findomain, assetfinder, etc.)
@@ -21,7 +20,6 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   5. sqlmap -m sqli --dbs --batch
   6. use tamper scripts
 ```
-* More Details in this source thread [https://twitter.com/El3ctr0Byt3s/status/1302706241240731649](https://twitter.com/El3ctr0Byt3s/status/1302706241240731649)
 
 ## 3. Using heuristic scan to get hidden parameters :
 ```
