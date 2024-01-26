@@ -3,17 +3,17 @@
 A high level view of my web application enumeration flow for the OSCP exam. 
 
 1. Scan and find the web application. 
-		- Rustcan
-		- Nmap
-			-Refer to NSE scripts for further modular scanning based on the protocol.
+		- rustscan -a 192.168.45.220 --ulimit 10000  --no-nmap   // I like to use rustscan to find initial open ports then feed them into nmap.
+		- nmap -v -Pn -sV -sC -p- 192.168.237.120 -T4 -oN nmapfullscripts.txt 
+		    -Refer to NSE scripts for further modular scanning based on the protocol.
 		
 2. Create Application Profile. Look at web stack, databases and technology using Wappalyzer, whatweb, nse scripts, etc. 
 
 3. Inspect Source Code. Curl the page and get the html or right click and inspect source. 
 		- While inspecting html on a splash or any page, be on the lookout for hardcoded credentials and references to  interesting URLs, files, and directories.
-		- Here are some general guidelines for analyzing sourcecode:
+		- Follow general guidelines for analyzing sourcecode.
 
-4. Fully test the application. Create a user account, test links,  test features and functionality across the site entirely.  "Walk the application" fully. 
+4. Fully test the application. Create a user account, test links, test features and functionality across the site entirely.  "Walk the application" fully. 
 		- You may choose to have burpsuite proxy intercept open and running while you test site functionality to capture all requests sent so you can further inspect them. You can use the burp browser for this. 
 
 5. Fully Bruteforce Directories and Subdirectories.
