@@ -1,15 +1,21 @@
 ## Bypassing File Upload Restrictions
 ```
-Suppose you have a limitation that you can only upload in a few formats like PDF, JPEG, JPG, ….But what if you can upload a PHP file by defying the Upload mechnism and validation of file type check. let me tell you if someone can upload a PHP file then its game over for the website as he will upload a php shell and can easily perform an RCE , or Worst will simply gain a reverse shell on the server.
+1. Create a malicious file with an extension that is accepted by the application.
+2. Upload that file and click on send.
+3. Capture the request in any proxy tool, edit the file extension to the malicious extension that you want. In some cases, you might need to change the content type of a file.
+4. Forward the request to the server.
+
+Suppose you have a limitation that you can only upload in a few formats like PDF, JPEG, JPG, ….But what if you can upload a PHP file by defying the Upload mechnism and validation of file type check. 
 
 How does Bypass work
-Well it depends on which kind of validation the system is using …it is just verfying the extension ? if its just doing that then it becomes very easy to bypass and upload a PHP file or something malicious. suppose we have to upload a JPG file so the extension must be something.jpg
+Well it depends on which kind of validation the system is using …it is just verfying the extension ? if its just doing that then it becomes very easy to bypass and upload a PHP file or something malicious.
+Suppose we have to upload a JPG file so the extension must be something.jpg
 
 Bypassing Normal extension
 Now what we can do is we can upload a file which looks like this something.php.jpg or somethings.jpg.php.
 ```
 
-## 2. Bypassing the magic Byte validation.
+## 2. Bypassing Magic Byte validation.
 ```
 Magic Bytes
 Successfully use magic bytes to fool the upload function into thinking php-reverse-shell.php was .pdf:
@@ -28,14 +34,6 @@ so while we have to upload a JPEG file type we actaully can upload a PHAR-JPEG f
 
 And at last Uploading a shell to some random websites for fun is not really cool so don’t ever try untill unless you have the permission to test.
 ```
-
-
-**How the bypass was possible?**
-
-1. Create a malicious file with an extension that is accepted by the application.
-2. Upload that file and click on send.
-3. Capture the request in any proxy tool, edit the file extension to the malicious extension that you want. In some cases, you might need to change the content type of a file.
-4. Forward the request to the server.
 
 **Test PDF upload functionality.**
 - [https://github.com/jonaslejon/malicious-pdf](https://github.com/jonaslejon/malicious-pdf)
