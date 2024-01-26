@@ -6,7 +6,6 @@ How does Bypass work
 Well it depends on which kind of validation the system is using …it is just verfying the extension ? if its just doing that then it becomes very easy to bypass and upload a PHP file or something malicious. suppose we have to upload a JPG file so the extension must be something.jpg
 ---
 
-
 ## 1. Bypassing Normal extension
 ```
 Now what we can do is we can upload a file which looks like this something.php.jpg or somethings.jpg.php.
