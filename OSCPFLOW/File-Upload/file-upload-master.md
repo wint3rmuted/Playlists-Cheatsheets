@@ -15,7 +15,7 @@ Bypassing Normal extension
 Now what we can do is we can upload a file which looks like this something.php.jpg or somethings.jpg.php.
 ```
 
-## 2. Bypassing Magic Byte validation.
+## Bypassing Magic Byte validation.
 ```
 Magic Bytes
 Successfully use magic bytes to fool the upload function into thinking php-reverse-shell.php was .pdf:
