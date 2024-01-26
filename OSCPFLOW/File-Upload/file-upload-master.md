@@ -7,7 +7,7 @@ Well it depends on which kind of validation the system is using …it is just ve
 
 Bypassing Normal extension
 Now what we can do is we can upload a file which looks like this something.php.jpg or somethings.jpg.php.
-
+```
 
 ## 2. Bypassing the magic Byte validation.
 ```
