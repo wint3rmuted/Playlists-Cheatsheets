@@ -22,6 +22,7 @@ I added an additional ..... (five) dots so the php payload does not get affected
 .....<?php
 /backend/default/uploads/php-reverse-shell.php <----Had to go back and fuzz to find trigger url. /uploads/php-reverse-shell.php
 ```
+
 ```
 Polyglots
 For this method we use polygots. Polyglots, in a security context, are files that are a valid form of multiple different file types. For example, a GIFAR is both a GIF and a RAR file. There are also files out there that can be both GIF and JS, both PPT and JS, etc.
