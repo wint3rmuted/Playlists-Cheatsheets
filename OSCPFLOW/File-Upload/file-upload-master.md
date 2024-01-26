@@ -144,6 +144,73 @@ Command Injection?
 Set filename to ; sleep 10; to test some command injection
 ```
 
+## SSH Key Upload
+```
+kali@kali:~$ curl http://site.com:8000/meteor/index.php
+404 page not found
+
+kali@kali:~$ curl http://site.com:8000/admin.php
+404 page not found
+Failed attempts to access PHP files
+
+index.php and admin.php files no longer exist in the web application. 
+We can safely assume that the web server is no longer using PHP. 
+
+Let's try to upload a text file. 
+We'll start Burp to capture the requests and use the form on the web application to upload the test.txt file from the previous section.
+
+Next, let's check if the web application allows us to specify a relative path in the filename and write a file via Directory Traversal outside of the web root. 
+We can do this by modifying the "filename" parameter in the request so it contains ../../../../../../../test.txt, then click send.
+
+Web applications using Apache, Nginx or other dedicated web servers often run with specific users, such as www-data on Linux. 
+Traditionally on Windows, the IIS web server runs as a Network Service account, a passwordless built-in Windows identity with low privileges. 
+Starting with IIS version 7.5, Microsoft introduced the IIS Application Pool Identities. These are virtual accounts running web applications grouped by application pools. 
+Each application pool has its own pool identity, making it possible to set more precise permissions for accounts running web applications.
+
+When using programming languages that include their own web server, administrators and developers often deploy the web application without any privilege structures by running applications as root or Administrator to avoid any permissions issues.
+This means we should always verify whether we can leverage root or administrator privileges in a file upload vulnerability.
+
+Let's try to overwrite the authorized_keys file in the home directory for root. 
+If this file contains the public key of a private key we control, we can access the system via SSH as the root user.
+
+Prepare authorized_keys file for File Upload
+To do this, we'll create an SSH keypair with ssh-keygen, as well as a file with the name authorized_keys containing the previously created public key.
+
+kali@kali:~$ ssh-keygen
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/kali/.ssh/id_rsa): fileup
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in fileup
+Your public key has been saved in fileup.pub
+
+kali@kali:~$ cat fileup.pub > authorized_keys
+
+Now that the authorized_keys file contains our public key, we can upload it using the relative path ../../../../../../../root/.ssh/authorized_keys. 
+We will select our authorized_keys file in the file upload form and enable intercept in Burp before we click on the Upload button. 
+When Burp shows the intercepted request, we can modify the filename accordingly and press Forward.
+
+If we've successfully overwritten the authorized_keys file of the root user, we should be able to use our private key to connect to the system via SSH. We should note that often the root user does not carry SSH access permissions. However, since we can't check for other users by, for example, displaying the contents of /etc/passwd, this is our only option.
+
+The target system runs an SSH server on port 2222. Let's use the corresponding private key of the public key in the authorized_keys file to try to connect to the system. We'll use the -i parameter to specify our private key and -p for the port.
+
+In the Directory Traversal Learning Unit, we connected to port 2222 on the host sit.com and our Kali system saved the host key of the remote host. Since the target system of this section is a different machine, SSH will throw an error because it cannot verify the host key it saved previously. To avoid this error, we'll delete the known_hosts file before we connect to the system. This file contains all host keys of previous SSH connections.
+kali@kali:~$ rm ~/.ssh/known_hosts
+
+Using the SSH key to successufully connect via SSH as the root user:
+
+kali@kali:~$ ssh -p 2222 -i fileup root@site.com
+The authenticity of host '[site.com]:2222 ([192.168.50.16]:2222)' can't be established.
+ED25519 key fingerprint is SHA256:R2JQNI3WJqpEehY2Iv9QdlMAoeB3jnPvjJqqfDZ3IXU.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+...
+root@76b77a6eae51:~#
+
+    We could successfully connect as root with our private key due to the overwritten authorized_keys file. 
+    Facing a scenario in which we can't use a file upload mechanism to upload executable files, we'll need to get creative to find other vectors we can leverage.
+
 
 **Test PDF upload functionality.**
 - [https://github.com/jonaslejon/malicious-pdf](https://github.com/jonaslejon/malicious-pdf)
