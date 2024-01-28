@@ -20,6 +20,27 @@ A high level view of my web application enumeration flow for the OSCP exam.
 		- Ffuf, Dirsearch, Gobuster, feroxbuster, you have options. I like to use dirsearch recursively.
 		- Brute for files, directories,  and extensions.  Use modular seclists for servers when possible such as apache and IIS. 
 		- Filetypes: php,html,htm,asp,aspx,js,xml,git,txt,pdf,zip,tar,gz,md,sh,log,md,doc,docx,xls,xlsx,json,ini,bak,jpg,jpeg,png,gif,mpg,mp3,old
+
+My Common Wordlists:
+/usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-files.txt 
+/usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories.txt
+/usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-extensions.txt
+/usr/share/wordlists/secLists/Discovery/DNS/subdomains-top1million-110000.txt
+/usr/share/wordlists/seclists/Usernames/Names/names.txt
+/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+/usr/share/dirb/wordlists/common.txt
+
+IIS 
+/usr/share/wordlists/seclists/Discovery/Web-Content/IIS.fuzz.txt
+/usr/share/wordlists/seclists/Discovery/Web-Content/iis-systemweb.txt
+
+APACHE
+/usr/share/wordlists/seclists/Discovery/Web-Content/Apache.fuzz.txt
+/usr/share/wordlists/seclists/Discovery/Web-Content/ApacheTomcat.fuzz.txt
+/usr/share/wordlists/seclists/Discovery/Web-Content/apache.txt
+
+
+
 		
 Dirsearch:
 dirsearch -u http://192.168.237.120/ -w /usr/share/wordlists/Seclists/Discovery/Web-Content/raft-large-files.txt -r -t 90 -x 403,404 ← SEARCH RECUSIVELY with 90 threads filtering out 403, 404 responses
