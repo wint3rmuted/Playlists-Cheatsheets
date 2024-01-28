@@ -28,6 +28,8 @@ kali@kali:~$ ssh -i dt_key -p 2222 user@valleys.com
 
 ## Fuzzing
 ```
+/usr/share/seclists/Fuzzing/LFI/LFI-gracefulsecurity-windows.txt
+
 LFI file lists
 Linux LFI file directories
 https://github.com/hussein98d/LFI-files
