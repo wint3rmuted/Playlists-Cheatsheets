@@ -9,7 +9,7 @@ $ pass-station search Weblogic
 Other sources:
 https://cirt.net/passwords
 www.virus.org/default-password
-Research application documentation to possible enumerate default users
+Research application documentation to enumerate default users
 
 ```
 
