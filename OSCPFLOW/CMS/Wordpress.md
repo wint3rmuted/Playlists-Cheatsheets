@@ -12,6 +12,8 @@ wpscan --url https://192.168.26.141:12380/blogblog  <--this will give you basic
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate vp    <---this will give you information on vulnerable plugins
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate at    <---enumerate all things
 wpscan --url http://192.168.50.244 --enumerate p --plugins-detection aggressive -o websrv1/wpscan
+wpscan --url sandbox.local --enumerate ap,at,cb,dbe <-- provide the URL of the target (--url) and configure the enumerate option (--enumerate) to include "All Plugins" (ap), "All Themes" (at), "Config backups" (cb), and "Db exports" (dbe). 
+
 
 Enumerate Wordpress users
 wpscan --url http://10.10.10.2 --enumerate u
