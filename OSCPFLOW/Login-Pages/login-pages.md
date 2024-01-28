@@ -14,8 +14,8 @@ Research application documentation to enumerate default users
 ```
 
 ## Hydra Dictionary Attack 
-```
 ## HTTP POST Login Form
+```
 Attacking an HTTP POST login form with Hydra is not as straightforward as attacking SSH or RDP. 
 We must first gather two different pieces of information. 
 The first is the POST data itself, which contains the request body specifying the username and password. 
