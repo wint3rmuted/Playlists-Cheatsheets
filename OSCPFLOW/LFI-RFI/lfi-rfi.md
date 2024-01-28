@@ -1,6 +1,6 @@
-## LFI directories to look for
-##Keys 
+## LFI Keys to look for:
 ```
+Keys:
 /home//.ssh/id_rsa
 /home//.ssh/id_ed25519
 /home/$USER/.ssh/id_rsa
