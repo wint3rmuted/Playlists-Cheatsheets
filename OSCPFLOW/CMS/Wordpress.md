@@ -12,9 +12,6 @@ wpscan --url https://192.168.26.141:12380/blogblog  <--this will give you basic
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate vp    <---this will give you information on vulnerable plugins
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate at    <---enumerate all things
 
-Scan Wordpress
-wpscan domain.com
-
 Enumerate Wordpress users
 wpscan --url http://10.10.10.2 --enumerate u
 ```
