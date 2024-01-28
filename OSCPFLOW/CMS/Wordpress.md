@@ -17,6 +17,7 @@ wpscan --url sandbox.local --enumerate ap,at,cb,dbe <-- provide the URL of the t
 
 Enumerate Wordpress users
 wpscan --url http://10.10.10.2 --enumerate u
+
 ```
 
 ## Bruteforce Wordpress user's password
@@ -87,6 +88,7 @@ I showed in Spectra how to generate a plugin that was a simple webshell. I’ll 
 
 ## Plugin Edit
 ```
+use searchsploit to find possible exploits for vulnerabilities in the installed plugins. 
 I can also try the “Editor” link under the “Plugins” menu. For example, it can load akismet.php:
 Unfortunately, it has the same text at the bottom. It seems the admin has made the entire WordPress directory structure not writable by the web user.
 ```
