@@ -27,7 +27,7 @@ The simplest way to do this is to forward the request or turn intercept off and 
 In more complex applications, you may need to dig deeper into the request and response or even inspect the source code of the login form to isolate a failed login indicator.
 
 Now we can assemble the pieces to start our Hydra attack. 
-As before, we'll specify -l for the user, -P for the wordlist, the target IP without any protocol, and a new http-post-form argument, which accepts three colon-delimited fields.
+Specify -l for the user, -P for the wordlist, the target IP without any protocol, and a new http-post-form argument, which accepts three colon-delimited fields.
 
 The first field indicates the location of the login form. 
 In this demonstration, the login form is located on the index.php web page. 
@@ -35,14 +35,13 @@ The second field specifies the request body used for providing a username and pa
 Finally we must provide the failed login identifier, also known as a condition string.
 
 Reduce False positives!
-To reduce false positives, we should always try to avoid keywords such as password or username. To do so, shorten the condition string appropriately.
+To reduce false positives, try to avoid keywords such as password or username. To do so, shorten the condition string appropriately.
 The complete command with the shortened condition string is shown below. 
 
+# kali@kali:~$ sudo hydra -l user -P /usr/share/wordlists/rockyou.txt 192.168.50.x http-post-form "/index.php:fm_usr=user&fm_pwd=^PASS^:Login failed. Invalid"
 
-kali@kali:~$ sudo hydra -l user -P /usr/share/wordlists/rockyou.txt 192.168.50.x http-post-form "/index.php:fm_usr=user&fm_pwd=^PASS^:Login failed. Invalid"
-
-As with any dictionary attack, this generates a lot of noise and many events. 
-If installed, a Web Application Firewall (WAF) would block this activity quickly. 
+Dictionary attacks generate a lot of noise and many events. 
+If installed a WAF will block this activity quickly. 
 Other brute force protection applications could also block this, such as fail2ban, which locks a user out after a set number of failed login attempts. 
 However, web services aren't often afforded this type of protection, making this is a highly effective vector against those targets.
 ```
