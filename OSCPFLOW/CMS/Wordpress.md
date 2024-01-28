@@ -11,6 +11,7 @@ wpscan -u http://10.11.1.234/ --threads 20 --wordlist /usr/share/wordlists/rocky
 wpscan --url https://192.168.26.141:12380/blogblog  <--this will give you basic information about wordpress
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate vp    <---this will give you information on vulnerable plugins
 wpscan --url https://192.168.26.141:12380/blogblog --enumerate at    <---enumerate all things
+wpscan --url http://192.168.50.244 --enumerate p --plugins-detection aggressive -o websrv1/wpscan
 
 Enumerate Wordpress users
 wpscan --url http://10.10.10.2 --enumerate u
