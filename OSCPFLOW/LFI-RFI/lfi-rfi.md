@@ -1,22 +1,62 @@
 ## LFI Keys to look for:
+## Private Keys:
 ```
-Keys:
-/home//.ssh/id_rsa
-/home//.ssh/id_ed25519
-/home/$USER/.ssh/id_rsa
-~/.ssh/authorized_keys
-~/.ssh/id_dsa
-~/.ssh/id_dsa.pub
 ~/.ssh/id_rsa
+~/.ssh/id_dsa
+~/.ssh/id_ecdsa
+~/.ssh/id_ecdsa_sk
+~/.ssh/id_ed25519
+~/.ssh/id_ed25519_sk
+~/.ssh/authorized_keys
+```
+
+## Public Keys & Authorized Keys File
+```
 ~/.ssh/id_rsa.pub
+~/.ssh/id_dsa.pub
+~/.ssh/id_ecdsa.pub
+~/.ssh/id_ecdsa_sk.pub
+~/.ssh/id_ed25519.pub
+~/.ssh/id_ed25519_sk.pub
 ~/.ssh/identity
 ~/.ssh/identity.pub
-/etc/ssh/ssh_config
-/etc/ssh/sshd_config
-/etc/ssh/ssh_host_dsa_key
-/etc/ssh/ssh_host_dsa_key.pub
-/etc/ssh/ssh_host_key
-/etc/ssh/ssh_host_key.pub
+
+Authorized Keys File
+Create .ssh dir and authorized keys for easy access
+        > mkdir ~/.ssh/; touch ~/.ssh/authorized_keys; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys
+        - Add your id_rsa.pub key to authorized keys
+        - should be able to ssh to the system with no password
+```
+
+## Crack Public Key
+```
+Crack Public Key
+There’s a great tool, RsaCtfTool, that will try a bunch of different well known cryptography attacks against a public key. I’ll clone it on to my machine, and run it, giving it the public key and --private so that it will show the private key if it cracks it. After a few minutes, it does:
+
+muted@winter$ /opt/RsaCtfTool/RsaCtfTool.py --publickey rootauthorizedsshkey.pub --private 
+
+[*] Testing key rootauthorizedsshkey.pub.
+[*] Performing factordb attack on rootauthorizedsshkey.pub.
+[*] Performing fibonacci_gcd attack on rootauthorizedsshkey.pub.
+100%| 9999/9999 [00:00<00:00, 157548.15it/s]
+[*] Performing system_primes_gcd attack on rootauthorizedsshkey.pub.
+100 7007/7007 [00:00<00:00, 1363275.26it/s]
+[*] Performing pastctfprimes attack on rootauthorizedsshkey.pub.
+100 113/113 [00:00<00:00, 1419030.99it/s]
+[*] Performing nonRSA attack on rootauthorizedsshkey.pub.
+...[snip]...
+[*] Attack success with wiener method !
+
+Results for rootauthorizedsshkey.pub:
+
+Private key :
+-----BEGIN RSA PRIVATE KEY-----
+MIICOgIBAAKBgQYHLL65S3kVbhZ6kJnpf072YPH4Clvxj/41tzMVp/O3PCRVkDK/
+...[snip]...
+hxnHNiRzKhXgV4umYdzDsQ6dPPBnzzMWkB7SOE5rxabZzkAinHK3eZ3HsMsC8Q==
+-----END RSA PRIVATE KEY-----
+
+I’ll save that to a file and chmod it to 600 so SSH will use it.
 ```
 
 ## Example LFI to keygrab
