@@ -60,6 +60,22 @@ hxnHNiRzKhXgV4umYdzDsQ6dPPBnzzMWkB7SOE5rxabZzkAinHK3eZ3HsMsC8Q==
 I’ll save that to a file and chmod it to 600 s
 ```
 
+## SSH using older ciphers
+```
+    - Using a different suite
+        > ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c 3des-cbc root@10.10.10.7
+        - or edit ~/.ssh/config
+            - add the following
+            - Host 10.10.10.76
+                KexAlgorithms +diffie-hellman-group1-sha1
+            - sudo systemctl restart sshd
+```
+
+## Algo not in PubkeyAcceptedAlgorithms?
+```
+You may need to edit your sshd_config to accept the algorithm type
+```
+
 ## Key Types (RSA, DSA, ECDSA, EdDSA)
 ```
 RSA, DSA, ECDSA, or EdDSA?
