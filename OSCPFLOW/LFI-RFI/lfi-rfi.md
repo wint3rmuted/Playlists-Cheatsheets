@@ -1,5 +1,6 @@
 ## LFI to look for:
 ```
+Simple Check:
 etc/passwd
 etc/passwd%00
 etc%2fpasswd
