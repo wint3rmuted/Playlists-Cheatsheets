@@ -54,12 +54,31 @@ steghide
 autorecon
 davtest
 cadaver
+pdfcrack
+wpscan
+pspy
+GetUserSPNs
+VNC
+hURL
+curl
+ssh
+xxd
+cookie-editor
+quipquip
+rsactftool
+nuclei
+fimap
 
-
-
+Web Applications:
+nikto
+droopescan
+kiterunner
 
 Metasploit Commands:
 
+
+Encoding:
+base64
 
 Windows Commands:
 kerberoast
@@ -80,4 +99,9 @@ Git Tools and Commands:
 
 Port Forwarding
 
+
+
+Protocols:
+smtp
+nfs
 ```
