@@ -363,6 +363,7 @@ C:\xampp\tomcat\conf\server.xml
 ```
 The following log files are controllable and can be included with an evil payload to achieve a command execution:
 
+/var/log/apache2/access.log
 /var/log/apache/access.log
 /var/log/apache/error.log
 /var/log/httpd/error_log
