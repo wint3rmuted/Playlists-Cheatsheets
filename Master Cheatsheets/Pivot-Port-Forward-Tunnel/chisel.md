@@ -12,8 +12,9 @@ chisel-x64.exe client [my_ip]:9999 R:socks
 After that use proxychains with port 1080 (default).
 After version 1.5.0 chisel uses socks5 proxy.
 ```
-```
+
 ## Chisel Port Forwarding
+```
 You need to use the same version for client and server of chisel.
 
 Server side (Attacker):
