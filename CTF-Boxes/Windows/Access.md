@@ -1,5 +1,5 @@
 # Access 
-## Key points: file upload, hypertext access (.htaccess), kerberoasting, SeChangeNotifyPrivilege
+## file upload, hypertext access (.htaccess), kerberoasting, SeChangeNotifyPrivilege
 ## Scan
 ```
 nmap -Pn -T4 -p- --min-rate=1000 -sV -sC $IP
