@@ -17,7 +17,7 @@ mget *
 ```
 No anonymous share enumeration, access denied.
 ```
-## HTTP
+## HTTP (TCP/80)
 ```
 Looks like a default installation of Microsoft IIS web server.
 I test for any files or directories using gobuster, but find nothing.
