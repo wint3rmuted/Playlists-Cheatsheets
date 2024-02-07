@@ -2,7 +2,7 @@
 ## SmarterMail
 ## Nmap Scan
 ```
-nmap -T4 -p- -A -oA scan-advanced 192.168.x.x
+nmap -T4 -p- -A -oN scan.txt 192.168.x.x
 ```
 ## Service Enumeration
 ```
