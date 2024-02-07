@@ -1,5 +1,5 @@
 # PG Algernon
-## SmarterMail
+## SmarterMail, .NET Remoting (TCP/17001)
 ## Nmap Scan
 ```
 nmap -T4 -p- -A -oN scan.txt 192.168.x.x
