@@ -49,7 +49,7 @@ LHOST='192.168.x.x'
 LPORT=80
 
 Python
-I then, start a TCP listener on port 80 and run the exploit.
+Start a TCP listener on port 80 and run the exploit.
 python3 49216.py
 ```
 ##  Post-Exploitation
