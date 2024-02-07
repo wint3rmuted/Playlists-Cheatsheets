@@ -1,4 +1,4 @@
-# Access 
+# PG Access 
 ## File Upload, Hypertext access (.htaccess), Kerberoasting, SeChangeNotifyPrivilege
 ## Scan
 ```
