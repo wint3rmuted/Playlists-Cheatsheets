@@ -15,7 +15,7 @@ The "/uploads" directory seems to be where users upload images to, create a test
 After clicking "purchase", there is a pop-up window to show us the purchase has been made. And now, the "sample.jpg" is also shown in the "/uploads" 
 File Upload -> Foothold
 The ".php" extension seems blocklisted on the server. I was able to upload files with my own extension such as ".xxx".
-I then uploaded the web shell as "webshell.xxx" to the server and the server accepted it.
+I then uploaded a web shell as "webshell.xxx" to the server and the server accepted it.
 ```
 ## .htaccess files
 ```
