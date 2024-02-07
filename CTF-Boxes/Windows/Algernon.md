@@ -24,7 +24,7 @@ I test for any files or directories using gobuster, but find nothing.
 ```
 ## HTTP (TCP/9998)
 ```
-Looks like an alternative web service called, SmarterMail.
+Looks like a web service called SmarterMail.
 Check Exploit DB for any vulnerabilities matching this service name using searchsploit. 
 Default credentials found using Google search do not work here.
 Source code reveals a version number.
