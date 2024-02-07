@@ -20,7 +20,7 @@ I then uploaded a web shell as "webshell.xxx" to the server and the server accep
 ## .htaccess files
 ```
 The server running on the machine is apache. So we could potentially upload a ".htaccess" file to the directory to let the server render my ".xxx" extension as PHP script.
-Make a ".htaccess" file and send it to the server:
+Make a ".htaccess" file and upload it to the server:
 echo "AddType application/x-httpd-php .xxx" > .htaccess
 The ".htaccess" file is not shown in the "/uploads" directory because it is a hidden file.
 After uploading, I could see the web shell.
