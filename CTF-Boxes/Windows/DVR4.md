@@ -68,18 +68,61 @@ pass_hash = "418DB740F641E03B956BE1D03F7EF6419083956BECB453D1ECB4ECB4"
 [+] BD8F:0
 [+] 3CD9:g
 [-] D9A8:Unknown <--- Couldnt find this one.
-
+```
+## Code
+```
 Lets take a look at the code to see whats going on, maybe we can fix it. 
 
+pass_hash = "418DB740F641E03B956BE1D03F7EF6419083956BECB453D1ECB4ECB4"
+if (len(pass_hash)%4) != 0:
+	print("[!] Error, check your password hash")
+	exit()
+split = []
+n = 4
+for index in range(0, len(pass_hash), n):
+	split.append(pass_hash[index : index + n])
 
+for key in split:
+	if key in characters.keys():
+		print("[+] " + key + ":" + characters[key])
+	else:
+		print("[-] " + key + ":Unknown")
 
+This code appears to be checking and printing information related to a password hash. Let break down the code:
+1. Checking the Length of Password Hash:
+    The code checks if the length of the pass_hash is divisible by 4. If not, it prints an error message and exits.
+python
+if (len(pass_hash) % 4) != 0:
+    print("[!] Error, check your password hash")
+    exit()
 
+2. Splitting the Password Hash:
+    The code then splits the password hash into groups of 4 characters.
+python
+split = []
+n = 4
+for index in range(0, len(pass_hash), n):
+    split.append(pass_hash[index : index + n])
 
+3. Checking and Printing Information:
+It iterates through each group and checks if the group is present in the characters dictionary.
+If present, it prints the corresponding value; otherwise, it prints "Unknown".
+python
+for key in split:
+    if key in characters.keys():
+        print("[+] " + key + ":" + characters[key])
+    else:
+        print("[-] " + key + ":Unknown")
 
+Real-life Analogy:
+Imagine your password is like a book, and this code is dividing the book into paragraphs of four sentences each.
+It then looks up each paragraph in a dictionary to see if there is additional information available.
 
+Why It's Important:
+This code is likely part of a larger system or script to analyze and understand the structure of a password hash.
+It helps identify specific segments and their corresponding information.
 
-
-
+There are no symbols so lets check them one by one for the last entry
 
 
 
