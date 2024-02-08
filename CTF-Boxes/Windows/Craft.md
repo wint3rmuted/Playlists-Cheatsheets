@@ -39,7 +39,7 @@ connect to [192.168.49.249] from (UNKNOWN) [192.168.249.169] 50049PS C:\Program 
 
 ## Apache
 ```
-We can write a file in C:\xampp\htdocs folder. I will upload a webshell.
+We can write in C:\xampp\htdocs folder. Upload a php webshell of you choie.
 
 PS C:\Program Files\LibreOffice\program> icacls C:\xampp\htdocs
 C:\xampp\htdocs CRAFT\apache:(OI)(CI)(F)
