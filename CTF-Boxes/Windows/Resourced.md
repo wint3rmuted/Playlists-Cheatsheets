@@ -1,5 +1,5 @@
 # Resourced
-## AD, NTDS.DIT, SYSTEM, secretsdump.py, NetExec, 
+## AD, rpcclient, NTDS.DIT, SYSTEM, secretsdump.py, NetExec, evil-winrm, RBCD
 ```
 The initial access strategy involved utilizing an RPC (Remote Procedure Call) Client.
 Subsequently, a old Password Audit was found on a shared network resource to obtain the NTLM hash of a privileged user.
