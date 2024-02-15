@@ -1,5 +1,5 @@
 # PG Squid
-## Squid Proxy, Spose, foxyproxy
+## Squid Proxy, Spose, foxyproxy, PhpMyAdmin, Full Powers, PrintSpoofer64.exe
 ## nmap
 ```
 PORT     STATE SERVICE    VERSION
